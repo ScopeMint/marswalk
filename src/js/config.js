@@ -11,31 +11,29 @@ const CONFIG = {
     defaultZoom:  14        // Leaflet zoom level on first load
   },
 
-  /* Mars Trek WMTS tile layers.
-     URL pattern: https://trek.nasa.gov/tiles/Mars/EQ/{LayerName}/default/default028mm/{z}/{y}/{x}.{ext}
-     NOTE: Trek uses {z}/{y}/{x} order (row then col). tms:false for north-up tiles. */
+  /* Tile layers for the map.
+     Primary base: OpenPlanetaryMap (OPM) — NASA Viking MDIM + MOLA color data, CARTO hosted.
+     Mars Trek WMTS tile endpoints were returning 404 as of Nov 14 2026 (server change/downtime).
+     OPM is openly licensed, cites NASA data, and is the documented fallback in docs/DATA_PLAN.md.
+     Source: https://www.openplanetary.org/opm-basemaps/opm-mars-basemap-v0-1
+     Data: NASA Viking MDIM 2.1 + MOLA colorized elevation (NASA/USGS/CARTO) */
   tileLayers: {
-    ctx: {
-      id:          'ctx',
-      name:        'CTX Mosaic (optical)',
-      urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MRO_CTX_Mosaic_global_006_v1/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/MSSS — MRO CTX via <a href="https://trek.nasa.gov/mars">Mars Trek</a>',
+    opm: {
+      id:          'opm',
+      name:        'OPM Mars Basemap (optical + MOLA)',
+      urlTemplate: 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-1/all/{z}/{x}/{y}.png',
+      attribution: 'Tiles: <a href="https://www.openplanetary.org/opm">OpenPlanetaryMap</a> | Data: NASA Viking MDIM 2.1, MOLA (NASA/USGS/CARTO)',
       minZoom: 1, maxZoom: 18, tms: false,
-      mission: 'MRO', instrument: 'CTX', resolution: '~5 m/px'
-    },
-    hirise: {
-      id:          'hirise',
-      name:        'HiRISE (high-res optical)',
-      urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MRO_HiRISE_Mosaic_global_25cm/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/UofA — MRO HiRISE via <a href="https://trek.nasa.gov/mars">Mars Trek</a>',
-      minZoom: 1, maxZoom: 18, tms: false,
-      mission: 'MRO', instrument: 'HiRISE', resolution: '~0.25 m/px'
+      mission: 'Viking + MGS', instrument: 'MDIM + MOLA', resolution: '~232 m/px global'
     },
     themisDay: {
       id:          'themisDay',
       name:        'THEMIS Day IR (thermal)',
+      /* Mars Trek WMTS URL — may need updating if Trek server comes back online.
+         Tested Nov 14 2026: Trek tile server returning 404 for all layer names tried.
+         Keeping URL here so it can be re-enabled when Trek is accessible. */
       urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-Day-IR_mosaic_global_100m_v12/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/ASU — MO THEMIS via <a href="https://trek.nasa.gov/mars">Mars Trek</a>',
+      attribution: 'NASA/JPL-Caltech/ASU — Mars Odyssey THEMIS via Mars Trek',
       minZoom: 1, maxZoom: 18, tms: false,
       mission: 'Mars Odyssey', instrument: 'THEMIS', resolution: '~100 m/px'
     },
@@ -43,7 +41,7 @@ const CONFIG = {
       id:          'themisNight',
       name:        'THEMIS Night IR (thermal)',
       urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-Night-IR_mosaic_global_100m_v14/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/ASU — MO THEMIS via <a href="https://trek.nasa.gov/mars">Mars Trek</a>',
+      attribution: 'NASA/JPL-Caltech/ASU — Mars Odyssey THEMIS via Mars Trek',
       minZoom: 1, maxZoom: 18, tms: false,
       mission: 'Mars Odyssey', instrument: 'THEMIS', resolution: '~100 m/px'
     }

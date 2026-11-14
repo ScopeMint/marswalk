@@ -5,17 +5,16 @@ const STATE = {
   /* Leaflet map instance (set by map.js initMap) */
   map: null,
 
-  /* Leaflet tile layer instances (set by layers.js) */
+  /* Leaflet tile layer instances (set by map.js / layers.js) */
   tileLayers: {
-    ctx:        null,
-    hirise:     null,
+    opm:        null,
     themisDay:  null,
     themisNight: null
   },
 
   /* Layer visibility and opacity for each layer */
   layers: {
-    ctx:        { visible: true,  opacity: 1.0 },
+    opm:        { visible: true,  opacity: 1.0 },
     slope:      { visible: true,  opacity: 0.6 },
     walkback:   { visible: false, opacity: 0.7 },
     themisDay:  { visible: false, opacity: 0.7 },

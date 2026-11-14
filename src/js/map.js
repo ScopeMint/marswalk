@@ -1,5 +1,9 @@
 /* map.js — Leaflet map initialization, tile layers, study-area outline, coordinate readout.
-   Depends on: config.js (CONFIG), state.js (STATE). Both must be loaded first. */
+   Depends on: config.js (CONFIG), state.js (STATE). Both must be loaded first.
+
+   CRS note: We use Leaflet's default L.CRS.EPSG3857 (Web Mercator). Gale Crater is at lat -4.59°
+   (near the equator), so Mercator distortion is <0.3% — negligible for a 6 km planning tool.
+   The route grid math uses lat/lon cell coordinates, not map pixels, so CRS only affects display. */
 
 /* Returns the bounds of the study area as a Leaflet LatLngBounds object.
    Uses CONFIG.studyArea.sizeMeters / 111320 to convert meters to degrees (Mars ~59 km/deg,
@@ -96,29 +100,28 @@ function addCoordinateReadout(map) {
    Stores the map instance in STATE.map so other modules can use it.
 
    TILE TROUBLESHOOTING (read this if tiles don't load):
-   - Tiles black/blank: try changing urlTemplate to the HiRISE layer in config.js
-   - Tiles offset (map image shifted from real location):
-       Trek uses {z}/{y}/{x} order. The URL template already has {y}/{x}.
-       If tiles are still misaligned, swap {y} and {x} in the URL template in config.js.
-   - Tiles flipped north/south: change tms:false to tms:true in the layer config in config.js
-   - 404 errors: zoom level may be out of range; Trek serves roughly z=1 to z=18
-   - CORS error in Console: Mars Trek tiles should be CORS-open; if not, see DATA_PLAN.md
-   - Emergency backup: OpenPlanetaryMap tiles — see docs/DATA_PLAN.md Layer B emergency */
+   - Tiles blank: OPM URL might have changed — check https://www.openplanetary.org/opm
+   - Tiles offset: check {x}/{y} vs {y}/{x} order in the urlTemplate in config.js
+   - Tiles flipped N/S: change tms:false to tms:true in the layer config in config.js
+   - 404 errors: zoom level out of range, or tile server issue
+   - CORS error: OPM tiles are CORS-open; if not, check Network tab for the blocked domain
+   - Mars Trek note: Trek WMTS was returning 404 on Nov 14 2026 — URL kept in config for reference */
 function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    crs:            L.CRS.EPSG4326,  // equirectangular — matches Mars Trek tile projection
-    center:         [centerLat, centerLon],
-    zoom:           defaultZoom,
-    zoomControl:    true,
+    // Using default L.CRS.EPSG3857 (Web Mercator) — compatible with OPM tiles
+    // and all standard XYZ tile services. Distortion at lat -4.59° is <0.3%.
+    center: [centerLat, centerLon],
+    zoom:   defaultZoom,
+    zoomControl:      true,
     attributionControl: true
   });
 
-  // Add CTX base layer (always on)
-  const ctxLayer = makeTileLayer(CONFIG.tileLayers.ctx, STATE.layers.ctx.opacity);
-  ctxLayer.addTo(map);
-  STATE.tileLayers.ctx = ctxLayer;
+  // Add OPM base layer (always on)
+  const opmLayer = makeTileLayer(CONFIG.tileLayers.opm, STATE.layers.opm ? STATE.layers.opm.opacity : 1.0);
+  opmLayer.addTo(map);
+  STATE.tileLayers.opm = opmLayer;
 
   // Study area outline + darkened exterior
   addStudyAreaOutline(map);
@@ -129,5 +132,5 @@ function initMap() {
   // Store in state
   STATE.map = map;
 
-  console.log('[map] Leaflet map initialized at', centerLat, centerLon, 'zoom', defaultZoom);
+  console.log('[map] Leaflet map initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| base layer: OPM');
 }
