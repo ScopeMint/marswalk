@@ -19,6 +19,17 @@
   <header id="top-bar" role="banner">
     <span class="brand">MarsWalk</span>
     <span class="tagline">Walk Mars safely: a layered EVA planner</span>
+
+    <!-- Search / location directory -->
+    <div id="search-wrap" role="search">
+      <span id="search-icon" aria-hidden="true">⌕</span>
+      <input id="search-input" type="text" placeholder="Search Mars locations…"
+             autocomplete="off" spellcheck="false"
+             aria-label="Search Mars locations" aria-autocomplete="list"
+             aria-controls="search-dropdown">
+      <div id="search-dropdown" role="listbox" aria-label="Location results"></div>
+    </div>
+
     <span class="mission-title" id="mission-title">Boxwork Survey — Gale Crater</span>
     <button id="btn-about" aria-label="About and Sources">About &amp; Sources</button>
     <button id="btn-assumptions" aria-label="View assumptions">Assumptions</button>
@@ -28,10 +39,16 @@
   <!-- ── Main area ── -->
   <main id="main-area" role="main">
 
-    <!-- Left panel: mission setup -->
+    <!-- Left panel: mission setup + location library -->
     <aside id="left-panel" aria-label="Mission setup">
       <div class="panel-heading">Mission Setup</div>
       <p class="placeholder-text">Science targets and route controls will appear here (M4–M5).</p>
+
+      <div class="panel-heading" style="margin-top:16px;">Mars Locations Library</div>
+      <p class="placeholder-text" style="font-size:11px;padding:4px 8px 8px;">
+        Click a location to expand safety notes. Use "Fly to location" or the search bar above.
+      </p>
+      <div id="location-library"></div>
     </aside>
 
     <!-- Map -->
@@ -60,10 +77,11 @@
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
           crossorigin="anonymous"></script>
 
-  <!-- ── App scripts (load order matters: config -> state -> map -> main -> rest) ── -->
+  <!-- ── App scripts (load order matters: config -> state -> map -> search -> main -> rest) ── -->
   <script src="./js/config.js"></script>
   <script src="./js/state.js"></script>
   <script src="./js/map.js"></script>
+  <script src="./js/search.js"></script>
   <script src="./js/main.js"></script>
 
   <!-- Stubs (safe to load as empty files) -->

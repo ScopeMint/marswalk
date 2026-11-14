@@ -126,11 +126,12 @@ body {
   min-width: 0;
 }
 
-/* Leaflet map fills the container */
-#map-container .leaflet-container {
+/* Leaflet adds .leaflet-container to #map-container itself (not a child).
+   background shows in gaps when tiles don't cover the full viewport. */
+.leaflet-container {
   width: 100%;
   height: 100%;
-  background: #1a1a1a;
+  background: #1a0e06;  /* dark mars-reddish, visible if tiles don't fill view */
 }
 
 /* ── Right panel ── */
@@ -220,6 +221,212 @@ body {
   padding: 12px 8px;
   text-align: center;
   line-height: 1.6;
+}
+
+/* ── Search bar (top bar) ── */
+#search-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+#search-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 10px 5px 28px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--font);
+  width: 200px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+#search-input::placeholder { color: var(--muted); }
+#search-input:focus { border-color: var(--accent); }
+
+#search-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+#search-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 300px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 2000;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+#search-dropdown.open { display: block; }
+
+.search-result {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.search-result:last-child { border-bottom: none; }
+.search-result:hover, .search-result.active { background: rgba(217,98,43,0.12); }
+
+.search-result-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.search-result-type {
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 1px;
+}
+
+.search-result-coords {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  margin-top: 2px;
+}
+
+/* ── Location library (left panel) ── */
+#location-library {
+  margin-top: 12px;
+}
+
+.loc-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.loc-card:hover { border-color: var(--accent); }
+.loc-card.expanded { border-color: var(--accent); }
+
+.loc-card-header {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loc-card-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.loc-card-dot.safe    { background: var(--pass); }
+.loc-card-dot.caution { background: var(--caution); }
+.loc-card-dot.danger  { background: var(--danger); }
+
+.loc-card-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.loc-card-type {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.loc-card-body {
+  display: none;
+  padding: 0 10px 10px;
+  border-top: 1px solid var(--border);
+}
+
+.loc-card.expanded .loc-card-body { display: block; }
+
+.loc-card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 8px 0 6px;
+}
+
+.loc-card-coords {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.loc-safety-heading {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--caution);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.loc-safety-note {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.5;
+  padding: 3px 0;
+  display: flex;
+  gap: 6px;
+}
+
+.loc-safety-note::before {
+  content: '⚠';
+  color: var(--caution);
+  flex-shrink: 0;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.loc-safety-note.info::before { content: 'ℹ'; color: var(--route); }
+.loc-safety-note.ok::before   { content: '✓'; color: var(--pass); }
+.loc-safety-note.warn::before { content: '!'; color: var(--danger); font-weight: 700; }
+
+.loc-fly-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 5px;
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s;
+}
+
+.loc-fly-btn:hover { background: rgba(217,98,43,0.12); }
+
+.loc-missions {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-style: italic;
 }
 
 /* ── Responsive: phones see a note ── */

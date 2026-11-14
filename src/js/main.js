@@ -3,6 +3,7 @@
 
 function initApp() {
   initMap();
+  initSearch();
   // future: initLayers(); initGrid(); initTargets(); initRoute(); initSafety(); initUI(); initProfile(); initPov();
 }
 

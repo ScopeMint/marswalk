@@ -20,3 +20,5 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/map.js | Claude Code wrote Leaflet init, CTX tile layer, study-area outline, coordinate readout | team to verify tiles load in browser
 2026-11-14 | src/js/main.js | Claude Code wrote initApp entry point | team to review
 2026-11-14 | src/js/layers.js, grid.js, route.js, route-worker.js, safety.js, targets.js, pov.js, profile.js, ui.js, export.js | Claude Code created stub files (one-line comments) | n/a (empty stubs)
+2026-11-14 | src/js/search.js | Claude Code wrote Mars location database (9 locations with coords, elevations, safety notes) and search/flyTo/library UI logic | team to verify coordinates against USGS Gazetteer
+2026-11-14 | src/css/styles.css (search/library styles), src/js/map.js (bounds fix), src/index.html (search bar + library markup), src/js/main.js (initSearch call) | Claude Code fixed map wrapping, added search bar and location library panel | team to test in browser

@@ -27,8 +27,9 @@ function makeTileLayer(layerConfig, opacity) {
     maxZoom:     layerConfig.maxZoom,
     tms:         layerConfig.tms,
     opacity:     opacity,
+    noWrap:      true,  // prevent tiles repeating east/west beyond [-180, 180]
+    bounds:      [[-90, -180], [90, 180]],  // clamp tile requests to Mars extent
     errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-    // ^ transparent 1px GIF so missing tiles show blank instead of broken-image icon
   });
 }
 
@@ -110,12 +111,16 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    // Using default L.CRS.EPSG3857 (Web Mercator) — compatible with OPM tiles
-    // and all standard XYZ tile services. Distortion at lat -4.59° is <0.3%.
     center: [centerLat, centerLon],
     zoom:   defaultZoom,
-    zoomControl:      true,
-    attributionControl: true
+    minZoom: 2,     // prevent zooming out past a readable global Mars view
+    maxZoom: 18,
+    worldCopyJump:  false,   // stop map snapping to repeated copies
+    // Hard bounds: clamp panning to Mars extent so the map cannot scroll past [-180,180]
+    maxBounds:           [[-90, -180], [90, 180]],
+    maxBoundsViscosity:  1.0,  // 1.0 = hard stop (no bounce)
+    zoomControl:         true,
+    attributionControl:  true
   });
 
   // Add OPM base layer (always on)
