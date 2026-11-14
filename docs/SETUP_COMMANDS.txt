@@ -1,0 +1,24 @@
+Run these in Terminal on your Mac to check your tools. Each should print a version.
+
+git --version
+node --version
+python3 --version
+
+If one says "command not found":
+git      -> run: xcode-select --install
+node     -> install from https://nodejs.org (LTS version)
+python3  -> install from https://www.python.org/downloads/
+
+Python packages we will probably need (install Saturday when we start):
+pip3 install numpy rasterio requests
+
+Make the project a git repo (after creating the empty GitHub repo):
+cd ~/Documents/nasa-space-apps-2026
+git init
+git add .
+git commit -m "Project setup: templates and checklists"
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git push -u origin main
+
+Turn on GitHub Pages (Saturday/Sunday): repo Settings -> Pages -> Deploy from branch -> main -> /root.
