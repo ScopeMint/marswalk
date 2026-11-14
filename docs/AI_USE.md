@@ -22,3 +22,20 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/layers.js, grid.js, route.js, route-worker.js, safety.js, targets.js, pov.js, profile.js, ui.js, export.js | Claude Code created stub files (one-line comments) | n/a (empty stubs)
 2026-11-14 | src/js/search.js | Claude Code wrote Mars location database (9 locations with coords, elevations, safety notes) and search/flyTo/library UI logic | team to verify coordinates against USGS Gazetteer
 2026-11-14 | src/css/styles.css (search/library styles), src/js/map.js (bounds fix), src/index.html (search bar + library markup), src/js/main.js (initSearch call) | Claude Code fixed map wrapping, added search bar and location library panel | team to test in browser
+2026-11-14 | scripts/03_make_grids.py, 04_make_overlays.py | Claude Code wrote Python scripts to resample elevation, compute slope+roughness, generate slope-overlay.png | team to run on Saturday with real elevation file
+2026-11-14 | src/data/rad-baseline.json | Claude Code structured sourced radiation data from Hassler et al. 2014 | team verified value against paper (233 µGy/day)
+2026-11-14 | src/data/rems-temps.json | Claude Code structured sourced temperature data from Martinez et al. 2017 + REMS | team to verify values against REMS published graphs
+2026-11-14 | src/data/targets.geojson | Claude Code created 5 science targets with coordinates and citations from Curiosity mission papers | team to verify coordinates against Mars Trek on Saturday morning
+2026-11-14 | src/data/pov-images.json | Claude Code created placeholder POV image entries | team to replace with real NASA Raw Images before submission
+2026-11-14 | src/js/grid.js | Claude Code wrote binary grid loader: fetch aoi.json + 3 .bin files, latLon↔cell conversion, walkable-cell check | team to verify after grids generated
+2026-11-14 | src/js/layers.js | Claude Code wrote LAYER_CATALOG, SLOPE_LEGEND, slope overlay placement, tile layer wiring | team to verify overlay alignment
+2026-11-14 | src/js/route-worker.js | Claude Code wrote Dijkstra walk-back-time map + gradient-descent route extraction in Web Worker | team to run T1-T2 route tests
+2026-11-14 | src/js/route.js | Claude Code wrote main-thread worker controller: triggerWalkback, triggerRoute, drawRouteLine, habitat marker | team to test route flow
+2026-11-14 | src/js/safety.js | Claude Code wrote radiation estimate, temperature range, and safety checklist from sourced data files | team to verify checklist logic
+2026-11-14 | src/js/targets.js | Claude Code wrote target marker + card rendering, selectTarget, route trigger | team to test card clicks
+2026-11-14 | src/js/pov.js | Claude Code wrote POV photo panel using DOM methods (security-safe, no innerHTML with user data) | team to add real NASA photos
+2026-11-14 | src/js/profile.js | Claude Code wrote elevation profile canvas chart + temperature chart (REMS data, EVA window shading) | team to verify visually
+2026-11-14 | src/js/ui.js | Claude Code wrote summary card, layer panel, EVA controls wiring, Assumptions modal, About & Sources modal — all DOM methods | team to review modal content
+2026-11-14 | src/js/main.js | Claude Code rewrote initApp with correct async init order | team to verify no console errors on load
+2026-11-14 | src/index.html | Claude Code rewrote with full structure: EVA controls, science targets list, map floating elements (summary card, pov panel, tooltips), canvas bottom bar | team to test layout at 1440px
+2026-11-14 | src/css/styles.css | Claude Code added CSS for all new components: loading banners, map overlays, summary card, EVA bar, checklist, layer toggles, slope legend, modals, target cards, pov panel, EVA controls | team to verify dark theme rendering
