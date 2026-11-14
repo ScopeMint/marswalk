@@ -111,8 +111,8 @@ function drawProfile(canvasId, profileData) {
     ctx.fillText(e.toFixed(0), pad.left - 4, yScale(e));
   }
 
-  // Habitat marker (H) at start, target marker at end
-  _drawProfileMarker(ctx, xScale(0), yScale(profileData[0].elevationM), 'H', '#D9622B');
+  // Base (habitat) marker at start, target marker at end
+  _drawProfileMarker(ctx, xScale(0), yScale(profileData[0].elevationM), 'Base', '#D9622B');
   const lastPt = profileData[profileData.length - 1];
   if (isFinite(lastPt.elevationM)) {
     _drawProfileMarker(ctx, xScale(maxDist), yScale(lastPt.elevationM), '★', '#3FD0C9');

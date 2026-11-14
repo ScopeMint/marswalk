@@ -169,10 +169,11 @@ function buildLayerPanel() {
   if (!panel) return;
 
   const layerDefs = [
-    { id: 'opm',       label: 'Imagery (OPM)',      defaultOn: true,  defaultOpacity: 1.0 },
-    { id: 'slope',     label: 'Slope classes',      defaultOn: true,  defaultOpacity: 0.6 },
-    { id: 'walkback',  label: 'Walk-back time',     defaultOn: false, defaultOpacity: 0.7 },
-    { id: 'themisDay', label: 'THEMIS Day IR',       defaultOn: false, defaultOpacity: 0.7 },
+    { id: 'opm',       label: 'Imagery (OPM)',       defaultOn: true,  defaultOpacity: 1.00 },
+    { id: 'hillshade', label: 'Terrain shading',     defaultOn: true,  defaultOpacity: 0.70 },
+    { id: 'slope',     label: 'Slope classes',       defaultOn: true,  defaultOpacity: 0.45 },
+    { id: 'walkback',  label: 'Walk-back time',      defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'themisDay', label: 'THEMIS Day IR',        defaultOn: false, defaultOpacity: 0.70 },
   ];
 
   panel.innerHTML = '';

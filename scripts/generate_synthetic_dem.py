@@ -1,177 +1,252 @@
 """
-generate_synthetic_dem.py — Creates synthetic terrain grids for the Gale Crater / Mount Sharp
-study area so the web app can run route planning before real NASA elevation data is downloaded.
+generate_synthetic_dem.py — Synthetic terrain for the Gale Crater / Mount Sharp study area.
+SYNTHETIC DATA — replace with real HiRISE/CTX DTM before final submission.
 
-IMPORTANT: This is SYNTHETIC (simulated) data. The app labels all computed numbers with
-"[synthetic terrain — replace with real DTM before submission]" so judges see this clearly.
-Replace with real HiRISE or CTX DTM data on Saturday morning using 03_make_grids.py.
+Key fix: explicitly flattens 10-cell radius around habitat and all science targets
+so slope < 5° there, allowing route planning to function.
 
-Study area: 6 km x 6 km centered at -5.10°S, 137.75°E (Murray formation boxwork zone)
-Grid: 20 m cells, 300 x 300 = 90,000 cells
-Elevation range: approx -4,200 m to -3,500 m (crater floor rising toward Mount Sharp)
+Also generates hillshade.png: elevation-coloured terrain with shading for depth/height.
 
-Output files (all in src/data/):
-  aoi.json        — bounds, cell size, grid dimensions, default habitat position
-  elevation.bin   — Float32, row-major, top-left origin, metres above MOLA datum
-  slope.bin       — Float32, degrees (0–90)
-  roughness.bin   — Float32, metres (std dev of elevation in 3x3 neighbourhood)
-  slope-overlay.png — RGBA image, one pixel per cell, slope classes coloured
+Output files (src/data/):
+  aoi.json, elevation.bin, slope.bin, roughness.bin
+  slope-overlay.png  — slope classification (semi-transparent)
+  hillshade.png      — terrain visualization: elevation colour + hillshade shadows
 """
 
 import numpy as np
 import json
 import os
+import sys
 from scipy.ndimage import gaussian_filter, generic_filter
-
-# ── Study area parameters ─────────────────────────────────────────────────────
-CENTER_LAT  = -5.10   # Murray formation boxwork zone
-CENTER_LON  = 137.75
-SIZE_M      = 6000    # 6 km side
-CELL_M      = 20      # 20 m cells
-GRID_N      = SIZE_M // CELL_M  # 300 x 300
-
-# Mars km per degree (approximate at equatorial latitudes)
-KM_PER_DEG  = 59.274  # used only for display / aoi.json — not for grid math
-DEG_HALF    = (SIZE_M / 2) / (KM_PER_DEG * 1000)  # 0.05064°
-
-WEST  = CENTER_LON - DEG_HALF
-EAST  = CENTER_LON + DEG_HALF
-SOUTH = CENTER_LAT - DEG_HALF
-NORTH = CENTER_LAT + DEG_HALF
-
-OUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'src', 'data')
-os.makedirs(OUT_DIR, exist_ok=True)
-
-print(f'Study area: W={WEST:.4f} E={EAST:.4f} S={SOUTH:.4f} N={NORTH:.4f}')
-print(f'Grid: {GRID_N} x {GRID_N} cells at {CELL_M} m/cell')
-
-# ── Build synthetic elevation ─────────────────────────────────────────────────
-# The terrain model has three components:
-#   1. Regional slope — Mount Sharp rises toward the SE corner
-#   2. Ridges — a few linear boxwork ridges running NE-SW (matches Curiosity observations)
-#   3. Filtered noise — adds realistic small-scale roughness
-
-rng = np.random.default_rng(42)  # fixed seed for reproducibility
-
-# Coordinate grids (row 0 = north edge)
-row_idx, col_idx = np.meshgrid(np.arange(GRID_N), np.arange(GRID_N), indexing='ij')
-
-# Normalised coordinates [0, 1] where (0,0) = NW corner (top-left)
-norm_x = col_idx / (GRID_N - 1)   # west→east
-norm_y = row_idx / (GRID_N - 1)   # north→south
-
-# 1. Base elevation: crater floor at -4,200 m; Mount Sharp rises toward SE
-#    SE corner ≈ -3,500 m; gradient across 6 km ≈ 700 m / 6000 m ≈ 0.117 m/m = ~6.7°
-base_elev = -4200.0 + 700.0 * (0.6 * norm_x + 0.4 * norm_y)
-
-# 2. Boxwork ridges: 4 roughly parallel ridges running NE–SW
-#    Each ridge is a narrow Gaussian bump across-track
-def ridge(norm_x, norm_y, offset_x, offset_y, amplitude, width, angle_deg):
-    angle = np.radians(angle_deg)
-    # Project coords onto a direction perpendicular to the ridge strike
-    perp = -(norm_x - offset_x) * np.sin(angle) + (norm_y - offset_y) * np.cos(angle)
-    return amplitude * np.exp(-0.5 * (perp / width) ** 2)
-
-ridge_elev  = ridge(norm_x, norm_y, 0.35, 0.50,  80, 0.012, -55)
-ridge_elev += ridge(norm_x, norm_y, 0.50, 0.45,  65, 0.010, -58)
-ridge_elev += ridge(norm_x, norm_y, 0.60, 0.55,  55, 0.009, -50)
-ridge_elev += ridge(norm_x, norm_y, 0.72, 0.60,  70, 0.011, -52)
-# A broader mound in the NW representing a butte
-ridge_elev += ridge(norm_x, norm_y, 0.20, 0.30, 120, 0.040, -20)
-
-# 3. Filtered noise — two scales (large swells + small roughness)
-noise_large = gaussian_filter(rng.standard_normal((GRID_N, GRID_N)), sigma=25) * 60
-noise_small = gaussian_filter(rng.standard_normal((GRID_N, GRID_N)), sigma=4)  * 12
-
-elevation = base_elev + ridge_elev + noise_large + noise_small
-elevation = elevation.astype(np.float32)
-
-print(f'Elevation: min={elevation.min():.1f} m  max={elevation.max():.1f} m')
-assert -5000 < elevation.min() < -3500, 'Elevation range sanity check failed'
-
-# ── Slope (degrees) ───────────────────────────────────────────────────────────
-# np.gradient returns [dz/drow, dz/dcol]; divide by cell size to get m/m
-dz_row, dz_col = np.gradient(elevation.astype(float), CELL_M, CELL_M)
-slope_rad = np.arctan(np.sqrt(dz_row**2 + dz_col**2))
-slope_deg = np.degrees(slope_rad).astype(np.float32)
-
-print(f'Slope:     min={slope_deg.min():.1f}°  max={slope_deg.max():.1f}°')
-assert slope_deg.max() < 60, 'Slope max sanity check failed'
-
-# ── Roughness (m) — std dev in 3×3 neighbourhood ─────────────────────────────
-def _std3x3(values):
-    return np.std(values)
-
-roughness = generic_filter(elevation.astype(float), _std3x3, size=3).astype(np.float32)
-
-print(f'Roughness: min={roughness.min():.2f} m  max={roughness.max():.2f} m')
-
-# ── Save binary grids ─────────────────────────────────────────────────────────
-elev_path  = os.path.join(OUT_DIR, 'elevation.bin')
-slope_path = os.path.join(OUT_DIR, 'slope.bin')
-rough_path = os.path.join(OUT_DIR, 'roughness.bin')
-
-elevation.tofile(elev_path)
-slope_deg.tofile(slope_path)
-roughness.tofile(rough_path)
-
-print(f'Saved {os.path.getsize(elev_path)//1024} KB → elevation.bin')
-print(f'Saved {os.path.getsize(slope_path)//1024} KB → slope.bin')
-print(f'Saved {os.path.getsize(rough_path)//1024} KB → roughness.bin')
-
-# ── Save aoi.json ─────────────────────────────────────────────────────────────
-# Habitat: flat spot in the NW quarter of the study area (lower terrain = crater floor)
-habitat_lat = CENTER_LAT + DEG_HALF * 0.5   # slightly north of center
-habitat_lon = CENTER_LON - DEG_HALF * 0.5   # slightly west of center
-
-aoi = {
-    'west':              round(WEST, 6),
-    'east':              round(EAST, 6),
-    'south':             round(SOUTH, 6),
-    'north':             round(NORTH, 6),
-    'cellSizeMeters':    CELL_M,
-    'width':             GRID_N,
-    'height':            GRID_N,
-    'defaultHabitatLat': round(habitat_lat, 4),
-    'defaultHabitatLon': round(habitat_lon, 4),
-    'syntheticTerrain':  True,
-    'syntheticNote':     'Synthetic terrain for development. Replace with HiRISE or CTX DTM before submission.'
-}
-
-aoi_path = os.path.join(OUT_DIR, 'aoi.json')
-with open(aoi_path, 'w') as f:
-    json.dump(aoi, f, indent=2)
-print(f'Saved aoi.json: {aoi}')
-
-# ── Slope-overlay PNG ─────────────────────────────────────────────────────────
 try:
     from PIL import Image
-
-    # Colour classes (must match styles.css and config descriptions)
-    SLOPE_COLORS = [
-        (0,   5,  ( 46, 125,  91, 200)),   # 0–5°   very gentle  #2E7D5B
-        (5,  10,  (143, 191,  77, 200)),   # 5–10°  gentle       #8FBF4D
-        (10, 15,  (242, 177,  52, 200)),   # 10–15° moderate     #F2B134
-        (15, 20,  (232, 116,  46, 200)),   # 15–20° steep        #E8742E
-        (20, 999, (229,  72,  77, 200)),   # >20°   very steep   #E5484D
-    ]
-
-    rgba = np.zeros((GRID_N, GRID_N, 4), dtype=np.uint8)
-    for lo, hi, color in SLOPE_COLORS:
-        mask = (slope_deg >= lo) & (slope_deg < hi)
-        rgba[mask] = color
-
-    img = Image.fromarray(rgba, 'RGBA')
-    img_path = os.path.join(OUT_DIR, 'slope-overlay.png')
-    img.save(img_path)
-    print(f'Saved slope-overlay.png ({os.path.getsize(img_path)//1024} KB)')
-
 except ImportError:
-    print('WARNING: Pillow not installed — slope-overlay.png not created.')
-    print('Run: pip3 install Pillow  then rerun this script.')
+    print("ERROR: Pillow not installed. Run: pip3 install Pillow")
+    sys.exit(1)
 
-# ── Summary ───────────────────────────────────────────────────────────────────
-print()
-print('ALL FILES WRITTEN — route planning should now work in the browser.')
-print(f'Default habitat: {habitat_lat:.4f}°N, {habitat_lon:.4f}°E')
-print('NOTE: This is SYNTHETIC terrain. Replace with real NASA DTM before submission.')
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR   = os.path.join(SCRIPT_DIR, '..', 'src', 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# Study area — 6 km × 6 km, Gale Crater Murray formation boxwork zone
+WEST   = 137.699388
+EAST   = 137.800612
+SOUTH  = -5.150612
+NORTH  = -5.049388
+CELL_M = 20
+GRID_N = 300  # 300 × 300 cells at 20 m = 6 km × 6 km
+
+# Key positions: lon, lat.  ALL must end up with slope < 5°.
+KEY_POS = [
+    {'name': 'habitat',  'lon': 137.7247, 'lat': -5.0747},
+    {'name': 'target-1', 'lon': 137.7500, 'lat': -5.0800},
+    {'name': 'target-2', 'lon': 137.7220, 'lat': -5.1120},
+    {'name': 'target-3', 'lon': 137.7800, 'lat': -5.0720},
+    {'name': 'target-4', 'lon': 137.7800, 'lat': -5.1380},
+    {'name': 'target-5', 'lon': 137.7120, 'lat': -5.0620},
+]
+
+def lonlat_to_rc(lon, lat):
+    col = int((lon  - WEST)  / (EAST  - WEST)  * GRID_N)
+    row = int((NORTH - lat)  / (NORTH - SOUTH) * GRID_N)
+    return (max(0, min(GRID_N - 1, row)),
+            max(0, min(GRID_N - 1, col)))
+
+print(f"Grid: {GRID_N}×{GRID_N} at {CELL_M} m/cell")
+
+# ---------------------------------------------------------------------------
+# 1.  Base elevation: gentle SE-rising gradient (crater floor → Mount Sharp)
+#     Gale Crater floor ~-4,500 m; upper Murray formation ~-3,800 m
+# ---------------------------------------------------------------------------
+rng = np.random.default_rng(42)
+
+r_idx, c_idx = np.meshgrid(np.arange(GRID_N), np.arange(GRID_N), indexing='ij')
+nx = c_idx / (GRID_N - 1)   # 0=W → 1=E
+ny = r_idx / (GRID_N - 1)   # 0=N → 1=S
+
+base = -4300.0 + 400.0 * (0.5 * nx + 0.5 * ny)   # -4300 to -3900 m
+
+# ---------------------------------------------------------------------------
+# 2.  Very gentle undulations (smooth, no steep ridges)
+# ---------------------------------------------------------------------------
+# Large smooth swells — sigma=30 cells = 600 m wavelength, amplitude ±20 m
+swell = gaussian_filter(rng.standard_normal((GRID_N, GRID_N)), sigma=30) * 20
+
+# Small roughness — sigma=8 cells = 160 m wavelength, amplitude ±5 m
+rough_noise = gaussian_filter(rng.standard_normal((GRID_N, GRID_N)), sigma=8) * 5
+
+# A few gentle boxwork ridges: very wide (sigma=0.07) and low (amplitude=12 m)
+def soft_ridge(nx, ny, x0, y0, amplitude, sigma, angle_deg):
+    a = np.radians(angle_deg)
+    perp = -(nx - x0) * np.sin(a) + (ny - y0) * np.cos(a)
+    return amplitude * np.exp(-0.5 * (perp / sigma) ** 2)
+
+ridges = (
+    soft_ridge(nx, ny, 0.35, 0.50, 12, 0.07, -55) +
+    soft_ridge(nx, ny, 0.55, 0.45, 10, 0.06, -58) +
+    soft_ridge(nx, ny, 0.70, 0.60, 11, 0.07, -50) +
+    soft_ridge(nx, ny, 0.20, 0.30, 15, 0.09, -20)   # gentle butte NW
+)
+
+elevation = (base + swell + rough_noise + ridges).astype(np.float32)
+
+# ---------------------------------------------------------------------------
+# 3.  Explicitly flatten around every key position (10-cell = 200 m radius)
+#     This guarantees slope < 5° there regardless of random terrain.
+# ---------------------------------------------------------------------------
+FLAT_R = 10    # cells fully flattened inside this radius
+BLEND_R = 6    # cells of smooth blend beyond the flat zone
+
+print("Flattening key positions…")
+for kp in KEY_POS:
+    r, c = lonlat_to_rc(kp['lon'], kp['lat'])
+    rA, rB = max(0, r - FLAT_R - BLEND_R), min(GRID_N, r + FLAT_R + BLEND_R + 1)
+    cA, cB = max(0, c - FLAT_R - BLEND_R), min(GRID_N, c + FLAT_R + BLEND_R + 1)
+    local_mean = float(elevation[rA:rB, cA:cB].mean())
+    for dr in range(-(FLAT_R + BLEND_R), FLAT_R + BLEND_R + 1):
+        for dc in range(-(FLAT_R + BLEND_R), FLAT_R + BLEND_R + 1):
+            nr, nc = r + dr, c + dc
+            if not (0 <= nr < GRID_N and 0 <= nc < GRID_N):
+                continue
+            dist = np.sqrt(dr * dr + dc * dc)
+            if dist <= FLAT_R:
+                weight = 1.0
+            else:
+                weight = float(np.exp(-0.5 * ((dist - FLAT_R) / (BLEND_R * 0.5)) ** 2))
+            elevation[nr, nc] = elevation[nr, nc] * (1 - weight) + local_mean * weight
+
+# Light smooth pass to remove numerical artifacts at blend edges
+elevation = gaussian_filter(elevation, sigma=0.7).astype(np.float32)
+
+# ---------------------------------------------------------------------------
+# 4.  Slope and roughness
+# ---------------------------------------------------------------------------
+dz_r, dz_c = np.gradient(elevation.astype(np.float64), CELL_M, CELL_M)
+slope_deg  = np.degrees(np.arctan(np.sqrt(dz_r**2 + dz_c**2))).astype(np.float32)
+roughness  = generic_filter(elevation.astype(np.float64), np.std, size=3).astype(np.float32)
+
+# ---------------------------------------------------------------------------
+# 5.  Verify key positions
+# ---------------------------------------------------------------------------
+print("\nSlope at key positions:")
+all_ok = True
+for kp in KEY_POS:
+    r, c = lonlat_to_rc(kp['lon'], kp['lat'])
+    s = slope_deg[r, c]
+    e = elevation[r, c]
+    ok = s < 5.0
+    if not ok:
+        all_ok = False
+    print(f"  {kp['name']:10s}: {s:.1f}°  elev={e:.0f}m  {'OK' if ok else '*** HIGH SLOPE ***'}")
+
+pct15 = (slope_deg <= 15).mean() * 100
+print(f"\nTerrain: max={slope_deg.max():.1f}° mean={slope_deg.mean():.1f}° "
+      f"walkable@15°={pct15:.0f}%")
+if not all_ok:
+    print("WARNING: Some positions > 5°. Increase FLAT_R and re-run.")
+
+# ---------------------------------------------------------------------------
+# 6.  Write binary grids
+# ---------------------------------------------------------------------------
+print("\nWriting grids…")
+elevation.tofile(os.path.join(DATA_DIR, 'elevation.bin'))
+slope_deg.tofile(os.path.join(DATA_DIR, 'slope.bin'))
+roughness.tofile(os.path.join(DATA_DIR, 'roughness.bin'))
+
+aoi = {
+    "west":  WEST,  "east":  EAST,
+    "south": SOUTH, "north": NORTH,
+    "cellSizeMeters": CELL_M,
+    "width": GRID_N, "height": GRID_N,
+    "defaultHabitatLat": -5.0747,
+    "defaultHabitatLon": 137.7247,
+    "syntheticTerrain": True,
+    "syntheticNote": "Synthetic terrain for development. Replace with HiRISE or CTX DTM before submission."
+}
+with open(os.path.join(DATA_DIR, 'aoi.json'), 'w') as f:
+    json.dump(aoi, f, indent=2)
+
+# ---------------------------------------------------------------------------
+# 7.  Hillshade + elevation-colour PNG  (terrain visualisation)
+#     Shows depth/height with natural-looking shadows.
+# ---------------------------------------------------------------------------
+print("Generating hillshade.png…")
+
+az  = np.radians(315)   # NW light source
+alt = np.radians(40)    # 40° sun elevation
+
+slope_r2 = np.arctan(np.sqrt(dz_r**2 + dz_c**2))
+aspect   = np.arctan2(-dz_r, dz_c)
+hs = np.cos(alt) * np.cos(slope_r2) + np.sin(alt) * np.sin(slope_r2) * np.cos(az - aspect)
+hs = np.clip(hs, 0, 1).astype(np.float32)
+
+# Elevation colour ramp — Mars-like palette from low to high
+elev_norm = ((elevation - elevation.min()) /
+             (elevation.max() - elevation.min() + 1e-6))
+
+# LUT: 256 steps from dark reddish-brown (low) → warm tan → light buff (high)
+lut = np.zeros((256, 3), dtype=np.uint8)
+for i in range(256):
+    t = i / 255.0
+    if t < 0.4:
+        t2 = t / 0.4
+        lut[i] = (int(100 + 55 * t2),  int(55 + 40 * t2),  int(30 + 20 * t2))
+    elif t < 0.75:
+        t2 = (t - 0.4) / 0.35
+        lut[i] = (int(155 + 35 * t2),  int(95 + 50 * t2),  int(50 + 35 * t2))
+    else:
+        t2 = (t - 0.75) / 0.25
+        lut[i] = (int(190 + 25 * t2),  int(145 + 30 * t2), int(85 + 30 * t2))
+
+idx = (elev_norm * 255).astype(np.uint8)
+cr = lut[idx, 0].astype(np.float32)
+cg = lut[idx, 1].astype(np.float32)
+cb = lut[idx, 2].astype(np.float32)
+
+# Blend elevation colour with hillshade (multiplicative shading)
+shade = 0.35 + 0.65 * hs
+r8 = np.clip(cr * shade, 0, 255).astype(np.uint8)
+g8 = np.clip(cg * shade, 0, 255).astype(np.uint8)
+b8 = np.clip(cb * shade, 0, 255).astype(np.uint8)
+a8 = np.full((GRID_N, GRID_N), 215, dtype=np.uint8)   # ~84% opaque; Leaflet controls the rest
+
+hs_img = Image.fromarray(np.dstack([r8, g8, b8, a8]), 'RGBA')
+hs_path = os.path.join(DATA_DIR, 'hillshade.png')
+hs_img.save(hs_path)
+
+# ---------------------------------------------------------------------------
+# 8.  Slope-overlay PNG  (semi-transparent classification)
+# ---------------------------------------------------------------------------
+print("Generating slope-overlay.png…")
+
+CLASSES = [
+    ( 0,  5,  46, 125,  91, 160),   # 0–5°   green   #2E7D5B
+    ( 5, 10, 143, 191,  77, 160),   # 5–10°  lime    #8FBF4D
+    (10, 15, 242, 177,  52, 160),   # 10–15° amber   #F2B134
+    (15, 20, 232, 116,  46, 170),   # 15–20° orange  #E8742E
+    (20, 999,229,  72,  77, 180),   # >20°   red     #E5484D
+]
+
+sr = np.zeros((GRID_N, GRID_N), dtype=np.uint8)
+sg = np.zeros((GRID_N, GRID_N), dtype=np.uint8)
+sb = np.zeros((GRID_N, GRID_N), dtype=np.uint8)
+sa = np.zeros((GRID_N, GRID_N), dtype=np.uint8)
+
+for lo, hi, r, g, b, a in CLASSES:
+    mask = (slope_deg >= lo) & (slope_deg < hi)
+    sr[mask] = r; sg[mask] = g; sb[mask] = b; sa[mask] = a
+
+slope_img = Image.fromarray(np.dstack([sr, sg, sb, sa]), 'RGBA')
+slope_path = os.path.join(DATA_DIR, 'slope-overlay.png')
+slope_img.save(slope_path)
+
+# ---------------------------------------------------------------------------
+# 9.  File sizes
+# ---------------------------------------------------------------------------
+print("\nFile sizes:")
+for fname in ['aoi.json', 'elevation.bin', 'slope.bin', 'roughness.bin',
+              'hillshade.png', 'slope-overlay.png']:
+    p = os.path.join(DATA_DIR, fname)
+    if os.path.exists(p):
+        print(f"  {fname:22s} {os.path.getsize(p)//1024} KB")
+print("\nDone.")

@@ -138,18 +138,13 @@ function showErrorBanner(message) {
 /* Shows a dismissible amber notice when synthetic (not real NASA DTM) terrain is loaded. */
 function showSyntheticTerrainNotice() {
   if (document.getElementById('synthetic-notice')) return;
+  // Small badge in map bottom-right — required disclosure without blocking the view
   const el = document.createElement('div');
   el.id = 'synthetic-notice';
   el.className = 'synthetic-notice';
-  const text = document.createElement('span');
-  text.textContent = '⚠ Terrain is synthetic (placeholder). Route numbers are illustrative only. Replace with real HiRISE/CTX DTM before submission.';
-  const dismiss = document.createElement('button');
-  dismiss.textContent = '✕';
-  dismiss.className = 'synthetic-notice-dismiss';
-  dismiss.setAttribute('aria-label', 'Dismiss');
-  dismiss.addEventListener('click', () => el.remove());
-  el.appendChild(text);
-  el.appendChild(dismiss);
+  el.title = 'Terrain is synthetic (placeholder). Route numbers computed from this model only. Replace with real HiRISE/CTX DTM before submission.';
+  el.textContent = '⚠ Synthetic terrain';
+  el.addEventListener('click', () => el.remove());
   const mapContainer = document.getElementById('map-container') || document.body;
   mapContainer.appendChild(el);
 }

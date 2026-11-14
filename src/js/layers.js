@@ -26,9 +26,18 @@ const LAYER_CATALOG = [
     source: 'OpenPlanetaryMap (openplanetary.org/opm) — NASA Viking / USGS / CARTO'
   },
   {
+    id: 'hillshade',
+    name: 'Terrain Shading',
+    description: 'Elevation colour + hillshade shadows showing height and depth. Darker = lower elevation; lighter = higher. Shadows from NW light source reveal ridge shapes.',
+    mission: 'Computed from elevation data (synthetic for development)',
+    instrument: 'Elevation grid + hillshade algorithm',
+    resolution: '20 m/cell [our assumption]',
+    source: 'Synthetic terrain — replace with HiRISE/CTX DTM before submission'
+  },
+  {
     id: 'slope',
     name: 'Slope Classes',
-    description: 'Terrain steepness in 5 classes. Red = too steep for EVA at the default 15° limit. Computed from elevation data.',
+    description: 'Terrain steepness in 5 classes. Orange/red = too steep for EVA at the default 15° limit. Computed from elevation data.',
     mission: 'Computed from elevation source (HiRISE DTM / CTX DTM / MOLA)',
     instrument: 'DTM + slope computation',
     resolution: '20 m/cell [our assumption]',
@@ -62,6 +71,27 @@ const LAYER_CATALOG = [
     source: 'NASA/JPL-Caltech/ASU via Mars Trek'
   }
 ];
+
+/* Adds the hillshade PNG overlay.
+   Shows elevation colour + shadow shading to communicate terrain depth/height.
+   Must run AFTER loadGrids() so aoi.json bounds are available. */
+function addHillshadeOverlay(map) {
+  if (!STATE.grids || !STATE.grids.aoi) {
+    console.warn('[layers] addHillshadeOverlay: grids not loaded yet');
+    return;
+  }
+  const aoi    = STATE.grids.aoi;
+  const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+
+  const overlay = L.imageOverlay('./data/hillshade.png', bounds, {
+    opacity:     STATE.layers.hillshade.opacity,
+    interactive: false
+  });
+
+  if (STATE.layers.hillshade.visible) overlay.addTo(map);
+  STATE.tileLayers.hillshade = overlay;
+  console.log('[layers] hillshade overlay added');
+}
 
 /* Adds the slope overlay PNG to the map as a Leaflet imageOverlay.
    Positioned exactly over the study area using aoi.json bounds. */

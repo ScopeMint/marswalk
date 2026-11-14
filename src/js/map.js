@@ -145,6 +145,31 @@ function initMap() {
     });
   }
 
+  // Geographic labels — help judges quickly understand the terrain context
+  addTerrainLabels(map);
+
   STATE.map = map;
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
+}
+
+/* Adds permanent text labels for terrain features inside the study area.
+   These use Leaflet tooltips set to permanent so they always show. */
+function addTerrainLabels(map) {
+  const labels = [
+    { lat: -5.065, lon: 137.730, text: 'Murray Formation', icon: '▲' },
+    { lat: -5.140, lon: 137.720, text: 'Crater Floor',     icon: '▽' },
+    { lat: -5.095, lon: 137.790, text: '↑ Mt. Sharp slope', icon: '' },
+  ];
+
+  labels.forEach(({ lat, lon, text, icon }) => {
+    L.marker([lat, lon], {
+      icon: L.divIcon({
+        className: 'terrain-label',
+        html: `<span class="terrain-label-inner">${icon ? icon + ' ' : ''}${text}</span>`,
+        iconAnchor: [0, 0]
+      }),
+      interactive: false,
+      zIndexOffset: -100
+    }).addTo(map);
+  });
 }

@@ -7,19 +7,22 @@ const STATE = {
 
   /* Leaflet tile layer instances (set by map.js / layers.js) */
   tileLayers: {
-    opm:        null,
-    themisDay:  null,
+    opm:         null,
+    hillshade:   null,   // elevation-colour + hillshade shadows (hillshade.png)
+    slope:       null,   // slope-overlay.png (kept in STATE.tileLayers, not tile layer)
+    themisDay:   null,
     themisNight: null
   },
 
   /* Layer visibility and opacity for each layer */
   layers: {
     opm:        { visible: true,  opacity: 1.0 },
-    slope:      { visible: true,  opacity: 0.6 },
-    walkback:   { visible: false, opacity: 0.7 },
-    themisDay:  { visible: false, opacity: 0.7 },
-    themisNight:{ visible: false, opacity: 0.7 },
-    minerals:   { visible: false, opacity: 0.7 }
+    hillshade:  { visible: true,  opacity: 0.70 },  // terrain shading — on by default
+    slope:      { visible: true,  opacity: 0.45 },  // slope classification over hillshade
+    walkback:   { visible: false, opacity: 0.70 },
+    themisDay:  { visible: false, opacity: 0.70 },
+    themisNight:{ visible: false, opacity: 0.70 },
+    minerals:   { visible: false, opacity: 0.70 }
   },
 
   /* Mission settings (driven by sliders/controls in left panel) */

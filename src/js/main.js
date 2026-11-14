@@ -18,7 +18,11 @@ async function initApp() {
     initPov()       // pov-images.json → STATE.povImages
   ]);
 
-  // 3. Slope overlay uses aoi.json bounds — must run AFTER loadGrids()
+  // 3. Terrain overlays — both need aoi.json bounds, so must run AFTER loadGrids()
+  //    hillshade first (bottom), then slope overlay on top
+  if (typeof addHillshadeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
+    addHillshadeOverlay(STATE.map);
+  }
   if (typeof addSlopeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addSlopeOverlay(STATE.map);
   }
@@ -26,9 +30,15 @@ async function initApp() {
   // 4. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();
 
-  // 4. Draw temperature chart now that REMS data is loaded
+  // 5. Draw temperature chart now that REMS data is loaded
   if (typeof drawTempChart === 'function') {
-    drawTempChart('temp-canvas');
+    // Slight delay so the canvas has rendered to its full CSS size
+    setTimeout(() => drawTempChart('temp-canvas'), 100);
+  }
+
+  // 6. Show placeholder text in profile canvas (no route yet)
+  if (typeof clearProfile === 'function') {
+    setTimeout(() => clearProfile('profile-canvas'), 100);
   }
 
   console.log('[main] MarsWalk ready');

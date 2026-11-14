@@ -180,6 +180,12 @@ body {
   overflow: hidden;
 }
 
+/* Canvas background — prevents the black-box before JavaScript draws anything */
+#bottom-bar canvas {
+  background: var(--bg);
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+}
+
 /* ── Leaflet dark theme overrides ── */
 .leaflet-control-attribution {
   background: rgba(15, 17, 21, 0.85) !important;
@@ -509,18 +515,60 @@ body {
 
 /* ── Habitat and target markers ── */
 .habitat-pin {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--accent);
   border: 2px solid var(--text);
   color: var(--text);
-  font-size: 11px;
-  font-weight: 700;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  line-height: 1;
+  gap: 1px;
+}
+.habitat-pin-h {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.habitat-pin-label {
+  font-size: 8px;
+  font-weight: 600;
+  opacity: 0.9;
+  letter-spacing: 0.3px;
+}
+.habitat-tooltip {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--accent);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* Geographic terrain labels on the map */
+.terrain-label {
+  background: none;
+  border: none;
+  pointer-events: none;
+}
+.terrain-label-inner {
+  display: inline-block;
+  background: rgba(15, 17, 21, 0.72);
+  color: rgba(232, 230, 227, 0.85);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(42, 47, 58, 0.8);
+  white-space: nowrap;
+  pointer-events: none;
+  text-transform: uppercase;
 }
 
 .target-pin {
@@ -1248,34 +1296,25 @@ body {
   outline-offset: 2px;
 }
 
+/* Small badge — required disclosure that terrain is synthetic, without blocking the map */
 .synthetic-notice {
   position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(15,17,21,0.95);
+  bottom: 32px;
+  right: 8px;
+  background: rgba(15,17,21,0.80);
   border: 1px solid var(--caution);
-  border-radius: 6px;
-  padding: 6px 10px 6px 12px;
-  font-size: 11px;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 10px;
   color: var(--caution);
   z-index: 800;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  max-width: 90%;
-  text-align: center;
-}
-
-.synthetic-notice-dismiss {
-  background: none;
-  border: none;
-  color: var(--muted);
   cursor: pointer;
-  font-size: 14px;
-  padding: 0 2px;
-  flex-shrink: 0;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+  pointer-events: auto;
+}
+.synthetic-notice:hover {
+  opacity: 1.0;
 }
 
 /* ── Responsive: phones see a note ── */

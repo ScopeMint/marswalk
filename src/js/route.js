@@ -176,11 +176,15 @@ function setHabitatMarker(lat, lon) {
 
   const icon = L.divIcon({
     className: 'habitat-icon',
-    html: '<div class="habitat-pin">H</div>',
-    iconSize:   [28, 28],
-    iconAnchor: [14, 14]
+    html: '<div class="habitat-pin"><span class="habitat-pin-h">EVA</span><div class="habitat-pin-label">Base</div></div>',
+    iconSize:   [44, 44],
+    iconAnchor: [22, 22]
   });
-  _habitatMarker = L.marker([lat, lon], { icon, zIndexOffset: 1000 }).addTo(STATE.map);
+  _habitatMarker = L.marker([lat, lon], { icon, zIndexOffset: 1000 })
+    .bindTooltip('EVA Habitat — Your starting point for all Marswalks', {
+      permanent: false, direction: 'top', className: 'habitat-tooltip'
+    })
+    .addTo(STATE.map);
 }
 
 /* ── Map message overlay ───────────────────────────────────────────────────── */
