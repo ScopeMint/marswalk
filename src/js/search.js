@@ -11,7 +11,8 @@ const MARS_LOCATIONS = [
   /* ── Rover / lander sites — well-studied ── */
   {
     id: 'gale-crater', name: 'Gale Crater', type: 'Impact Crater',
-    lat: -5.4, lon: 137.8, zoom: 11, elevM: -4451,
+    lat: -5.37, lon: 137.80, zoom: 11, elevM: -4451,
+    isStudyArea: true,
     riskLevel: 'caution',
     description: 'Site of the Curiosity rover (MSL). Ancient lake sediments and layered rocks inside Mount Sharp record billions of years of Mars climate history. Our primary MarsWalk study area.',
     safetyNotes: [
@@ -25,19 +26,20 @@ const MARS_LOCATIONS = [
   {
     id: 'mount-sharp', name: 'Mount Sharp (Aeolis Mons)', type: 'Sedimentary Mound',
     lat: -5.08, lon: 137.85, zoom: 13, elevM: -1500,
+    isStudyArea: true,
     riskLevel: 'caution',
     description: 'Central mound of Gale Crater, rising ~5.5 km above the crater floor. Curiosity is actively climbing layered strata. Each rock layer records a different climate epoch.',
     safetyNotes: [
       { level: 'warn', text: 'Steep upper slopes (>20°) — route planning critical; approach only via gradual switchbacks' },
       { level: '',     text: 'Loose sedimentary rock on upper flanks increases slip risk' },
-      { level: 'ok',   text: 'Primary MarsWalk science target. Boxwork formations at ~-4.2°N, 137.75°E' }
+      { level: 'ok',   text: 'Primary MarsWalk science target. Boxwork ridges studied by Curiosity at ~5.1°S, 137.75°E' }
     ],
     missions: 'MSL/Curiosity (actively exploring)',
     source: 'Grotzinger et al. 2015, Science; MOLA'
   },
   {
     id: 'jezero-crater', name: 'Jezero Crater', type: 'Ancient Lake Delta',
-    lat: 18.4, lon: 77.7, zoom: 12, elevM: -2535,
+    lat: 18.38, lon: 77.69, zoom: 12, elevM: -2535,
     riskLevel: 'caution',
     description: 'Site of the Perseverance rover (Mars 2020). An ancient river delta — highest probability site for preserved biosignatures. Mars Sample Return cache is being assembled here.',
     safetyNotes: [
@@ -470,6 +472,7 @@ function renderLibrary() {
         <div class="loc-safety-heading">Astronaut Safety Notes</div>
         ${safetyHtml}
         <button class="loc-fly-btn" data-id="${loc.id}">Fly to this location →</button>
+        ${loc.isStudyArea ? '' : '<div class="loc-note-outside-area">⚠ EVA planning (route, slope, safety) only works for the Gale Crater study area</div>'}
         <div class="loc-missions">${loc.missions}</div>
         <div class="loc-missions" style="font-style:normal;margin-top:2px;">Source: ${loc.source}</div>
       </div>

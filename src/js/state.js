@@ -63,10 +63,12 @@ const STATE = {
   /* No-go zones drawn by the user */
   noGoZones: [],  // array of { id, latLngs: [[lat,lon],...] }
 
+  /* Selected science target (feature object from targets.geojson) */
+  selectedTarget: null,
+
   /* UI state */
   ui: {
     welcomeDismissed: false,
-    selectedTarget:   null,   // target id string
     aboutOpen:        false,
     assumptionsOpen:  false
   }

@@ -64,10 +64,12 @@ function addCoordinateReadout(map) {
   control.addTo(map);
 
   map.on('mousemove', function(e) {
-    const lat = e.latlng.lat.toFixed(4);
-    const lon = e.latlng.lng.toFixed(4);
+    const rawLat = e.latlng.lat;
+    const rawLon = e.latlng.lng;
+    const latStr = (rawLat >= 0 ? rawLat.toFixed(4) + '°N' : Math.abs(rawLat).toFixed(4) + '°S');
+    const lonStr = (rawLon >= 0 ? rawLon.toFixed(4) + '°E' : Math.abs(rawLon).toFixed(4) + '°W');
     const el = document.getElementById('coord-readout');
-    if (el) el.textContent = lat + '°N  ' + lon + '°E';
+    if (el) el.textContent = latStr + '  ' + lonStr;
   });
 
   map.on('mouseout', function() {

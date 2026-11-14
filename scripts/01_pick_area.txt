@@ -1,0 +1,38 @@
+STUDY AREA SELECTION
+Updated: Sat Nov 14, 2026
+
+SITE: Gale Crater / Mount Sharp (Aeolis Mons), Mars
+Rationale: Primary MSL/Curiosity science site. Abundant HiRISE, CTX, THEMIS coverage.
+           Boxwork formations studied by Curiosity (Rapin et al. 2021). RAD + REMS data available.
+
+STUDY AREA CENTER (to be confirmed in Mars Trek):
+  Lat:  -5.10 degrees (areocentric, IAU2000)
+  Lon: 137.75 degrees E
+
+BOX CORNERS (approximate, 6 km x 6 km):
+  NW: 5.049°S, 137.699°E
+  NE: 5.049°S, 137.801°E
+  SW: 5.151°S, 137.699°E
+  SE: 5.151°S, 137.801°E
+
+GRID PARAMETERS:
+  Cell size: 20 m [OUR ASSUMPTION — see CLAUDE.md section 10]
+  Grid dimensions: ~300 x 300 cells (6000 m / 20 m)
+  File size per grid: ~360 KB (90,000 cells * 4 bytes Float32)
+
+DEFAULT HABITAT LOCATION:
+  Lat: -5.08 degrees
+  Lon: 137.68 degrees E
+  Description: Flat area near base of Mount Sharp, Murray formation lower slopes.
+  [OUR SELECTION — to be confirmed against HiRISE imagery on Sat morning]
+
+ELEVATION SOURCE TRIED (fill in on Saturday):
+  [ ] HiRISE DTM — URL: https://www.uahirise.org/dtm/
+  [ ] CTX DTM — URL: https://murray-lab.caltech.edu/CTX/
+  [ ] MOLA 128ppd — URL: see DATA_PLAN.md
+  Chosen source: ____________
+
+NOTES:
+  - Center shifted from Bradbury Landing (-4.59, 137.44) south to Murray formation boxwork zone
+  - Mount Sharp peak is at ~5.08°S, 137.85°E — upper slopes likely extend beyond study box
+  - Adjust box if HiRISE DTM coverage is missing; try shifting 1-2 km N or S

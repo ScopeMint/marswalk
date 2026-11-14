@@ -31,44 +31,136 @@
     </div>
 
     <span class="mission-title" id="mission-title">Boxwork Survey — Gale Crater</span>
-    <button id="btn-about" aria-label="About and Sources">About &amp; Sources</button>
+    <button id="btn-about"       aria-label="About and Sources">About &amp; Sources</button>
     <button id="btn-assumptions" aria-label="View assumptions">Assumptions</button>
-    <button id="btn-reload" aria-label="Reload example mission">Reload example</button>
+    <button id="btn-reload"      aria-label="Reload example mission">Reload example</button>
   </header>
 
-  <!-- ── Main area ── -->
+  <!-- ── Main area: left panel + map + right panel ── -->
   <main id="main-area" role="main">
 
-    <!-- Left panel: mission setup + location library -->
+    <!-- ── Left panel: mission setup ── -->
     <aside id="left-panel" aria-label="Mission setup">
-      <div class="panel-heading">Mission Setup</div>
-      <p class="placeholder-text">Science targets and route controls will appear here (M4–M5).</p>
 
-      <div class="panel-heading" style="margin-top:16px;">Mars Locations Library</div>
+      <div class="panel-heading">Science Goal</div>
+      <div class="science-goal-desc">
+        Study boxwork formations at Gale Crater / Mount Sharp
+      </div>
+
+      <div class="panel-heading" style="margin-top:12px;">Science Targets</div>
+      <div id="science-targets-list">
+        <p class="placeholder-text">Loading targets…</p>
+      </div>
+
+      <div class="panel-heading" style="margin-top:12px;">
+        EVA Controls
+        <span class="assumption-tag">[our assumption]</span>
+      </div>
+      <div id="eva-controls">
+        <div class="control-row">
+          <label class="control-label" for="slope-limit-slider">
+            Slope limit: <span id="slope-limit-val">15</span>°
+          </label>
+          <input type="range" id="slope-limit-slider"
+                 min="5" max="25" value="15" step="1"
+                 class="ctrl-slider"
+                 aria-label="Slope limit in degrees">
+        </div>
+        <div class="control-row">
+          <label class="control-label" for="eva-hours-slider">
+            EVA length: <span id="eva-hours-val">6</span> h
+          </label>
+          <input type="range" id="eva-hours-slider"
+                 min="2" max="8" value="6" step="0.5"
+                 class="ctrl-slider"
+                 aria-label="EVA length in hours">
+        </div>
+        <div class="control-row">
+          <label class="control-label">Walking speed</label>
+          <div class="speed-presets" role="group" aria-label="Walking speed presets">
+            <button class="speed-btn" data-speed="2" aria-pressed="false">
+              Slow<br><small>2 km/h</small>
+            </button>
+            <button class="speed-btn active" data-speed="3" aria-pressed="true">
+              Normal<br><small>3 km/h</small>
+            </button>
+            <button class="speed-btn" data-speed="4" aria-pressed="false">
+              Fast<br><small>4 km/h</small>
+            </button>
+          </div>
+        </div>
+        <div class="control-row">
+          <label class="control-label" for="eva-start-slider">
+            EVA start: <span id="eva-start-val">08:00</span>
+          </label>
+          <input type="range" id="eva-start-slider"
+                 min="0" max="23" value="8" step="1"
+                 class="ctrl-slider"
+                 aria-label="EVA start hour (local Mars time)">
+        </div>
+      </div>
+
+      <div class="panel-heading" style="margin-top:12px;">Mars Locations</div>
       <p class="placeholder-text" style="font-size:11px;padding:4px 8px 8px;">
-        Click a location to expand safety notes. Use "Fly to location" or the search bar above.
+        Click to expand. EVA planning only works inside the Gale Crater study area.
       </p>
       <div id="location-library"></div>
+
     </aside>
 
-    <!-- Map -->
-    <div id="map-container" aria-label="Mars surface map"></div>
+    <!-- ── Map ── -->
+    <div id="map-container" aria-label="Mars surface map">
 
-    <!-- Right panel: layers -->
+      <!-- Loading indicator (shown while binary grids fetch) -->
+      <div id="loading-banner" class="loading-banner"
+           role="status" aria-live="polite" style="display:none;">
+        Loading Mars data…
+      </div>
+
+      <!-- Error banner (shown if a data file fails to load) -->
+      <div id="error-banner" class="error-banner"
+           role="alert" aria-live="assertive" style="display:none;"></div>
+
+      <!-- Route / map status message -->
+      <div id="map-message" class="map-message"
+           role="status" aria-live="polite" style="display:none;"></div>
+
+      <!-- Hover tooltip (elevation + slope) -->
+      <div id="hover-tooltip" class="hover-tooltip"
+           role="tooltip" style="display:none;"></div>
+
+      <!-- Floating summary card (top-right on map) -->
+      <div id="summary-card" class="summary-card"
+           aria-label="Route summary" style="display:none;">
+        <p class="placeholder-text">Pick a target to plan a route.</p>
+      </div>
+
+      <!-- POV photo panel (slides in from right over summary card) -->
+      <div id="pov-panel" class="pov-panel"
+           aria-label="Surface photo" style="display:none;"></div>
+
+    </div>
+
+    <!-- ── Right panel: layer controls ── -->
     <aside id="right-panel" aria-label="Map layers">
       <div class="panel-heading">Layers</div>
-      <p class="placeholder-text">Layer toggles and opacity sliders will appear here (M4).</p>
+      <div id="layer-panel-content">
+        <p class="placeholder-text">Loading…</p>
+      </div>
     </aside>
 
   </main>
 
-  <!-- ── Bottom bar ── -->
+  <!-- ── Bottom bar: charts ── -->
   <footer id="bottom-bar" role="contentinfo">
     <div class="chart-slot" id="elevation-profile-slot" aria-label="Elevation profile">
-      Elevation profile (M5)
+      <canvas id="profile-canvas"></canvas>
     </div>
     <div class="chart-slot" id="temperature-chart-slot" aria-label="Temperature chart">
-      EVA temperature chart (M6)
+      <canvas id="temp-canvas"></canvas>
+    </div>
+    <div class="bottom-footer-text">
+      Data: NASA Mars missions. A planning concept, not flight software.
     </div>
   </footer>
 
@@ -77,24 +169,21 @@
           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
           crossorigin="anonymous"></script>
 
-  <!-- ── App scripts (load order matters: config -> state -> map -> search -> main -> rest) ── -->
+  <!-- App scripts — load order matters. main.js MUST be last. -->
+  <!-- route-worker.js is loaded via: new Worker('./js/route-worker.js') inside route.js -->
   <script src="./js/config.js"></script>
   <script src="./js/state.js"></script>
   <script src="./js/map.js"></script>
   <script src="./js/search.js"></script>
-  <script src="./js/main.js"></script>
-
-  <!-- Stubs (safe to load as empty files) -->
-  <script src="./js/layers.js"></script>
   <script src="./js/grid.js"></script>
+  <script src="./js/layers.js"></script>
   <script src="./js/route.js"></script>
-  <!-- route-worker.js is NOT here — it is loaded via: new Worker('./js/route-worker.js') -->
   <script src="./js/safety.js"></script>
   <script src="./js/targets.js"></script>
   <script src="./js/pov.js"></script>
   <script src="./js/profile.js"></script>
   <script src="./js/ui.js"></script>
-  <script src="./js/export.js"></script>
+  <script src="./js/main.js"></script>
 
 </body>
 </html>
