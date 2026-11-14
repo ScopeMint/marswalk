@@ -46,3 +46,8 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/ui.js | Claude Code added showHowToUseModal() with full 11-section How to Use guide covering every feature | team to review content accuracy
 2026-11-14 | src/index.html | Claude Code added "How to Use" button to top bar; improved EVA controls with hint text explaining each slider | team to test UI
 2026-11-14 | src/js/grid.js | Claude Code added showSyntheticTerrainNotice() to flag when synthetic terrain is loaded | team to verify banner appears and dismiss works
+2026-11-14 | scripts/generate_synthetic_dem.py | Claude Code rewrote DEM generator with explicit flat zones (200m radius) at all key positions; added hillshade.png generation | team to replace with real HiRISE/CTX DTM before submission
+2026-11-14 | src/data/ (elevation.bin, slope.bin, roughness.bin, aoi.json, hillshade.png, slope-overlay.png) | Claude Code regenerated all terrain data — all 6 key positions now 0.0° slope | team to replace with NASA DTM data
+2026-11-14 | src/js/state.js, layers.js, ui.js | Claude Code added hillshade terrain visualization layer (elevation colour + shadow shading) to the layer stack | team to verify renders correctly
+2026-11-14 | src/js/route.js, css/styles.css | Claude Code changed habitat marker from "H" to "EVA Base" with two-line icon and tooltip | team to verify on map
+2026-11-14 | src/js/map.js, css/styles.css | Claude Code added geographic terrain labels (Murray Formation, Crater Floor, Mt. Sharp slope) as map overlays | team to verify positions are accurate
