@@ -39,3 +39,10 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/main.js | Claude Code rewrote initApp with correct async init order | team to verify no console errors on load
 2026-11-14 | src/index.html | Claude Code rewrote with full structure: EVA controls, science targets list, map floating elements (summary card, pov panel, tooltips), canvas bottom bar | team to test layout at 1440px
 2026-11-14 | src/css/styles.css | Claude Code added CSS for all new components: loading banners, map overlays, summary card, EVA bar, checklist, layer toggles, slope legend, modals, target cards, pov panel, EVA controls | team to verify dark theme rendering
+2026-11-14 | src/js/config.js | Claude Code fixed centerLat (-4.59→-5.10), centerLon (137.44→137.75), defaultZoom (4→12) to point at Murray formation boxwork zone | team to verify map opens on correct location
+2026-11-14 | scripts/generate_synthetic_dem.py | Claude Code wrote synthetic DEM generator: creates elevation/slope/roughness .bin files + aoi.json for Gale Crater boxwork area until real NASA DTM is available | team to replace with real HiRISE/CTX DTM
+2026-11-14 | src/data/ (aoi.json, elevation.bin, slope.bin, roughness.bin, slope-overlay.png) | Claude Code generated synthetic terrain data via generate_synthetic_dem.py | team to replace with real NASA elevation data before submission
+2026-11-14 | src/js/search.js | Claude Code added 28 more Mars locations (volcanoes, channels, polar caps, glacial terrain, canyons, astrobiological targets) bringing total to 52 | team to verify coordinates against USGS Gazetteer
+2026-11-14 | src/js/ui.js | Claude Code added showHowToUseModal() with full 11-section How to Use guide covering every feature | team to review content accuracy
+2026-11-14 | src/index.html | Claude Code added "How to Use" button to top bar; improved EVA controls with hint text explaining each slider | team to test UI
+2026-11-14 | src/js/grid.js | Claude Code added showSyntheticTerrainNotice() to flag when synthetic terrain is loaded | team to verify banner appears and dismiss works

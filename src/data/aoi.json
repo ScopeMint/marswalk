@@ -1,0 +1,13 @@
+{
+  "west": 137.699388,
+  "east": 137.800612,
+  "south": -5.150612,
+  "north": -5.049388,
+  "cellSizeMeters": 20,
+  "width": 300,
+  "height": 300,
+  "defaultHabitatLat": -5.0747,
+  "defaultHabitatLon": 137.7247,
+  "syntheticTerrain": true,
+  "syntheticNote": "Synthetic terrain for development. Replace with HiRISE or CTX DTM before submission."
+}

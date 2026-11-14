@@ -1,15 +1,16 @@
 {
   "type": "FeatureCollection",
   "metadata": {
-    "site": "Gale Crater / Mount Sharp, Mars",
-    "selectionNote": "Our selection based on published Curiosity mission traverse data and science reports. Coordinates are approximate — MSL/JPL traverse maps, MSL/JPL.",
-    "coordinateSystem": "IAU2000 areocentric latitude, east positive longitude"
+    "site": "Gale Crater / Mount Sharp, Mars — 6 km study area centered 5.10°S, 137.75°E",
+    "selectionNote": "Our selection based on published Curiosity mission traverse data and science reports. Coordinates are representative positions inside the 6 km planning area; the named geological units are real features studied by Curiosity nearby. Labeled 'our selection' throughout the app.",
+    "coordinateSystem": "IAU2000 areocentric latitude, east positive longitude",
+    "studyAreaBounds": "W 137.699°E  E 137.801°E  S 5.151°S  N 5.049°S"
   },
   "features": [
     {
       "type": "Feature",
       "id": "target-1",
-      "geometry": { "type": "Point", "coordinates": [137.75, -5.08] },
+      "geometry": { "type": "Point", "coordinates": [137.750, -5.080] },
       "properties": {
         "index": 1,
         "name": "Murray Buttes Boxwork",
@@ -18,7 +19,7 @@
         "why": "Eroded boxwork ridges in sulfate/mudstone layers — the primary science goal of this Marswalk.",
         "detail": "Curiosity documented boxwork formations at Murray Buttes: erosion-resistant veins form ridge networks as surrounding mudstone weathers away. These record the chemistry of ancient groundwater that likely supported a habitable environment. Rapin et al. (2021) identified similar sulfate-bearing boxwork ridges as evidence of cyclical wet/dry periods.",
         "source": "Rapin et al. (2021), Astrobiology, doi:10.1089/ast.2020.2362",
-        "selectionNote": "Our selection based on Curiosity traverse data",
+        "selectionNote": "Our selection — representative position inside study area",
         "povPhotoId": "pov-1",
         "distanceFromHabitatKm": null
       }
@@ -26,7 +27,7 @@
     {
       "type": "Feature",
       "id": "target-2",
-      "geometry": { "type": "Point", "coordinates": [137.59, -5.06] },
+      "geometry": { "type": "Point", "coordinates": [137.722, -5.112] },
       "properties": {
         "index": 2,
         "name": "Glen Torridon Clay Unit",
@@ -35,7 +36,7 @@
         "why": "Strongest evidence of a long-lived ancient lake. Clay minerals form only when water persists for thousands of years.",
         "detail": "Glen Torridon hosts the largest clay mineral deposits found by Curiosity. Bristow et al. (2021) showed iron-magnesium smectite clays require prolonged water contact to form — strong evidence the ancient lake in Gale Crater persisted for geologically significant time. A human geologist could sample fresh outcrop faces inaccessible to the rover arm.",
         "source": "Bristow et al. (2021), Science Advances, doi:10.1126/sciadv.abh3023",
-        "selectionNote": "Our selection based on Curiosity traverse data",
+        "selectionNote": "Our selection — representative position inside study area",
         "povPhotoId": "pov-2",
         "distanceFromHabitatKm": null
       }
@@ -43,7 +44,7 @@
     {
       "type": "Feature",
       "id": "target-3",
-      "geometry": { "type": "Point", "coordinates": [137.52, -4.82] },
+      "geometry": { "type": "Point", "coordinates": [137.780, -5.072] },
       "properties": {
         "index": 3,
         "name": "Vera Rubin Ridge",
@@ -52,7 +53,7 @@
         "why": "Hematite-rich layer formed in ancient standing water. The ridge is a natural waypoint and navigation landmark.",
         "detail": "Vera Rubin Ridge is an iron-oxide (hematite) bearing unit that forms a prominent east-west ridge. Fraeman et al. (2020) showed the hematite formed in acidic to neutral standing water. Its hardness made it resistant to erosion, creating a natural path along the ridge with panoramic views of the crater floor below.",
         "source": "Fraeman et al. (2020), JGR Planets, doi:10.1029/2019JE006306",
-        "selectionNote": "Our selection based on Curiosity traverse data",
+        "selectionNote": "Our selection — representative position inside study area",
         "povPhotoId": "pov-3",
         "distanceFromHabitatKm": null
       }
@@ -60,7 +61,7 @@
     {
       "type": "Feature",
       "id": "target-4",
-      "geometry": { "type": "Point", "coordinates": [137.78, -5.14] },
+      "geometry": { "type": "Point", "coordinates": [137.780, -5.138] },
       "properties": {
         "index": 4,
         "name": "Gediz Vallis Channel",
@@ -69,7 +70,7 @@
         "why": "Possible water-carved channel on the flank of Mount Sharp. Could reveal the most recent wet period on Mars.",
         "detail": "Gediz Vallis is an erosional channel cutting through the sulfate unit of Mount Sharp. NASA (2023) reported that Curiosity found evidence the channel was carved by liquid water relatively recently in Mars history, potentially billions of years after the ancient lake dried up. A human explorer could investigate channel walls and floor deposits unreachable by the rover.",
         "source": "NASA/JPL press release, 2023; MSL Science Team",
-        "selectionNote": "Our selection based on Curiosity traverse data",
+        "selectionNote": "Our selection — representative position inside study area",
         "povPhotoId": "pov-4",
         "distanceFromHabitatKm": null
       }
@@ -77,16 +78,16 @@
     {
       "type": "Feature",
       "id": "target-5",
-      "geometry": { "type": "Point", "coordinates": [137.70, -5.00] },
+      "geometry": { "type": "Point", "coordinates": [137.712, -5.062] },
       "properties": {
         "index": 5,
         "name": "Greenheugh Pediment",
         "shortName": "Sandstone Cap",
         "kind": "Eroded pediment",
         "why": "Erosion-resistant sandstone cap preserving a climate transition layer — evidence of a drier Mars era following the ancient lake.",
-        "detail": "Greenheugh Pediment is a broad, gently-sloping erosional surface capped by coarse sandstone. Edgar et al. (2020) showed it records a major climate transition: sandstone deposited by wind (an aeolian process) overlies older lake-deposited mudstone, marking the moment the persistent lake dried. A human explorer at this boundary could collect samples at the contact zone.",
+        "detail": "Greenheugh Pediment is a broad, gently-sloping erosional surface capped by coarse sandstone. Edgar et al. (2020) showed it records a major climate transition: sandstone deposited by wind (aeolian) overlies older lake-deposited mudstone, marking the moment the persistent lake dried. A human explorer at this boundary could collect samples at the contact zone.",
         "source": "Edgar et al. (2020), JGR Planets, doi:10.1029/2020JE006527",
-        "selectionNote": "Our selection based on Curiosity traverse data",
+        "selectionNote": "Our selection — representative position inside study area",
         "povPhotoId": null,
         "distanceFromHabitatKm": null
       }

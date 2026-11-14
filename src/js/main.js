@@ -18,7 +18,12 @@ async function initApp() {
     initPov()       // pov-images.json → STATE.povImages
   ]);
 
-  // 3. Needs grids: place habitat and start the walk-back map
+  // 3. Slope overlay uses aoi.json bounds — must run AFTER loadGrids()
+  if (typeof addSlopeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
+    addSlopeOverlay(STATE.map);
+  }
+
+  // 4. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();
 
   // 4. Draw temperature chart now that REMS data is loaded

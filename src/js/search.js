@@ -326,6 +326,382 @@ const MARS_LOCATIONS = [
     ],
     missions: 'Orbital coverage only (MRO/THEMIS)',
     source: 'MOLA Smith et al. 2001; USGS Gazetteer'
+  },
+
+  /* ── Tharsis volcanoes ── */
+  {
+    id: 'arsia-mons', name: 'Arsia Mons', type: 'Shield Volcano',
+    lat: -8.4, lon: -120.1, zoom: 8, elevM: 17781,
+    riskLevel: 'danger',
+    description: 'Southernmost of the three Tharsis Montes shield volcanoes. Caldera 110 km wide. The youngest volcanism on Mars may have occurred here within the last 150 million years.',
+    safetyNotes: [
+      { level: 'warn', text: 'EXTREME ALTITUDE: 17.8 km — near-vacuum at summit, atmospheric pressure <1% of Mars average' },
+      { level: '',     text: 'Caldera edges have vertical drop-offs; steep flank slopes on approach' },
+      { level: 'info', text: 'Possible recent glacial deposit on flanks (Head et al. 2003, Nature) — ice resource candidate' }
+    ],
+    missions: 'Orbital coverage only (MRO, MEx, TGO)',
+    source: 'Plescia 2004, JGR; USGS Gazetteer; MOLA'
+  },
+  {
+    id: 'pavonis-mons', name: 'Pavonis Mons', type: 'Shield Volcano',
+    lat: -0.1, lon: -113.4, zoom: 8, elevM: 14057,
+    riskLevel: 'danger',
+    description: 'Middle of the three Tharsis Montes. Located almost exactly on the Martian equator. Caldera 50 km wide.',
+    safetyNotes: [
+      { level: 'warn', text: 'EXTREME ALTITUDE: 14 km — extremely thin atmosphere, EVA suit pressure margin critical' },
+      { level: '',     text: 'Equatorial location gives moderate temperature, but altitude cancels this advantage' },
+      { level: '',     text: 'No surface mission data — terrain uncertainty high' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Plescia 2004, JGR; USGS Gazetteer'
+  },
+  {
+    id: 'ascraeus-mons', name: 'Ascraeus Mons', type: 'Shield Volcano',
+    lat: 11.9, lon: -104.1, zoom: 8, elevM: 18209,
+    riskLevel: 'danger',
+    description: 'Northernmost and tallest of the three Tharsis Montes. At 18.2 km, it rivals Olympus Mons in height. The volcano\'s broad, low-angle slopes are remarkably uniform.',
+    safetyNotes: [
+      { level: 'warn', text: 'TALLEST THARSIS VOLCANO: 18.2 km — above most Martian atmosphere' },
+      { level: '',     text: 'Caldera pit 3 km deep — steep inner walls, collapse risk' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Plescia 2004, JGR; USGS Gazetteer'
+  },
+  {
+    id: 'alba-mons', name: 'Alba Mons', type: 'Shield Volcano',
+    lat: 40.5, lon: -110.0, zoom: 7, elevM: 6788,
+    riskLevel: 'caution',
+    description: 'Largest volcano by area on Mars (wider than Olympus Mons), but with extremely gentle slopes — typically less than 1°. The flattest large volcano in the solar system.',
+    safetyNotes: [
+      { level: 'ok',   text: 'ULTRA-FLAT: slopes typically <1° — excellent EVA mobility across summit' },
+      { level: '',     text: 'High latitude (40.5°N) — temperature extremes; frost risk in autumn/winter' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Cailleau et al. 2003; USGS Gazetteer'
+  },
+  {
+    id: 'elysium-mons', name: 'Elysium Mons', type: 'Shield Volcano',
+    lat: 25.0, lon: 147.2, zoom: 8, elevM: 14127,
+    riskLevel: 'danger',
+    description: 'Largest volcano in the Elysium volcanic region. Located near the InSight lander but far enough away to represent completely different terrain.',
+    safetyNotes: [
+      { level: 'warn', text: 'HIGH ALTITUDE: 14.1 km — far above the InSight landing plains below' },
+      { level: '',     text: 'Lava flow channels on flanks — rough terrain with collapse pit hazards' },
+      { level: '',     text: 'No surface mission data for the volcano itself' }
+    ],
+    missions: 'Orbital coverage only (InSight is on the adjacent plain, not the volcano)',
+    source: 'MOLA Smith et al. 2001; USGS Gazetteer'
+  },
+
+  /* ── Outflow channels and valleys ── */
+  {
+    id: 'noctis-labyrinthus', name: 'Noctis Labyrinthus', type: 'Canyon Labyrinth',
+    lat: -7.0, lon: -99.0, zoom: 7, elevM: 3500,
+    riskLevel: 'danger',
+    description: 'A maze of intersecting valleys at the western end of Valles Marineris. Formed by tectonic collapse and volcanic activity. Canyon floors are 4–8 km below the plateau rim.',
+    safetyNotes: [
+      { level: 'warn', text: 'COMPLEX CANYON SYSTEM: walls up to 8 km tall — extreme terrain with many dead ends' },
+      { level: '',     text: 'Evidence of collapse pits and pit chains — unstable subsurface near vents' },
+      { level: 'info', text: 'Recently active volcanic features detected by ESA Mars Express (Brož et al. 2021, Nature Geoscience)' }
+    ],
+    missions: 'Orbital coverage only (MRO/HiRISE, MEx)',
+    source: 'Hauber et al. 2010; Brož et al. 2021 Nature Geoscience; USGS Gazetteer'
+  },
+  {
+    id: 'kasei-vallis', name: 'Kasei Vallis', type: 'Outflow Channel',
+    lat: 24.6, lon: -58.0, zoom: 7, elevM: -1500,
+    riskLevel: 'caution',
+    description: 'One of Mars\'s largest outflow channels. Carved by catastrophic ancient floods, it extends over 3,000 km. The channel\'s floor shows massive streamlined islands and scoured terrain.',
+    safetyNotes: [
+      { level: '',     text: 'Flood-scoured terrain — high boulder density and irregular channel floor' },
+      { level: '',     text: 'Channel walls up to 3 km tall — extreme terrain at edges' },
+      { level: 'info', text: 'Flood carved in Noachian/Hesperian; evidence of multiple flood events' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Baker et al. 1992; USGS Gazetteer; MOLA'
+  },
+  {
+    id: 'ares-vallis', name: 'Ares Vallis (Pathfinder)', type: 'Outflow Channel',
+    lat: 19.33, lon: -33.25, zoom: 10, elevM: -3680,
+    riskLevel: 'caution',
+    description: 'Site of Mars Pathfinder and Sojourner rover (1997). Flood-scoured channel mouth with rock fields deposited by ancient catastrophic water flows.',
+    safetyNotes: [
+      { level: '',     text: 'Rock field from ancient flooding — moderate boulder density confirmed by Pathfinder' },
+      { level: 'ok',   text: 'Relatively flat channel floor — Sojourner successfully traversed the area' },
+      { level: 'info', text: 'First Mars rover operation proved rover mobility on rocky terrain' }
+    ],
+    missions: 'Mars Pathfinder / Sojourner (1997)',
+    source: 'Golombek et al. 1997, Science; USGS Gazetteer'
+  },
+  {
+    id: 'gusev-crater', name: 'Gusev Crater (Spirit)', type: 'Impact Crater',
+    lat: -14.57, lon: 175.47, zoom: 11, elevM: -1900,
+    riskLevel: 'caution',
+    description: 'Site of the Spirit rover (2004–2010). An ancient lake bed where water once flowed through Ma\'adim Vallis. Spirit discovered evidence of ancient volcanic and hydrothermal activity at Columbia Hills.',
+    safetyNotes: [
+      { level: '',     text: 'Rocky plains and Columbia Hills confirmed by Spirit traverse data' },
+      { level: 'warn', text: 'Spirit became stuck in soft soil (Trojan) in 2009 — loose, unconsolidated ground hazard' },
+      { level: 'ok',   text: 'Columbia Hills offer scientifically rich hydrothermal deposits within EVA range' }
+    ],
+    missions: 'MER-A/Spirit (2004–2010)',
+    source: 'Squyres et al. 2004, Science 305; USGS Gazetteer'
+  },
+  {
+    id: 'reull-vallis', name: 'Reull Vallis', type: 'Ancient River Valley',
+    lat: -41.0, lon: 102.0, zoom: 7, elevM: 500,
+    riskLevel: 'caution',
+    description: 'One of Mars\'s best-preserved ancient river valley systems. MRO HiRISE images reveal well-preserved meandering channels. Evidence of ice-carved modifications in later epochs.',
+    safetyNotes: [
+      { level: '',     text: 'High latitude (41°S) — seasonal frost, low winter temperatures' },
+      { level: 'info', text: 'Valley walls preserve ancient river terrace features — excellent geology target' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only (MRO/HiRISE)',
+    source: 'Dohm et al. 2001; USGS Gazetteer'
+  },
+  {
+    id: 'nirgal-vallis', name: 'Nirgal Vallis', type: 'Ancient River Valley',
+    lat: -28.0, lon: -41.0, zoom: 8, elevM: 400,
+    riskLevel: 'caution',
+    description: 'An ancient valley network with evidence of both ancient groundwater sapping and surface flow. Associated gullies suggest more recent liquid water activity.',
+    safetyNotes: [
+      { level: '',     text: 'Valley walls may have gully erosion — slope instability possible' },
+      { level: 'info', text: 'Gully features in walls suggest relatively recent fluid flow (MRO/HiRISE data)' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Malin & Edgett 2000, Science; USGS Gazetteer'
+  },
+
+  /* ── High-interest astrobiology targets ── */
+  {
+    id: 'mawrth-vallis', name: 'Mawrth Vallis', type: 'Ancient Valley',
+    lat: 24.5, lon: -19.0, zoom: 9, elevM: -2400,
+    riskLevel: 'caution',
+    description: 'One of the best-preserved clay mineral sites on Mars. OMEGA and CRISM instruments detected thick deposits of phyllosilicate clays — formed in liquid water billions of years ago. High-priority astrobiology target.',
+    safetyNotes: [
+      { level: 'info', text: 'CLAY DEPOSITS: thickest phyllosilicates on Mars — ancient habitability indicator (Poulet et al. 2005, Nature)' },
+      { level: '',     text: 'Valley terrain with moderate boulder density based on orbital imaging' },
+      { level: '',     text: 'Was a finalist landing site for Mars 2020 (Perseverance) — well characterized orbitally' }
+    ],
+    missions: 'Orbital coverage only; finalist for Mars 2020 landing',
+    source: 'Poulet et al. 2005, Nature; Bishop et al. 2008, Science; USGS Gazetteer'
+  },
+  {
+    id: 'oxia-planum', name: 'Oxia Planum', type: 'Ancient Plain',
+    lat: 18.3, lon: -24.6, zoom: 9, elevM: -3100,
+    riskLevel: 'caution',
+    description: 'Selected landing site for ESA/Roscosmos ExoMars Rosalind Franklin rover (target ~2028). Extensive ancient clay deposits. One of the highest-priority biosignature search areas.',
+    safetyNotes: [
+      { level: 'ok',   text: 'CHOSEN FOR SAFETY: ESA performed exhaustive hazard mapping — unusually good terrain data available' },
+      { level: 'info', text: 'Fe/Mg phyllosilicate clays at >3.5 Ga — ancient habitability confirmed orbitally (Quantin-Nataf et al. 2021)' },
+      { level: '',     text: 'No surface mission to date — ExoMars Rosalind Franklin rover planned ~2028' }
+    ],
+    missions: 'ExoMars Rosalind Franklin rover (planned ~2028)',
+    source: 'Quantin-Nataf et al. 2021, Astrobiology; ESA ExoMars landing site selection documents'
+  },
+  {
+    id: 'nili-fossae', name: 'Nili Fossae', type: 'Fracture System',
+    lat: 22.5, lon: 76.5, zoom: 8, elevM: 1200,
+    riskLevel: 'caution',
+    description: 'A system of ancient fractures (grabens) north of Isidis Basin. Rich in olivine and clay minerals. Historically associated with methane detections from orbit, though interpretation is contested.',
+    safetyNotes: [
+      { level: '',     text: 'Fracture terrain — irregular topography with steep graben walls' },
+      { level: 'info', text: 'Olivine-rich terrain: possible hydrothermal history (Hoefen et al. 2003, Science)' },
+      { level: 'info', text: 'Associated with periodic methane detections (Mumma et al. 2009) — scientific interest but source unconfirmed' }
+    ],
+    missions: 'Orbital coverage only (MRO/CRISM, MEx/OMEGA)',
+    source: 'Hoefen et al. 2003, Science; Mumma et al. 2009, Science; USGS Gazetteer'
+  },
+
+  /* ── Polar regions ── */
+  {
+    id: 'planum-boreum', name: 'Planum Boreum (North Polar Cap)', type: 'Polar Ice Cap',
+    lat: 88.0, lon: 0.0, zoom: 5, elevM: 2900,
+    riskLevel: 'danger',
+    description: 'Mars\'s north polar ice cap — a layered stack of water ice and CO₂ frost about 3 km thick. The polar layered deposits record Mars climate history like tree rings.',
+    safetyNotes: [
+      { level: 'warn', text: 'EXTREME COLD: polar winter temperatures below -120°C — well outside EVA suit operating range' },
+      { level: 'warn', text: 'CO₂ frost year-round at high latitudes — unstable surface traction' },
+      { level: 'info', text: 'Water ice cap is a potential resource but CO₂ processing required first' }
+    ],
+    missions: 'Orbital coverage only (SHARAD, MOLA, MEx MARSIS)',
+    source: 'Phillips et al. 2008, Science; MOLA Smith et al. 2001'
+  },
+  {
+    id: 'planum-australe', name: 'Planum Australe (South Polar Cap)', type: 'Polar Ice Cap',
+    lat: -86.0, lon: 0.0, zoom: 5, elevM: 3700,
+    riskLevel: 'danger',
+    description: 'Mars\'s south polar ice cap — permanently covered by CO₂ ice. Radar data (MARSIS) suggests a possible liquid water lake beneath the ice at ~1.5 km depth.',
+    safetyNotes: [
+      { level: 'warn', text: 'EXTREME COLD: consistently below -130°C; CO₂ ice layer year-round' },
+      { level: 'info', text: 'POSSIBLE SUBGLACIAL LAKE: radar reflection at 1.5 km depth (Orosei et al. 2018, Science) — unconfirmed' },
+      { level: 'warn', text: 'CO₂ sublimation creates unstable terrain seasonally (Swiss cheese pits observed by MRO)' }
+    ],
+    missions: 'Orbital coverage only (MEx/MARSIS radar)',
+    source: 'Orosei et al. 2018, Science; MOLA Smith et al. 2001'
+  },
+
+  /* ── Glacial and periglacial terrain ── */
+  {
+    id: 'deuteronilus-mensae', name: 'Deuteronilus Mensae', type: 'Glacial Terrain',
+    lat: 44.4, lon: 23.5, zoom: 7, elevM: -700,
+    riskLevel: 'caution',
+    description: 'A region of mesas and lobate debris aprons that are almost certainly debris-covered glaciers. SHARAD radar confirms ice is present a few meters below the surface.',
+    safetyNotes: [
+      { level: 'info', text: 'ICE DETECTED: SHARAD radar confirms buried glacier ice (Plaut et al. 2009, GRL)' },
+      { level: 'warn', text: 'Lobate terrain may hide ice table 1–10 m deep — ground instability possible if ice sublimates' },
+      { level: '',     text: 'High latitude (44°N) — temperature extremes; frost possible' }
+    ],
+    missions: 'Orbital coverage only (MRO SHARAD radar)',
+    source: 'Plaut et al. 2009, GRL; USGS Gazetteer'
+  },
+  {
+    id: 'medusae-fossae', name: 'Medusae Fossae Formation', type: 'Mysterious Deposit',
+    lat: -2.5, lon: -146.1, zoom: 7, elevM: 1200,
+    riskLevel: 'caution',
+    description: 'A vast, enigmatic deposit larger than the United States that is unusually easy to erode. Its origin is debated: volcanic ash, ancient ice, or aeolian dust. One of Mars\'s most puzzling features.',
+    safetyNotes: [
+      { level: '',     text: 'Very soft, friable material — terrain may crumble; sinkhole/collapse risk uncertain' },
+      { level: 'info', text: 'Origin debated: volcanic ash vs. ancient ice deposit (Bradley et al. 2002)' },
+      { level: '',     text: 'Yardangs (wind-eroded ridges) create complex, irregular surface terrain' }
+    ],
+    missions: 'Orbital coverage only (MRO/HiRISE, MOLA)',
+    source: 'Bradley et al. 2002, JGR; Watters et al. 2007 Science; USGS Gazetteer'
+  },
+  {
+    id: 'phlegra-montes', name: 'Phlegra Montes', type: 'Mountain Range',
+    lat: 41.0, lon: 165.0, zoom: 7, elevM: 2400,
+    riskLevel: 'caution',
+    description: 'A curved mountain range in the northern hemisphere. The mountains border the transition between the northern lowlands and ancient highlands.',
+    safetyNotes: [
+      { level: '',     text: 'Mountain terrain — slopes can exceed 20°; route planning essential' },
+      { level: '',     text: 'High latitude (41°N) — frost risk; cold temperatures' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'MOLA Smith et al. 2001; USGS Gazetteer'
+  },
+
+  /* ── Canyons (Valles Marineris system) ── */
+  {
+    id: 'candor-chasma', name: 'Candor Chasma', type: 'Canyon',
+    lat: -6.0, lon: -78.0, zoom: 8, elevM: -6000,
+    riskLevel: 'danger',
+    description: 'One of the largest individual canyons in Valles Marineris, 813 km long and 4 km deep. Light-toned layered deposits on the canyon floor may have formed in ancient standing water.',
+    safetyNotes: [
+      { level: 'warn', text: 'CANYON DEPTH: 4–6 km below rim — extreme terrain, no EVA route in/out without specialized equipment' },
+      { level: 'info', text: 'Light-toned layered deposits suggest ancient lake sediments (Murchie et al. 2009, JGR)' },
+      { level: '',     text: 'Major dust trap — thick dust deposits on canyon floor' }
+    ],
+    missions: 'Orbital coverage only (MRO/CRISM detects sulfate minerals)',
+    source: 'Murchie et al. 2009, JGR; Bibring et al. 2007 Science; USGS Gazetteer'
+  },
+  {
+    id: 'hesperia-planum', name: 'Hesperia Planum', type: 'Volcanic Plain',
+    lat: -23.0, lon: 109.0, zoom: 7, elevM: 800,
+    riskLevel: 'caution',
+    description: 'The type locality for the Hesperian geological period (~3.7–3.0 Ga). An ancient volcanic plain with distinctive wrinkle ridges from lava cooling and tectonic compression.',
+    safetyNotes: [
+      { level: '',     text: 'Wrinkle ridges create kilometre-scale obstacles — route planning around them needed' },
+      { level: 'info', text: 'Type locality for Hesperian epoch: studying this terrain helps calibrate Mars geological timescale' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Scott & Tanaka 1986 USGS; MOLA Smith et al. 2001'
+  },
+  {
+    id: 'tyrrhena-patera', name: 'Tyrrhena Patera', type: 'Ancient Volcano',
+    lat: -21.3, lon: 106.8, zoom: 8, elevM: 1600,
+    riskLevel: 'caution',
+    description: 'One of Mars\'s most ancient volcanoes, dating to the Noachian (>3.7 Ga). Very low, broad shield with a heavily eroded caldera. Phreatomagmatic (steam-driven) eruptions likely.',
+    safetyNotes: [
+      { level: '',     text: 'Heavily eroded ancient volcano — rough, irregular terrain from billions of years of weathering' },
+      { level: 'info', text: 'Ancient phreatomagmatic eruptions suggest water interaction — geological interest high' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Greeley & Spudis 1981; USGS Gazetteer'
+  },
+  {
+    id: 'apollinaris-patera', name: 'Apollinaris Patera', type: 'Ancient Volcano',
+    lat: -8.65, lon: 174.4, zoom: 8, elevM: 4890,
+    riskLevel: 'caution',
+    description: 'An ancient isolated shield volcano with a prominent caldera and a large fan deposit on its south flank from possible pyroclastic flows. Relatively isolated; not part of Tharsis.',
+    safetyNotes: [
+      { level: '',     text: 'Flank fan deposit may include loose pyroclastic material — traction risk' },
+      { level: 'info', text: 'The fan deposit on the south flank may preserve water-altered volcanic material' },
+      { level: '',     text: 'No surface mission data; orbital imaging available' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Robinson et al. 1993; USGS Gazetteer'
+  },
+  {
+    id: 'margaritifer-terra', name: 'Margaritifer Terra', type: 'Chaotic Terrain',
+    lat: -10.0, lon: -25.0, zoom: 7, elevM: -1200,
+    riskLevel: 'caution',
+    description: 'Transition zone between ancient highlands and chaotic terrain at the head of Ares Vallis. Contains abundant evidence of water-altered minerals and ancient valley networks.',
+    safetyNotes: [
+      { level: '',     text: 'Chaotic terrain with irregular blocks and scarps — complex EVA navigation' },
+      { level: 'info', text: 'Abundant water-altered minerals detected by CRISM (Noe Dobrea et al. 2010)' },
+      { level: '',     text: 'Near outflow channel heads — ancient catastrophic flood source region' }
+    ],
+    missions: 'Orbital coverage only (MRO/CRISM)',
+    source: 'Noe Dobrea et al. 2010; USGS Gazetteer'
+  },
+  {
+    id: 'tharsis-tholus', name: 'Tharsis Tholus', type: 'Shield Volcano',
+    lat: 13.4, lon: -91.0, zoom: 8, elevM: 8100,
+    riskLevel: 'danger',
+    description: 'A smaller but steep-flanked shield volcano on the eastern edge of the Tharsis plateau. Its caldera has collapsed on its southeastern side, creating a dramatic partial rim.',
+    safetyNotes: [
+      { level: 'warn', text: 'STEEP SLOPES: flank slopes up to 20–25° — near the EVA planning limit' },
+      { level: '',     text: 'High altitude (~8 km) — lower atmospheric pressure than Mars average' },
+      { level: '',     text: 'Caldera collapse wall on SE side — extreme drop-off hazard' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'Plescia 2004, JGR; USGS Gazetteer'
+  },
+  {
+    id: 'nili-planum', name: 'Nili Planum', type: 'Ancient Plain',
+    lat: 28.0, lon: 73.0, zoom: 8, elevM: 1500,
+    riskLevel: 'caution',
+    description: 'An ancient plateau near Nili Fossae with olivine and carbonate mineral detections — among the strongest carbonate signatures on Mars. Carbonates hint at ancient CO₂-rich neutral-pH water.',
+    safetyNotes: [
+      { level: 'info', text: 'CARBONATE DETECTED: Mg-Fe carbonates indicate ancient neutral-pH water (Ehlmann et al. 2008, Science)' },
+      { level: '',     text: 'Plateau edge — canyon rim hazards on northern side' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only (MRO/CRISM)',
+    source: 'Ehlmann et al. 2008, Science; USGS Gazetteer'
+  },
+  {
+    id: 'isidis-basin-northwest', name: 'Northwest Isidis Basin', type: 'Ancient Basin Floor',
+    lat: 11.0, lon: 82.0, zoom: 8, elevM: -3400,
+    riskLevel: 'safe',
+    description: 'The smooth northwestern floor of the Isidis impact basin. Very flat terrain at the transition between ancient highlands and the northern lowlands. Potential ancient shoreline deposits.',
+    safetyNotes: [
+      { level: 'ok',   text: 'Very flat terrain — smooth ancient basin floor, good mobility' },
+      { level: 'info', text: 'Near Nili Fossae clay deposits — scientifically rich area within reach' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'MOLA Smith et al. 2001; USGS Gazetteer'
+  },
+  {
+    id: 'amenthes-planum', name: 'Amenthes Planum', type: 'Ancient Highland',
+    lat: 3.0, lon: 107.0, zoom: 7, elevM: 1800,
+    riskLevel: 'caution',
+    description: 'An ancient highland region east of Elysium. Contains well-preserved ancient valley networks carved by water runoff billions of years ago. Relatively unexplored region scientifically.',
+    safetyNotes: [
+      { level: '',     text: 'Cratered highland terrain with ancient valley networks — irregular EVA surface' },
+      { level: 'info', text: 'Valley networks here date from the Noachian — well-preserved ancient water channels' },
+      { level: '',     text: 'No surface mission data' }
+    ],
+    missions: 'Orbital coverage only',
+    source: 'MOLA Smith et al. 2001; USGS Gazetteer'
   }
 ];
 

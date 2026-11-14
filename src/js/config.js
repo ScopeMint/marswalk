@@ -5,11 +5,11 @@ const CONFIG = {
   /* Study area: ~6 km x 6 km box around boxwork formations at Mount Sharp, Gale Crater.
      OUR ASSUMPTION: 6 km walkable range for a single Marswalk. */
   studyArea: {
-    centerLat:    -4.59,    // degrees, areocentric lat (Mars)
-    centerLon:    137.44,   // degrees, east longitude
+    centerLat:    -5.10,    // Murray formation boxwork zone, Mount Sharp (not Bradbury Landing)
+    centerLon:    137.75,   // degrees, east longitude
     sizeMeters:   6000,     // side length of the study area square [OUR ASSUMPTION]
-    defaultZoom:  4,        // global Mars view on first load; judges see the full planet in context
-    planningZoom: 13        // zoom used when flying to the planning area / clicking a target
+    defaultZoom:  12,       // shows Gale Crater terrain detail on load
+    planningZoom: 14        // zoom used when flying to the planning area / clicking a target
   },
 
   /* Tile layers for the map.

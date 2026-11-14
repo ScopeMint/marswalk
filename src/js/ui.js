@@ -422,6 +422,191 @@ function _buildAboutModal() {
   return modal;
 }
 
+/* ── How to Use modal ───────────────────────────────────────────────────────── */
+
+function showHowToUseModal() {
+  let modal = document.getElementById('how-to-use-modal');
+  if (!modal) {
+    modal = _buildHowToUseModal();
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+}
+
+function _buildHowToUseModal() {
+  const modal = document.createElement('div');
+  modal.id = 'how-to-use-modal';
+  modal.className = 'modal-overlay';
+
+  const box = document.createElement('div');
+  box.className = 'modal-box modal-box-wide';
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
+  const title = document.createElement('h2');
+  title.textContent = 'How to Use MarsWalk';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '✕';
+  closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+  header.appendChild(title);
+  header.appendChild(closeBtn);
+  box.appendChild(header);
+
+  const sections = [
+    {
+      heading: '🗺 What is MarsWalk?',
+      items: [
+        'MarsWalk is an EVA (spacewalk) planning tool for astronauts on Mars.',
+        'It layers NASA data on a map to help you plan a safe walking route to a science target at Gale Crater.',
+        'You pick a target, the tool draws a route that avoids steep slopes, and shows you a safety summary — distance, time, radiation, temperature — before you go.',
+        'This is a planning concept, not flight software. All assumptions are clearly labeled.',
+      ]
+    },
+    {
+      heading: '🌍 The Map',
+      items: [
+        'The map shows Mars using NASA Viking and MOLA data (provided by OpenPlanetaryMap).',
+        'The orange dashed box is your 6 km × 6 km planning area centered on the boxwork formations at Mount Sharp.',
+        'Pan by clicking and dragging. Zoom with the scroll wheel or +/− buttons.',
+        'You can explore anywhere on Mars using the location library in the left panel — but EVA planning only works inside the orange box.',
+        'If you pan away from Gale Crater, a yellow banner appears. Click "Return to study area" to come back.',
+        'The coordinate readout in the bottom-left corner shows the latitude and longitude of your cursor.',
+      ]
+    },
+    {
+      heading: '📍 Science Targets (left panel, top section)',
+      items: [
+        'The "Science Targets" section lists 5 real places that Curiosity has studied near Mount Sharp.',
+        'Click a target card to expand it and read about why that location matters scientifically.',
+        'Each card shows the target\'s name, distance from the habitat, and a one-line science description.',
+        'Click "Plan route to this target →" on any card to draw the safest walking route from the habitat.',
+        'The orange ① ② ③ ④ ⑤ circles on the map mark each target. Click them directly to select a target.',
+        'The green tent icon (⌂) on the map marks your habitat — the starting point for all routes.',
+      ]
+    },
+    {
+      heading: '🗂 Location Library (left panel, bottom section)',
+      items: [
+        'The location library lists 52 places on Mars you can explore.',
+        'Use the search box to find any location by name, type, or mission (try "volcanic", "rover", or "crater").',
+        'Click any card header to expand it and read full safety notes, elevation, and mission data.',
+        'Click "Fly to this location →" to zoom the map to that place.',
+        'Only Gale Crater and Mount Sharp are inside the EVA planning area. All other locations show an informational note.',
+      ]
+    },
+    {
+      heading: '🛤 Planning a Route',
+      items: [
+        '1. The habitat (green tent) is your starting point. It is placed on flat terrain in the northwest of the study area.',
+        '2. Click a science target card and press "Plan route" — or click directly on a numbered marker on the map.',
+        '3. The route (teal/cyan line) will appear in under a second, following the flattest path that respects your slope limit.',
+        '4. The Summary Card appears in the top-right corner of the map with all the numbers you need.',
+        '5. Adjust the slope limit slider to see how the route changes (steeper = shorter route; gentler = safer route).',
+        '6. The elevation profile chart at the bottom shows the height changes along the route.',
+      ]
+    },
+    {
+      heading: '📊 Summary Card (top-right of map)',
+      items: [
+        'Distance — total distance of the route in kilometres.',
+        'One-way time — estimated walking time to the target in minutes.',
+        'Steepest slope — the steepest point on the route. The small "[limit 15°]" tag is your current slope limit.',
+        'Climb / Descent — total height gained and lost along the route in metres.',
+        'Walk-back time — estimated time to walk back from the target to the habitat.',
+        'EVA used — percentage of your EVA time that the full trip (out + science work + back) will use. Green = safe, amber = tight, red = over budget.',
+        'Radiation est. — estimated radiation dose for the EVA duration, based on Curiosity RAD data [Hassler et al. 2014]. Hover to see the source.',
+        'Temp range — estimated air temperature range during your EVA window, from Curiosity REMS data. Hover to see the source.',
+        'Safety checklist — ✓ pass, ⚠ caution, ✕ fail for each safety check. Hover any item for details.',
+      ]
+    },
+    {
+      heading: '⚙ EVA Controls (left panel, middle section)',
+      items: [
+        'Slope limit — the steepest angle (in degrees) the route is allowed to cross. Default 15°. Raise it to allow steeper paths; lower it for safer travel. 0° = flat only; 25° = very steep.',
+        'EVA length — how many hours your spacewalk lasts. Default 6 hours. The EVA used % bar in the summary card will update.',
+        'Walking speed — how fast you walk on flat ground. Slow (2 km/h) = very careful; Normal (3 km/h) = default; Fast (4 km/h) = best case. Uphill and rough ground automatically slow you down.',
+        'EVA start time — the local Mars time when you leave the habitat. This sets the temperature window shown in the temperature chart and the temperature range in the summary card.',
+        'All controls are labeled [our assumption] because no official suited-EVA speed data exists for Mars yet.',
+      ]
+    },
+    {
+      heading: '🗂 Layers Panel (right panel)',
+      items: [
+        'Each row is a data layer. The toggle switch (blue = on, grey = off) turns it on or off.',
+        'The opacity slider below each layer name adjusts how transparent the layer is.',
+        'The ⓘ button shows the data source, mission, and resolution for that layer.',
+        'Imagery (OPM) — the base map showing Mars terrain from NASA Viking and MOLA data.',
+        'Slope classes — a colour overlay showing terrain steepness: green = gentle, yellow = moderate, orange = steep, red = very steep. See the SLOPE LEGEND below.',
+        'Walk-back time — colour bands showing how many minutes it takes to walk back to the habitat from any point (requires a route to be computed first).',
+        'THEMIS Day IR — thermal infrared from the Mars Odyssey spacecraft showing surface warmth during the day.',
+        'The SLOPE LEGEND at the bottom of the layers panel shows what each colour means in degrees.',
+      ]
+    },
+    {
+      heading: '📈 Charts (bottom bar)',
+      items: [
+        'Elevation Profile (left chart) — shows the height of the terrain along your route from start to finish. Steep sections are highlighted.',
+        'Temperature Chart (right chart) — shows the estimated air temperature at Gale Crater over a full Mars day (24 hours). The shaded amber region is your EVA window. Orange line = spring/summer season; teal line = autumn/winter season.',
+        'The charts update whenever you pick a new route or change the EVA start time.',
+        'Both charts use real data from Curiosity instruments, sourced from published papers.',
+      ]
+    },
+    {
+      heading: '🏠 Safety Checklist Explained',
+      items: [
+        '✓ Pass (green) — this check is satisfied. No action needed.',
+        '⚠ Caution (amber) — the route works but is tight. Consider adjusting your plan.',
+        '✕ Fail (red) — a critical limit is exceeded. The route is not safe as planned.',
+        'ℹ Info (grey) — informational note. Not a pass/fail — just context.',
+        'Hover any checklist item to see the specific numbers and data source behind the check.',
+        'Common cautions: route is much longer than a straight line (big detour); target is near the edge of the study area; steepest slope is close to your limit.',
+      ]
+    },
+    {
+      heading: '📷 Surface Photos',
+      items: [
+        'Each science target has a "Show surface photo →" button at the bottom of the Summary Card.',
+        'The photo panel slides in from the right showing a real Curiosity photograph near that target.',
+        'Photos are from the Curiosity Mastcam or Navcam cameras. The caption shows the camera, Mars sol (day), and a link to the original NASA image.',
+        '"What you should expect on arrival" describes the terrain visible in the photo.',
+        'If no photo is available for a target yet, a text description appears instead.',
+      ]
+    },
+    {
+      heading: '⚠ What This Tool Cannot Do',
+      items: [
+        'Single boulders — the terrain grid is 20 m cells; individual rocks are invisible.',
+        'Soil softness or dust depth — cannot predict whether the ground will bear weight.',
+        'Suit or life support details — no suit pressure, oxygen, or cooling modeled.',
+        'Radiation forecasts — the radiation number is a baseline from calm solar conditions, not a forecast.',
+        'Real-time Mars weather — all atmospheric data is a statistical average, not a live feed.',
+        'All limitations are listed on the About & Sources page.',
+      ]
+    },
+  ];
+
+  sections.forEach(section => {
+    const h = document.createElement('h3');
+    h.className = 'modal-section-heading';
+    h.textContent = section.heading;
+    box.appendChild(h);
+
+    const ul = document.createElement('ul');
+    ul.className = 'how-to-list';
+    section.items.forEach(text => {
+      const li = document.createElement('li');
+      li.textContent = text;
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  });
+
+  modal.appendChild(box);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+  return modal;
+}
+
 /* ── EVA controls wiring ────────────────────────────────────────────────────── */
 
 let _evaDebounceTimer = null;
@@ -500,6 +685,7 @@ function initUI() {
   _initEvaControls();
 
   // Wire up top-bar buttons
+  document.getElementById('btn-how-to-use')?.addEventListener('click', showHowToUseModal);
   document.getElementById('btn-assumptions')?.addEventListener('click', showAssumptionsModal);
   document.getElementById('btn-about')?.addEventListener('click', showAboutModal);
   document.getElementById('btn-reload')?.addEventListener('click', () => {

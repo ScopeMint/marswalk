@@ -36,6 +36,12 @@ async function loadGrids() {
 
     hideLoadingBanner();
     console.log(`[grid] loaded: ${aoi.width}x${aoi.height} cells at ${aoi.cellSizeMeters}m/cell`);
+
+    // Warn clearly if synthetic terrain is loaded (before real NASA DTM is available)
+    if (aoi.syntheticTerrain) {
+      showSyntheticTerrainNotice();
+    }
+
     return true;
 
   } catch (err) {
@@ -127,4 +133,23 @@ function showErrorBanner(message) {
   }
   el.textContent = '⚠ ' + message;
   el.style.display = 'block';
+}
+
+/* Shows a dismissible amber notice when synthetic (not real NASA DTM) terrain is loaded. */
+function showSyntheticTerrainNotice() {
+  if (document.getElementById('synthetic-notice')) return;
+  const el = document.createElement('div');
+  el.id = 'synthetic-notice';
+  el.className = 'synthetic-notice';
+  const text = document.createElement('span');
+  text.textContent = '⚠ Terrain is synthetic (placeholder). Route numbers are illustrative only. Replace with real HiRISE/CTX DTM before submission.';
+  const dismiss = document.createElement('button');
+  dismiss.textContent = '✕';
+  dismiss.className = 'synthetic-notice-dismiss';
+  dismiss.setAttribute('aria-label', 'Dismiss');
+  dismiss.addEventListener('click', () => el.remove());
+  el.appendChild(text);
+  el.appendChild(dismiss);
+  const mapContainer = document.getElementById('map-container') || document.body;
+  mapContainer.appendChild(el);
 }

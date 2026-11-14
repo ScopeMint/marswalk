@@ -144,12 +144,11 @@ function toggleLayer(layerId, visible) {
   if (STATE.layers[layerId]) STATE.layers[layerId].visible = visible;
 }
 
-/* Initializes all overlay layers once grids are loaded. Called from main.js. */
+/* Initializes base layers. Slope overlay is added after grids load in main.js. */
 function initLayers() {
   const map = STATE.map;
   if (!map) { console.warn('[layers] initLayers: map not ready'); return; }
-
-  addSlopeOverlay(map);
-  // THEMIS layers lazy-loaded on first toggle (Mars Trek may be down)
-  console.log('[layers] initialized');
+  // THEMIS layers lazy-loaded on first toggle (Mars Trek server may be down)
+  // addSlopeOverlay() is called from main.js AFTER loadGrids() so aoi bounds are available
+  console.log('[layers] initialized (slope overlay deferred until grids load)');
 }
