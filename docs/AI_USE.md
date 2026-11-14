@@ -12,3 +12,11 @@ Rules we follow:
 
 LOG (add a line each time AI helps)
 Date/time | File or part | What AI did | Who checked it
+
+2026-11-14 | src/index.html | Claude Code wrote full page skeleton (top-bar, main-area, bottom-bar layout, CDN links) | team to verify in browser
+2026-11-14 | src/css/styles.css | Claude Code wrote all CSS custom properties (colors, layout sizes), fixed layout, Leaflet dark overrides | team to verify in browser
+2026-11-14 | src/js/config.js | Claude Code wrote CONFIG object with all numbers, tile layer URLs, mission metadata | team to verify tile URLs against Mars Trek
+2026-11-14 | src/js/state.js | Claude Code wrote STATE object structure | team to review
+2026-11-14 | src/js/map.js | Claude Code wrote Leaflet init, CTX tile layer, study-area outline, coordinate readout | team to verify tiles load in browser
+2026-11-14 | src/js/main.js | Claude Code wrote initApp entry point | team to review
+2026-11-14 | src/js/layers.js, grid.js, route.js, route-worker.js, safety.js, targets.js, pov.js, profile.js, ui.js, export.js | Claude Code created stub files (one-line comments) | n/a (empty stubs)

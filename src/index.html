@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarsWalk — EVA Planner</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin="anonymous">
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+  <!-- ── Top bar ── -->
+  <header id="top-bar" role="banner">
+    <span class="brand">MarsWalk</span>
+    <span class="tagline">Walk Mars safely: a layered EVA planner</span>
+    <span class="mission-title" id="mission-title">Boxwork Survey — Gale Crater</span>
+    <button id="btn-about" aria-label="About and Sources">About &amp; Sources</button>
+    <button id="btn-assumptions" aria-label="View assumptions">Assumptions</button>
+    <button id="btn-reload" aria-label="Reload example mission">Reload example</button>
+  </header>
+
+  <!-- ── Main area ── -->
+  <main id="main-area" role="main">
+
+    <!-- Left panel: mission setup -->
+    <aside id="left-panel" aria-label="Mission setup">
+      <div class="panel-heading">Mission Setup</div>
+      <p class="placeholder-text">Science targets and route controls will appear here (M4–M5).</p>
+    </aside>
+
+    <!-- Map -->
+    <div id="map-container" aria-label="Mars surface map"></div>
+
+    <!-- Right panel: layers -->
+    <aside id="right-panel" aria-label="Map layers">
+      <div class="panel-heading">Layers</div>
+      <p class="placeholder-text">Layer toggles and opacity sliders will appear here (M4).</p>
+    </aside>
+
+  </main>
+
+  <!-- ── Bottom bar ── -->
+  <footer id="bottom-bar" role="contentinfo">
+    <div class="chart-slot" id="elevation-profile-slot" aria-label="Elevation profile">
+      Elevation profile (M5)
+    </div>
+    <div class="chart-slot" id="temperature-chart-slot" aria-label="Temperature chart">
+      EVA temperature chart (M6)
+    </div>
+  </footer>
+
+  <!-- ── Leaflet JS ── -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs="
+          crossorigin="anonymous"></script>
+
+  <!-- ── App scripts (load order matters: config -> state -> map -> main -> rest) ── -->
+  <script src="./js/config.js"></script>
+  <script src="./js/state.js"></script>
+  <script src="./js/map.js"></script>
+  <script src="./js/main.js"></script>
+
+  <!-- Stubs (safe to load as empty files) -->
+  <script src="./js/layers.js"></script>
+  <script src="./js/grid.js"></script>
+  <script src="./js/route.js"></script>
+  <!-- route-worker.js is NOT here — it is loaded via: new Worker('./js/route-worker.js') -->
+  <script src="./js/safety.js"></script>
+  <script src="./js/targets.js"></script>
+  <script src="./js/pov.js"></script>
+  <script src="./js/profile.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/export.js"></script>
+
+</body>
+</html>
