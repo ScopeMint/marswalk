@@ -10,6 +10,10 @@ async function initApp() {
   initLayers();        // defines LAYER_CATALOG + SLOPE_LEGEND; adds imagery tiles to map
   initUI();            // builds layer panel + EVA controls; wires top-bar buttons
 
+  // Place habitat marker immediately using CONFIG fallback — grids may not be loaded yet.
+  // This ensures the EVA Base is always visible on first load, even on slow connections.
+  initDefaultHabitat();
+
   // 2. Parallel async data loads — each handles its own errors
   await Promise.all([
     loadGrids(),    // elevation.bin, slope.bin, roughness.bin, aoi.json → STATE.grids

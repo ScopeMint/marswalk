@@ -9,7 +9,11 @@ const CONFIG = {
     centerLon:    137.75,   // degrees, east longitude
     sizeMeters:   6000,     // side length of the study area square [OUR ASSUMPTION]
     defaultZoom:  12,       // shows Gale Crater terrain detail on load
-    planningZoom: 14        // zoom used when flying to the planning area / clicking a target
+    planningZoom: 14,       // zoom used when flying to the planning area / clicking a target
+    // Default habitat position (NW quadrant of study area, flattest zone near targets)
+    // Matches aoi.json defaultHabitatLat/Lon — duplicated here as fallback if aoi.json fails
+    defaultHabitatLat: -5.0747,
+    defaultHabitatLon: 137.7247
   },
 
   /* Tile layers for the map.

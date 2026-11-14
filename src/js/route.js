@@ -207,12 +207,18 @@ function clearMapMessage() {
   if (el) el.style.display = 'none';
 }
 
-/* Sets the default habitat from aoi.json and triggers the walkback map. */
+/* Places the default habitat and starts the walk-back map.
+   Falls back to CONFIG if aoi.json hasn't loaded yet (e.g. slow network).
+   The marker always appears; walkback only runs when grids are ready. */
 function initDefaultHabitat() {
-  if (!STATE.grids.loaded || !STATE.grids.aoi) return;
-  const aoi = STATE.grids.aoi;
-  const lat = aoi.defaultHabitatLat;
-  const lon = aoi.defaultHabitatLon;
+  // Position: prefer aoi.json (matches actual terrain data); fallback to CONFIG constant
+  const lat = (STATE.grids.aoi ? STATE.grids.aoi.defaultHabitatLat : CONFIG.studyArea.defaultHabitatLat);
+  const lon = (STATE.grids.aoi ? STATE.grids.aoi.defaultHabitatLon : CONFIG.studyArea.defaultHabitatLon);
+
   setHabitatMarker(lat, lon);
-  triggerWalkback({ lat, lon });
+  STATE.habitat = { lat, lon };
+
+  if (STATE.grids.loaded) {
+    triggerWalkback({ lat, lon });
+  }
 }
