@@ -19,22 +19,14 @@
   <header id="top-bar" role="banner">
     <span class="brand">MarsWalk</span>
     <span class="tagline">Walk Mars safely: a layered EVA planner</span>
-
-    <!-- Search / location directory -->
-    <div id="search-wrap" role="search">
-      <span id="search-icon" aria-hidden="true">⌕</span>
-      <input id="search-input" type="text" placeholder="Search Mars locations…"
-             autocomplete="off" spellcheck="false"
-             aria-label="Search Mars locations" aria-autocomplete="list"
-             aria-controls="search-dropdown">
-      <div id="search-dropdown" role="listbox" aria-label="Location results"></div>
-    </div>
-
     <span class="mission-title" id="mission-title">Boxwork Survey — Gale Crater</span>
     <button id="btn-about"       aria-label="About and Sources">About &amp; Sources</button>
     <button id="btn-assumptions" aria-label="View assumptions">Assumptions</button>
     <button id="btn-reload"      aria-label="Reload example mission">Reload example</button>
   </header>
+
+  <!-- Search dropdown attaches to <body> at runtime (initSearch moves it) -->
+  <div id="search-dropdown" role="listbox" aria-label="Location results"></div>
 
   <!-- ── Main area: left panel + map + right panel ── -->
   <main id="main-area" role="main">
@@ -101,8 +93,19 @@
       </div>
 
       <div class="panel-heading" style="margin-top:12px;">Mars Locations</div>
-      <p class="placeholder-text" style="font-size:11px;padding:4px 8px 8px;">
-        Click to expand. EVA planning only works inside the Gale Crater study area.
+
+      <!-- Library search bar (moved from top bar) -->
+      <div id="lib-search-wrap" class="lib-search-wrap" role="search">
+        <span class="lib-search-icon" aria-hidden="true">⌕</span>
+        <input id="search-input" type="text"
+               placeholder="Search 24 locations…"
+               autocomplete="off" spellcheck="false"
+               aria-label="Search Mars locations"
+               aria-autocomplete="list"
+               aria-controls="search-dropdown">
+      </div>
+      <p class="placeholder-text" style="font-size:11px;padding:2px 8px 6px;">
+        Click any card to expand. EVA planning only works inside the Gale Crater study area.
       </p>
       <div id="location-library"></div>
 
@@ -124,6 +127,14 @@
       <!-- Route / map status message -->
       <div id="map-message" class="map-message"
            role="status" aria-live="polite" style="display:none;"></div>
+
+      <!-- Outside-study-area notice (shown when map pans away from Gale Crater) -->
+      <div id="outside-area-notice" class="outside-area-notice" style="display:none;"
+           role="status" aria-live="polite">
+        <span class="outside-area-text">⚠ EVA planning only available at Gale Crater — zoom into the orange box</span>
+        <button class="outside-area-btn" id="btn-goto-gale"
+                aria-label="Return to Gale Crater study area">Return to study area →</button>
+      </div>
 
       <!-- Hover tooltip (elevation + slope) -->
       <div id="hover-tooltip" class="hover-tooltip"

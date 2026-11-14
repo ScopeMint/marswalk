@@ -526,9 +526,9 @@ function initSearch() {
     }
   });
 
-  // Close when clicking outside search
+  // Close when clicking outside the library search bar or dropdown
   document.addEventListener('click', e => {
-    if (!e.target.closest('#search-wrap') && !e.target.closest('#search-dropdown')) {
+    if (!e.target.closest('#lib-search-wrap') && !e.target.closest('#search-dropdown')) {
       closeDropdown();
     }
   });

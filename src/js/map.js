@@ -78,6 +78,25 @@ function addCoordinateReadout(map) {
   });
 }
 
+/* Shows/hides the "outside study area" notice banner based on current map center. */
+function checkStudyAreaBounds() {
+  const el = document.getElementById('outside-area-notice');
+  if (!el || !STATE.map) return;
+  const center = STATE.map.getCenter();
+  const bounds = studyAreaBounds();
+  // Use a generous check (3× the study area) so the notice only shows when clearly away
+  const pad = (CONFIG.studyArea.sizeMeters / 2) / 111320 * 3;
+  const nearBounds = L.latLngBounds(
+    [CONFIG.studyArea.centerLat - pad, CONFIG.studyArea.centerLon - pad],
+    [CONFIG.studyArea.centerLat + pad, CONFIG.studyArea.centerLon + pad]
+  );
+  if (nearBounds.contains(center)) {
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'flex';
+  }
+}
+
 /* Creates the Leaflet map, adds the base CTX tile layer, and sets up helpers.
    Stores the map instance in STATE.map so other modules can use it.
 
@@ -113,6 +132,18 @@ function initMap() {
 
   // Coordinate readout
   addCoordinateReadout(map);
+
+  // Check study area bounds whenever the map finishes moving
+  map.on('moveend', checkStudyAreaBounds);
+
+  // Wire the "Return to study area" button
+  const galeBtn = document.getElementById('btn-goto-gale');
+  if (galeBtn) {
+    galeBtn.addEventListener('click', () => {
+      map.flyTo([CONFIG.studyArea.centerLat, CONFIG.studyArea.centerLon],
+                CONFIG.studyArea.defaultZoom, { duration: 1.2 });
+    });
+  }
 
   STATE.map = map;
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
