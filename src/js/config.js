@@ -8,7 +8,8 @@ const CONFIG = {
     centerLat:    -4.59,    // degrees, areocentric lat (Mars)
     centerLon:    137.44,   // degrees, east longitude
     sizeMeters:   6000,     // side length of the study area square [OUR ASSUMPTION]
-    defaultZoom:  14        // Leaflet zoom level on first load
+    defaultZoom:  4,        // global Mars view on first load; judges see the full planet in context
+    planningZoom: 13        // zoom used when flying to the planning area / clicking a target
   },
 
   /* Tile layers for the map.

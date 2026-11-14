@@ -33,37 +33,16 @@ function makeTileLayer(layerConfig, opacity) {
   });
 }
 
-/* Adds a rectangle showing the study-area boundary on the map.
-   Outside the box is slightly darkened by a GeoJSON polygon with a hole. */
+/* Adds a thin orange border showing the study-area boundary on the map.
+   No outside darkening — that covered most of Mars and was too distracting at global zoom. */
 function addStudyAreaOutline(map) {
   const bounds = studyAreaBounds();
-  const sw = bounds.getSouthWest();
-  const ne = bounds.getNorthEast();
 
-  // Outer ring covers the whole world; inner ring (hole) is the study area.
-  // This darkens everything outside the box.
-  const outerRing = [[-90, -180], [-90, 180], [90, 180], [90, -180], [-90, -180]];
-  const innerRing = [
-    [sw.lat, sw.lng], [sw.lat, ne.lng],
-    [ne.lat, ne.lng], [ne.lat, sw.lng],
-    [sw.lat, sw.lng]
-  ];
-
-  L.geoJSON({
-    type: 'Feature',
-    geometry: {
-      type: 'Polygon',
-      coordinates: [outerRing, innerRing]
-    }
-  }, {
-    style: { fillColor: '#000', fillOpacity: 0.35, stroke: false }
-  }).addTo(map);
-
-  // Bright border around the study area itself
   L.rectangle(bounds, {
-    color:       '#D9622B',
-    weight:      1.5,
-    opacity:     0.7,
+    color:       '#D9622B',  // var(--accent)
+    weight:      2,
+    opacity:     0.9,
+    dashArray:   '6 4',      // dashed so it reads as "planning boundary" not solid territory
     fill:        false,
     interactive: false
   }).addTo(map);
@@ -111,14 +90,13 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    center: [centerLat, centerLon],
-    zoom:   defaultZoom,
-    minZoom: 2,     // prevent zooming out past a readable global Mars view
+    center:  [centerLat, centerLon],
+    zoom:    defaultZoom,
+    minZoom: 3,     // zoom 3 ≈ full Mars fits the viewport without white edges
     maxZoom: 18,
-    worldCopyJump:  false,   // stop map snapping to repeated copies
-    // Hard bounds: clamp panning to Mars extent so the map cannot scroll past [-180,180]
-    maxBounds:           [[-90, -180], [90, 180]],
-    maxBoundsViscosity:  1.0,  // 1.0 = hard stop (no bounce)
+    worldCopyJump:       false,
+    maxBounds:           [[-90, -185], [90, 185]], // 5° of padding prevents hard-edge artifacts
+    maxBoundsViscosity:  1.0,
     zoomControl:         true,
     attributionControl:  true
   });
@@ -134,8 +112,6 @@ function initMap() {
   // Coordinate readout
   addCoordinateReadout(map);
 
-  // Store in state
   STATE.map = map;
-
-  console.log('[map] Leaflet map initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| base layer: OPM');
+  console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
