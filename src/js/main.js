@@ -12,6 +12,7 @@ async function initApp() {
   if (typeof initAppShell === 'function') initAppShell();       // install / offline / link status
   if (typeof initMarsClock === 'function') initMarsClock();     // live sol + LMST at the site
   if (typeof initConsumables === 'function') initConsumables(); // suit & crew section in route card
+  if (typeof initHazards === 'function') initHazards();         // radio shadow / rocky / steep call-outs
   if (typeof initBrief === 'function') initBrief();             // EVA cue card button
   if (typeof initTour === 'function') initTour();               // guided tour with captions
 
