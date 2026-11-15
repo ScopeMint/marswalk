@@ -13,6 +13,7 @@ async function initApp() {
   if (typeof initMarsClock === 'function') initMarsClock();     // live sol + LMST at the site
   if (typeof initConsumables === 'function') initConsumables(); // suit & crew section in route card
   if (typeof initBrief === 'function') initBrief();             // EVA cue card button
+  if (typeof initTour === 'function') initTour();               // guided tour with captions
 
   // Place habitat marker immediately using CONFIG fallback — grids may not be loaded yet.
   // This ensures the EVA Base is always visible on first load, even on slow connections.
@@ -72,6 +73,8 @@ async function initApp() {
 
   // 9. Visor HUD + walk simulation (adds its own button to the top bar)
   if (typeof initHud === 'function') initHud();
+
+  if (typeof initSunChart === 'function') initSunChart();       // today's sun elevation chart
 
   console.log('[main] MarsWalk ready');
 }

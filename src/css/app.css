@@ -101,3 +101,19 @@
 #top-bar #btn-brief, #top-bar #hud-toggle, #top-bar button.hud-toggle { color: #3FD0C9; border-color: rgba(63,208,201,.55); font-weight: 600; }
 @media (max-width: 1360px) { #top-bar .link-pill { display: none; } }
 @media (max-width: 1220px) { #top-bar .app-btn { display: none; } #top-bar .mission-title { display: none; } }
+
+/* ── Guided tour captions (tour.js) — big, high-contrast, video-subtitle friendly ── */
+.tour-caption {
+  position: fixed; left: 50%; top: 66px; transform: translateX(-50%); z-index: 4500;
+  width: min(980px, 92vw); text-align: center; pointer-events: none;
+  background: rgba(10, 12, 16, .86); border: 1px solid rgba(63, 208, 201, .45); border-radius: 12px;
+  padding: 16px 22px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.55);
+}
+.tour-main { font: 650 24px/1.3 system-ui, sans-serif; color: #fff; }
+.tour-small { font: 13px/1.4 ui-monospace, Consolas, monospace; color: #3FD0C9; margin-top: 6px; }
+.tour-stop { pointer-events: auto; position: absolute; bottom: -34px; right: 0; background: #181B22; color: #A3A8B3; border: 1px solid #2A2F3A; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; }
+.tour-in { animation: tourIn .45s ease both; }
+@keyframes tourIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@media (prefers-reduced-motion: reduce) { .tour-in { animation: none; } }
+body.hud-active .tour-caption { top: 120px; z-index: 2600; }
+#top-bar #btn-tour { color: #fff; background: #D9622B; border-color: #D9622B; font-weight: 700; }
