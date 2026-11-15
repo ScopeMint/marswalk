@@ -149,7 +149,28 @@ LIBRARIES
 CONFIRMED SOURCES (add each one here when accessed and working)
 ===========================================================================
 
-(none confirmed yet — confirm on Saturday as you use each one)
+[CONFIRMED] MOLA MEGDR 128 ppd — elevation data
+  Citation: Smith, D. E. et al. (2001). Mars Orbiter Laser Altimeter: Experiment summary after the
+  first year of global mapping of Mars. Journal of Geophysical Research: Planets, 106(E10),
+  23689–23722. doi:10.1029/2000JE001364
+  File used: megt00n090hb.img (0°–−44° S, 90°–180° E quadrant, 128 ppd)
+  PDS URL: https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/
+  How used: HTTP Range request to download 1.73 MB of the 130 MB file (rows covering our AOI);
+  bicubic-resampled to 20 m cells; native resolution ~463 m/px.
+  License: NASA/JPL public domain
+  Date accessed: 2026-11-14
+  Note: show on screen — "Elevation: MOLA global model (~463 m native resolution, resampled to
+  20 m cells). Individual boulders and small features are not visible. This is a planning
+  illustration, not flight data."
+
+[CONFIRMED] Hassler et al. 2014 — RAD surface radiation baseline
+  Citation: Hassler, D. M. et al. (2014). Mars' surface radiation environment measured with the
+  Mars Science Laboratory's Curiosity rover. Science, 343(6169).
+  DOI: https://doi.org/10.1126/science.1244797
+  Values used: 233 µGy/day GCR absorbed dose at surface; SPE range 1–8 mGy/day (Supplementary
+  Table S2) → 10× multiplier for solar storm scenario.
+  License: publicly accessible journal article; data cited in full
+  Date accessed: 2026-11-14
 
 ===========================================================================
 IDEAS / PAPERS / INSPIRATION

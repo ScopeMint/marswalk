@@ -8,6 +8,13 @@
   "height": 300,
   "defaultHabitatLat": -5.0747,
   "defaultHabitatLon": 137.7247,
-  "syntheticTerrain": true,
-  "syntheticNote": "Synthetic terrain for development. Replace with HiRISE or CTX DTM before submission."
+  "elevationUnit": "meters (above MOLA areoid \u2014 negative values normal for Gale Crater)",
+  "slopeUnit": "degrees",
+  "roughnessUnit": "meters",
+  "elevationSource": "MOLA MEGDR 128ppd \u2014 file megt00n090hb.img",
+  "elevationCitation": "Smith, D.E. et al. (2001), JGR Planets 106(E10), doi:10.1029/2000JE001364",
+  "elevationResolution": "~463 m/px native (128 ppd), bicubic-resampled to 20 m cells",
+  "elevationNote": "MOLA 128ppd cannot resolve features smaller than ~460 m. Individual ridges and boxwork formations are sub-resolution. Use HiRISE DTM (~1 m/px) for full fidelity.",
+  "syntheticTerrain": false,
+  "source": "NASA PDS Geosciences Node \u2014 https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/"
 }

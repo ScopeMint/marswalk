@@ -65,3 +65,4 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/data/rad-overlay.png | Claude Code generated via generate_rad_overlay.py (synthetic terrain) | team to verify visually
 2026-11-14 | src/js/layers.js | Claude Code added addLosOverlay(), addRadOverlay(), catalog entries for both new layers | team to verify overlays display correctly
 2026-11-14 | src/css/styles.css | Claude Code added CSS for ponr-pin, target-detail-block, storm-row toggle, rad-badge | team to verify dark theme rendering
+2026-11-14 | scripts/02_get_mola.py | Claude Code wrote script to download real MOLA elevation data from NASA PDS via HTTP Range request (1.73 MB of 130 MB file); bicubic-resample to 300×300 grid; compute slope, roughness, overlays; regenerate all src/data/ binary files | team to verify elevation range and spot-check against Mars Trek
