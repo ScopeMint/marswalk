@@ -158,11 +158,15 @@ function initMap() {
     map.flyTo([centerLat, centerLon], defaultZoom, { duration: 12 });
   }, 1800);
 
-  // Custom pane for the route line + hazard segments so they always render above tile layers,
-  // even during Leaflet's CSS zoom animation (tiles animate inside their own stacking context).
+  // routePane: the main teal route line. hazardPane sits one level above it so hazard
+  // colour segments always render on top of the route — both are above tile layers (z 200).
   map.createPane('routePane');
   map.getPane('routePane').style.zIndex = 450;
   STATE.routeRenderer = L.svg({ pane: 'routePane' });
+
+  map.createPane('hazardPane');
+  map.getPane('hazardPane').style.zIndex = 460;
+  STATE.hazardRenderer = L.svg({ pane: 'hazardPane' });
 
   STATE.map = map;
   initRouteAnimation();
