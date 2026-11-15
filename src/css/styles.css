@@ -125,9 +125,11 @@ body {
 #left-panel {
   width: var(--left-w);
   min-width: var(--left-w);
+  min-height: 0;
   background: var(--panel);
   border-right: 1px solid var(--border);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--gap);
 }
 
@@ -153,6 +155,7 @@ body {
   background: var(--panel);
   border-left: 1px solid var(--border);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--gap);
 }
 
@@ -606,6 +609,7 @@ body {
   backdrop-filter: blur(4px);
   max-height: calc(100% - 24px);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sum-heading {

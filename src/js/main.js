@@ -81,6 +81,14 @@ async function initApp() {
 
   if (typeof initSunChart === 'function') initSunChart();       // today's sun elevation chart
 
+  // Stop wheel events from floating panels reaching Leaflet's zoom handler.
+  // These elements sit inside #map-container, so their wheel events would otherwise
+  // bubble up and zoom the map while the user is trying to scroll the panel.
+  ['summary-card', 'pov-panel', 'hover-tooltip'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('wheel', e => e.stopPropagation(), { passive: false });
+  });
+
   console.log('[main] MarsWalk ready');
 }
 

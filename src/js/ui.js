@@ -206,6 +206,55 @@ function _updateRadBadge(rad) {
 
 /* ── Layer panel ──────────────────────────────────────────────────────────── */
 
+/* Shows a small popup near a layer info button. Closes when clicking anywhere else. */
+function _showLayerInfoPopup(btn, text) {
+  let popup = document.getElementById('layer-info-popup');
+  // If already open for the same button, close it (toggle)
+  if (popup && popup._sourceBtn === btn) {
+    popup.remove();
+    return;
+  }
+  if (popup) popup.remove();
+
+  popup = document.createElement('div');
+  popup.id = 'layer-info-popup';
+  popup._sourceBtn = btn;
+
+  // Build content lines
+  text.split('\n').forEach(line => {
+    const p = document.createElement('p');
+    p.textContent = line;
+    popup.appendChild(p);
+  });
+
+  // Close button
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'layer-info-popup-close';
+  closeBtn.textContent = '✕';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.addEventListener('click', (e) => { e.stopPropagation(); popup.remove(); });
+  popup.appendChild(closeBtn);
+
+  document.body.appendChild(popup);
+
+  // Position near the button
+  const rect = btn.getBoundingClientRect();
+  const popW = 220;
+  let left = rect.right + 6;
+  if (left + popW > window.innerWidth - 8) left = rect.left - popW - 6;
+  popup.style.left = `${left}px`;
+  popup.style.top  = `${Math.max(8, rect.top)}px`;
+
+  // Close on outside click
+  const dismiss = (e) => {
+    if (!popup.contains(e.target) && e.target !== btn) {
+      popup.remove();
+      document.removeEventListener('click', dismiss);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', dismiss), 0);
+}
+
 /* Builds the right panel layer controls and legend.
    Each layer has: toggle switch, opacity slider, ⓘ info popup.
    Uses DOM methods throughout — no innerHTML with computed values. */
@@ -259,9 +308,26 @@ function buildLayerPanel() {
     const infoBtn = document.createElement('button');
     infoBtn.className = 'layer-info-btn';
     infoBtn.textContent = 'ⓘ';
-    infoBtn.title = catalogEntry
-      ? `${catalogEntry.description}\nMission: ${catalogEntry.mission}\nResolution: ${catalogEntry.resolution}\nSource: ${catalogEntry.source}`
-      : def.label;
+    infoBtn.setAttribute('aria-label', `Info: ${def.label}`);
+
+    if (catalogEntry) {
+      const popupLines = [
+        catalogEntry.description,
+        `Mission: ${catalogEntry.mission}`,
+        `Resolution: ${catalogEntry.resolution}`,
+        `Source: ${catalogEntry.source}`
+      ];
+      infoBtn.dataset.infoText = popupLines.join('\n');
+      infoBtn.title = popupLines.join('\n');  // keep native hover for desktop
+    } else {
+      infoBtn.dataset.infoText = def.label;
+      infoBtn.title = def.label;
+    }
+
+    infoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      _showLayerInfoPopup(infoBtn, infoBtn.dataset.infoText || '');
+    });
 
     row.appendChild(label);
     row.appendChild(labelText);
@@ -287,13 +353,7 @@ function buildLayerPanel() {
     panel.appendChild(opacityRow);
   });
 
-  // Path Data section — filled by updateRouteDataPanel() after route computed
-  const pathHeading = document.createElement('div');
-  pathHeading.className = 'panel-heading';
-  pathHeading.style.marginTop = '10px';
-  pathHeading.textContent = 'PATH DATA';
-  panel.appendChild(pathHeading);
-
+  // Route data section — filled by updateRouteDataPanel() after route computed
   const pathPanel = document.createElement('div');
   pathPanel.id = 'route-data-panel';
   pathPanel.className = 'route-data-panel';

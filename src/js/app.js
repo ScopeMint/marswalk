@@ -108,19 +108,6 @@ function initAppShell() {
   const group = document.createElement('div');
   group.className = 'app-actions';
 
-  const link = document.createElement('span');
-  link.className = 'link-pill';
-  const setLink = () => {
-    const on = navigator.onLine;
-    link.textContent = on ? '● EARTH LINK' : '● OFFLINE · ALL DATA ON BOARD';
-    link.classList.toggle('link-off', !on);
-    link.title = on ? 'Online. The app also works fully offline once installed.'
-                    : 'No network. Every map, grid and model runs from the copy stored on this device.';
-  };
-  window.addEventListener('online', setLink);
-  window.addEventListener('offline', setLink);
-  setLink();
-  group.appendChild(link);
 
   const installBtn = document.createElement('button');
   installBtn.className = 'app-btn';
