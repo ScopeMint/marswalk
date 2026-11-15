@@ -92,7 +92,6 @@ function buildBrief() {
     [done <= evaMin * (1 - CONFIG.eva.reserveFraction), `EVA fits with ${Math.round(CONFIG.eva.reserveFraction * 100)}% time reserve`],
     [!cons || cons.o2Frac <= CONFIG.suit.cautionFraction, 'Oxygen keeps ≥ 25% reserve'],
     [!cons || cons.waterFrac <= CONFIG.suit.cautionFraction, 'Cooling water keeps ≥ 25% reserve'],
-    [!STATE.solarStormMode, 'No solar particle event in progress'],
     [!day || (lmstAt(0) >= day.sunriseLmst && lmstAt(done) <= day.sunsetLmst),
       day ? `Whole EVA in daylight (sunrise ${briefLmst(day.sunriseLmst)}, sunset ${briefLmst(day.sunsetLmst)} LMST)` : 'Whole EVA in daylight']
   ];
