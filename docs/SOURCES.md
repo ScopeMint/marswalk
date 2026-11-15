@@ -145,6 +145,11 @@ LIBRARIES
 [CONFIRMED] Leaflet.js v1.9.x | interactive map display | https://leafletjs.com | BSD-2-Clause license
   CDN: https://unpkg.com/leaflet@1.9.4/dist/leaflet.js
 
+[CONFIRMED] IBM Plex Sans | UI font — self-hosted in src/vendor/fonts/ | https://github.com/IBM/plex | SIL Open Font License 1.1 (OFL-1.1)
+  Files used: static Latin-1 woff2 subsets for weights 400, 500, 600, 700 + italic
+  Obtained from: official IBM Plex GitHub release (ibm-plex-sans-*.zip)
+  Date accessed: 2026-11-15
+
 ===========================================================================
 CONFIRMED SOURCES (add each one here when accessed and working)
 ===========================================================================
