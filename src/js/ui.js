@@ -206,7 +206,6 @@ function buildLayerPanel() {
 
   const layerDefs = [
     { id: 'opm',       label: 'Imagery (OPM)',           defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'hillshade', label: 'Terrain shading',         defaultOn: true,  defaultOpacity: 0.70 },
     { id: 'slope',     label: 'Slope classes',           defaultOn: true,  defaultOpacity: 0.45 },
     { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
     { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
@@ -275,27 +274,19 @@ function buildLayerPanel() {
     panel.appendChild(opacityRow);
   });
 
-  // Legend section
-  const legendHeading = document.createElement('div');
-  legendHeading.className = 'panel-heading';
-  legendHeading.textContent = 'SLOPE LEGEND';
-  panel.appendChild(legendHeading);
+  // Path Data section — filled by updateRouteDataPanel() after route computed
+  const pathHeading = document.createElement('div');
+  pathHeading.className = 'panel-heading';
+  pathHeading.style.marginTop = '10px';
+  pathHeading.textContent = 'PATH DATA';
+  panel.appendChild(pathHeading);
 
-  if (typeof SLOPE_LEGEND !== 'undefined') {
-    SLOPE_LEGEND.forEach(cls => {
-      const item = document.createElement('div');
-      item.className = 'legend-item';
-      const swatch = document.createElement('div');
-      swatch.className = 'legend-swatch';
-      swatch.style.background = cls.color;
-      const lbl = document.createElement('span');
-      lbl.className = 'legend-label';
-      lbl.textContent = cls.label;
-      item.appendChild(swatch);
-      item.appendChild(lbl);
-      panel.appendChild(item);
-    });
-  }
+  const pathPanel = document.createElement('div');
+  pathPanel.id = 'route-data-panel';
+  pathPanel.className = 'route-data-panel';
+  panel.appendChild(pathPanel);
+
+  updateRouteDataPanel(null);
 }
 
 /* ── Coordinate tooltip on hover ───────────────────────────────────────────── */
