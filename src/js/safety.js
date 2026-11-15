@@ -78,7 +78,9 @@ function _hourlyAt(values, hour) {
    evaStartHour: EVA start in LMST hours (the clock on the start-time slider). evaHours: duration.
    season: a key in rems-temps.json; defaults to today's season at Gale (currentSeason()).
    Samples every 10 minutes and converts LMST -> LTST, because REMS hours are LTST.
-   Returns { minC, maxC, source, note, seasonKey } or null if data not loaded. */
+   Returns { minC, maxC, spreadLowC, spreadHighC, source, note, seasonKey } or null if data not loaded.
+   minC/maxC come from the hourly MEDIANS. spreadLowC/spreadHighC are the coldest 10th-percentile and
+   warmest 90th-percentile hour in the window (the usual day-to-day range), or null if the file lacks them. */
 function computeTemperatureRange(evaStartHour, evaHours, season) {
   if (!STATE.remsTemps) return null;
   const now = currentSeason();
@@ -94,13 +96,39 @@ function computeTemperatureRange(evaStartHour, evaHours, season) {
     evaTemps.push(_hourlyAt(temps, evaStartHour + t + shift));
   }
 
+  // Day-to-day spread: the same window read from the 10th and 90th percentile curves, when the file has them
+  const p10 = seasonData.airTempP10C, p90 = seasonData.airTempP90C;
+  let spreadLowC = null, spreadHighC = null;
+  if (p10 && p90) {
+    const lows = [], highs = [];
+    for (let t = 0; t <= Math.min(evaHours, 24) + 1e-9; t += stepH) {
+      lows.push(_hourlyAt(p10, evaStartHour + t + shift));
+      highs.push(_hourlyAt(p90, evaStartHour + t + shift));
+    }
+    spreadLowC = Math.round(Math.min(...lows)); spreadHighC = Math.round(Math.max(...highs));
+  }
+
   return {
     minC:   Math.round(Math.min(...evaTemps)),
     maxC:   Math.round(Math.max(...evaTemps)),
+    spreadLowC, spreadHighC,
     seasonKey: key,
     source: STATE.remsTemps.source,
-    note:   `${STATE.remsTemps.note} Season: ${seasonData.lsSeason} (${now.key === key ? now.label : key}).`
+    note:   `${STATE.remsTemps.note} Season: ${seasonData.lsSeason} (${now.key === key ? now.label : key}).` +
+            (spreadLowC != null ? ' Day-to-day range = 10th to 90th percentile of the sols measured.' : '')
   };
+}
+
+/* Text for the day-to-day temperature spread, e.g. " (day-to-day range -36 to -9)". Empty if unknown.
+   Used by every screen that shows the EVA temperature, so the range reads the same everywhere. */
+function tempSpreadText(temp) {
+  return temp && temp.spreadLowC != null ? ` (day-to-day range ${temp.spreadLowC} to ${temp.spreadHighC})` : '';
+}
+
+/* Text for the radiation dose range, e.g. " (45 to 56)", from the measured daily range. Empty if unknown.
+   Used by every screen that shows the EVA dose. */
+function doseRangeText(rad) {
+  return rad && rad.doseLowMuGy != null ? ` (${rad.doseLowMuGy} to ${rad.doseHighMuGy})` : '';
 }
 
 /* Runs the full safety checklist given a route result and EVA parameters.

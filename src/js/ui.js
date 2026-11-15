@@ -137,7 +137,7 @@ function updateSummaryCard() {
     const radVal = document.createElement('span');
     radVal.className = 'sum-val sum-sourced';
     const _dose = rad.doseEstimateMuGy;
-    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy';
+    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy' + doseRangeText(rad);
     radVal.title = rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
@@ -155,7 +155,7 @@ function updateSummaryCard() {
     tempLabel.textContent = 'Temp range';
     const tempVal = document.createElement('span');
     tempVal.className = 'sum-val sum-sourced';
-    tempVal.textContent = temp.minC + '°C to ' + temp.maxC + '°C';
+    tempVal.textContent = temp.minC + '°C to ' + temp.maxC + '°C' + tempSpreadText(temp);
     tempVal.title = temp.note;
     tempRow.appendChild(tempLabel);
     tempRow.appendChild(tempVal);
@@ -545,6 +545,9 @@ function _buildAssumptionsModal() {
     { name: 'Amber warning level', value: Math.round(S.cautionFraction * 100) + '% of capacity', why: 'Same 25% margin as the EVA time rule', type: A },
     { name: 'Walking energy model', value: 'Pandolf equation', why: 'Load-carriage walking cost (an Earth equation). We scale its load and walking terms by Mars gravity 3.721 / 9.807 m/s²: that scaling is OUR ASSUMPTION', type: 'SOURCE: Pandolf, Givoni & Goldman 1977, J Appl Physiol 43' },
     { name: 'Oxygen per energy',   value: '4.825 kcal per L O₂', why: 'Converts energy used into oxygen breathed', type: 'SOURCE: Weir 1949, J Physiol 109' },
+    { group: 'Rover check (a test of the planner, changes no route)' },
+    { name: 'Rover check leg length', value: `${Math.round(CONFIG.roverCheck.legMinKm * 1000)} m`, why: "Curiosity's drive is cut into legs at least this long before our planner is asked to connect them", type: 'OUR CHOICE' },
+    { name: 'Rover check slope limits', value: CONFIG.roverCheck.limitsDeg.join('°, ') + '°', why: 'The slope slider default, middle and maximum', type: 'OUR CHOICE' },
     { group: 'Measured environment' },
     { name: 'Radiation baseline',  value: rb ? `${rb.doseRateMuGyPerDay} ± ${rb.uncertaintyMuGyPerDay} μGy/day` : '210 ± 40 μGy/day', why: 'Galactic cosmic rays measured by Curiosity RAD at Gale, 2012-2013 (daily 180-225). On the rover, not inside a suit', type: 'SOURCE: Hassler et al. 2014, Science 343, 1244797' },
     { name: 'Air temperature',     value: rt && rt.seasons ? 'REMS hourly medians' : 'REMS', why: 'Curiosity REMS air temperature (~1.6 m), median for each hour of the sol, two halves of the Mars year', type: 'SOURCE: NASA PDS, REMS MODRDR (Gómez-Elvira et al. 2012)' },

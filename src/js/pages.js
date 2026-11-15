@@ -173,7 +173,7 @@ function pagesWeatherRefresh() {
   const startHour = STATE.evaStartHour == null ? 8 : STATE.evaStartHour, evaHours = STATE.evaHours || 6;
 
   const temp = typeof computeTemperatureRange === 'function' ? computeTemperatureRange(startHour, evaHours) : null;
-  w.temp.value.textContent = temp ? temp.minC + ' °C to ' + temp.maxC + ' °C' : 'no data';
+  w.temp.value.textContent = temp ? temp.minC + ' °C to ' + temp.maxC + ' °C' + (typeof tempSpreadText === 'function' ? tempSpreadText(temp) : '') : 'no data';
   w.temp.note.textContent = temp ? temp.note : 'The temperature file did not load.';
 
   let light = null, clock = null;
@@ -185,7 +185,7 @@ function pagesWeatherRefresh() {
   if (rad) {
     const dose = rad.doseEstimateMuGy;                       // same rounding as the route card
     w.rad.value.textContent = '~' + (dose >= 100 ? Math.round(dose / 10) * 10 : Math.round(dose)) + ' μGy' +
-      (rad.doseLowMuGy != null ? '  (' + rad.doseLowMuGy + ' to ' + rad.doseHighMuGy + ')' : '');
+      (typeof doseRangeText === 'function' ? doseRangeText(rad) : '');
     w.rad.note.textContent = 'For ' + evaHours + ' h outside. ' + rad.note + ' Source: ' + rad.source;
   } else { w.rad.value.textContent = 'no data'; w.rad.note.textContent = 'The radiation file did not load.'; }
 

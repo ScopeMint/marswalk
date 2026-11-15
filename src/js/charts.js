@@ -258,17 +258,28 @@ function drawTempChart(canvasId) {
   chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Local Mars time (hour of the day)', 'Air temp (°C)');
   // Today's half of the Mars year is the one the planner uses, so it is drawn thicker
   const coolNow = chartSeasonUsed() === 'northern_spring_summer', shift = chartLtstShift();
+  // Shaded band: usual day-to-day range (10th to 90th percentile of the sols measured) for today's half-year
+  const used = seasons[chartSeasonUsed()], p10 = used && used.airTempP10C, p90 = used && used.airTempP90C;
+  if (p10 && p90) {
+    const clampY = t => yOf(Math.max(lo, Math.min(hi, t)));
+    ctx.fillStyle = coolNow ? 'rgba(143, 179, 222, 0.16)' : 'rgba(232, 116, 46, 0.14)';
+    ctx.beginPath();
+    for (let q = 0; q <= 96; q++) { const h = q / 4, y = clampY(chartHourly(p90, ((h + shift) % 24 + 24) % 24)); if (q) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
+    for (let q = 96; q >= 0; q--) { const h = q / 4; ctx.lineTo(xOf(h), clampY(chartHourly(p10, ((h + shift) % 24 + 24) % 24))); }
+    ctx.closePath(); ctx.fill();
+  }
   [[warm, CHART_COLORS.orange, coolNow ? 1.5 : 2.5], [cool, CHART_COLORS.blue, coolNow ? 2.5 : 1.5]].forEach(([values, color, width]) => {
     ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
     for (let q = 0; q <= 96; q++) { const h = q / 4, y = yOf(chartHourly(values, ((h + shift) % 24 + 24) % 24)); if (q) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
     ctx.stroke();
   });
   chartLegend(state, [{ color: CHART_COLORS.blue, text: coolName }, { color: CHART_COLORS.orange, text: warmName },
-                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]
+    .concat(p10 && p90 ? [{ color: coolNow ? 'rgba(143, 179, 222, 0.3)' : 'rgba(232, 116, 46, 0.3)', text: "Usual day-to-day range (today's half-year)", shape: 'box' }] : []));
   if (state.cursor == null) {
     const range = typeof computeTemperatureRange === 'function'
       ? computeTemperatureRange(STATE.evaStartHour == null ? 8 : STATE.evaStartHour, STATE.evaHours || 6, chartSeasonUsed()) : null;
-    state.readout.textContent = range ? 'During your EVA: ' + range.minC + ' °C to ' + range.maxC + ' °C (' + (chartSeasonUsed() === 'northern_spring_summer' ? 'cooler' : 'warmer') + ' half-year, today)' : 'Move over the chart to read any hour';
+    state.readout.textContent = range ? 'During your EVA: ' + range.minC + ' °C to ' + range.maxC + ' °C' + (typeof tempSpreadText === 'function' ? tempSpreadText(range) : '') + ' (' + (chartSeasonUsed() === 'northern_spring_summer' ? 'cooler' : 'warmer') + ' half-year, today)' : 'Move over the chart to read any hour';
   } else {
     const h = Math.max(0, Math.min(24, state.cursor)), hl = ((h + chartLtstShift()) % 24 + 24) % 24, k = chartHourly(cool, hl), w = chartHourly(warm, hl);
     chartCursor(ctx, plot, xOf(h), [{ y: yOf(w), color: CHART_COLORS.orange }, { y: yOf(k), color: CHART_COLORS.blue }]);

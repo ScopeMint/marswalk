@@ -134,5 +134,12 @@ const CONFIG = {
   roughness: {
     thresholdMeters:    0.5,  // elevation spread in a cell [OUR ASSUMPTION]
     timePenaltyFraction: 0.25 // 25% slower on rough ground [OUR ASSUMPTION]
+  },
+
+  /* Rover check (rovercheck.js): settings of the TEST that compares our planner with Curiosity's real drive.
+     They do not change any route. OUR CHOICE: legs of at least 300 m; the slider's default, middle and maximum. */
+  roverCheck: {
+    legMinKm:  0.3,          // cut the rover's drive into legs at least this long (rover odometer) [OUR CHOICE]
+    limitsDeg: [15, 20, 25]  // slope limits tested [OUR CHOICE]
   }
 };
