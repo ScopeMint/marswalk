@@ -125,3 +125,13 @@ body.hud-active .tour-caption { top: 120px; z-index: 2600; }
 .haz-clear { color: #46C37B; }
 .haz-note { font-size: 11px; color: #F2B134; margin-top: 4px; line-height: 1.4; }
 .tour-caption.tour-bottom { top: auto; bottom: 24px; }
+
+/* ── Mission tools (interact.js) ── */
+.tool-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px 8px; }
+.tool-btn { background: #1d2129; color: #E8E6E3; border: 1px solid #3a4150; border-radius: 6px; padding: 7px 4px; font-size: 12px; cursor: pointer; }
+.tool-btn:hover { border-color: #3FD0C9; }
+.tool-btn.active { background: rgba(63,208,201,.15); border-color: #3FD0C9; color: #3FD0C9; }
+#nogo-list { padding: 2px 8px; }
+.nogo-item { display: flex; justify-content: space-between; align-items: center; font: 12px ui-monospace, Consolas, monospace; color: #F2B134; margin: 3px 0; }
+.nogo-item button { background: none; border: 1px solid #3a4150; color: #A3A8B3; border-radius: 4px; cursor: pointer; padding: 0 6px; }
+.custom-pin { background: #F2B134 !important; color: #0F1115 !important; }
