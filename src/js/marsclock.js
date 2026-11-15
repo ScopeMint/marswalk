@@ -205,35 +205,38 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
   const x = hours => MC.padLeft + hours / MC.hoursPerSol * (width - MC.padLeft - MC.padRight);
   const y = elevationDeg => MC.padTop + (MC.quarterTurnDeg - elevationDeg) / MC.halfTurnDeg *
     (height - MC.padTop - MC.padBottom);
-  // Palette comes from the MarsWalk theme; dimensions above are widget design choices.
-  ctx.fillStyle = '#0F1115'; ctx.fillRect(0, 0, width, height);
+  // Palette: read CSS tokens at draw time so they stay in sync with the UI theme.
+  const _t = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
+  const MC_BG = _t.bg || '#100E0D', MC_MUTED = _t.muted || '#9E9890', MC_TEXT = _t.text || '#EAE7E2';
+  const MC_ROUTE = _t.route || '#3FD0C9', MC_ACCENT = _t.accent || '#B07D4A', MC_BORDER = _t.border || '#2D2A28';
+  ctx.fillStyle = MC_BG; ctx.fillRect(0, 0, width, height);
   if (Number.isFinite(evaStartLmstHours) && Number.isFinite(evaHours) && evaHours > 0) {
     const start = mcMod(evaStartLmstHours, MC.hoursPerSol), duration = Math.min(evaHours, MC.hoursPerSol);
-    ctx.fillStyle = '#D9622B'; ctx.globalAlpha = MC.evaOpacity;
+    ctx.fillStyle = MC_ACCENT; ctx.globalAlpha = MC.evaOpacity;
     [[start, Math.min(start + duration, MC.hoursPerSol)], [0, Math.max(0, start + duration - MC.hoursPerSol)]]
       .forEach(range => ctx.fillRect(x(range[0]), MC.padTop, x(range[1]) - x(range[0]), y(-MC.quarterTurnDeg) - MC.padTop));
     ctx.globalAlpha = 1;
   }
   ctx.font = MC.fontPx + 'px ui-monospace, monospace'; ctx.lineWidth = MC.lineWidth;
   [-MC.quarterTurnDeg, 0, MC.quarterTurnDeg].forEach(elevationDeg => {
-    ctx.strokeStyle = elevationDeg === 0 ? '#A3A8B3' : '#2A2F3A';
+    ctx.strokeStyle = elevationDeg === 0 ? MC_MUTED : MC_BORDER;
     ctx.beginPath(); ctx.moveTo(x(0), y(elevationDeg)); ctx.lineTo(x(MC.hoursPerSol), y(elevationDeg)); ctx.stroke();
-    ctx.fillStyle = '#A3A8B3'; ctx.textAlign = 'right';
+    ctx.fillStyle = MC_MUTED; ctx.textAlign = 'right';
     ctx.fillText(elevationDeg + '°', MC.padLeft - MC.labelGap, y(elevationDeg));
   });
-  ctx.strokeStyle = '#3FD0C9'; ctx.beginPath();
+  ctx.strokeStyle = MC_ROUTE; ctx.beginPath();
   track.forEach((point, i) => { if (i) ctx.lineTo(x(point.lmstHours), y(point.sunElevationDeg));
     else ctx.moveTo(x(point.lmstHours), y(point.sunElevationDeg)); });
-  ctx.stroke(); ctx.fillStyle = '#A3A8B3';
+  ctx.stroke(); ctx.fillStyle = MC_MUTED;
   for (let hour = 0; hour <= MC.hoursPerSol; hour += MC.tickHours) {
     ctx.textAlign = hour === MC.hoursPerSol ? 'right' : 'center';
-    ctx.fillText(String(hour), x(hour), height - MC.labelGap);
+    ctx.fillText(hour < MC.hoursPerSol ? String(hour) : String(hour) + ' h LMST', x(hour), height - MC.labelGap);
   }
-  ctx.textAlign = 'left'; ctx.fillStyle = '#E8E6E3';
+  ctx.textAlign = 'left'; ctx.fillStyle = MC_TEXT;
   const caption = 'Sun · LMST | Rise ' + mcFormatHours(light.sunriseLmst) + ' / Set ' + mcFormatHours(light.sunsetLmst);
   ctx.fillText(caption, MC.labelGap, MC.padTop - MC.fontPx, width - MC.labelGap);
   canvas.setAttribute('role', 'img');
-  canvas.setAttribute('aria-label', caption + '. Elevation in degrees. Orange shading marks the EVA window.');
+  canvas.setAttribute('aria-label', caption + '. Elevation in degrees. Shading marks the EVA window.');
 }
 
 if (typeof module !== 'undefined') module.exports = { marsTime, sunTrack, daylight, lmstToUtc, initMarsClock, drawSunChart };

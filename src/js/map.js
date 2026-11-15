@@ -159,7 +159,37 @@ function initMap() {
   }, 1800);
 
   STATE.map = map;
+  initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
+}
+
+/* Watches the Leaflet SVG overlay for new path elements (new route line) and
+   plays a draw-on animation so the route feels fast and purposeful. */
+function initRouteAnimation() {
+  const pane = STATE.map && STATE.map.getPanes && STATE.map.getPanes().overlayPane;
+  if (!pane) return;
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(m => {
+      m.addedNodes.forEach(node => {
+        // Find newly added SVG path elements (Leaflet polyline)
+        const paths = node.nodeName === 'path' ? [node]
+          : (node.querySelectorAll ? [...node.querySelectorAll('path')] : []);
+        paths.forEach(path => {
+          if (path._routeAnimated) return;
+          path._routeAnimated = true;
+          try {
+            const len = path.getTotalLength();
+            if (len < 20) return;  // ignore tiny paths (target circles etc.)
+            path.style.strokeDasharray = len;
+            path.style.strokeDashoffset = len;
+            path.style.transition = 'stroke-dashoffset 0.55s cubic-bezier(.4,0,.2,1)';
+            requestAnimationFrame(() => { path.style.strokeDashoffset = '0'; });
+          } catch (_) { /* SVG not in document yet */ }
+        });
+      });
+    });
+  });
+  observer.observe(pane, { childList: true, subtree: true });
 }
 
 /* Adds permanent text labels for terrain features inside the study area.
