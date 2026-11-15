@@ -333,7 +333,7 @@ function initRouteAnimation() {
 
 let _routeLegendControl = null;
 
-/* Builds and attaches a small floating route-colour legend at the bottom-right of the map.
+/* Builds and attaches a small floating route-colour legend at the bottom-left of the map.
    Hidden by default; shown by showRouteLegend(), hidden by hideRouteLegend(). */
 function addRouteLegend(map) {
   const RouteLegend = L.Control.extend({
@@ -352,7 +352,7 @@ function addRouteLegend(map) {
       return el;
     }
   });
-  _routeLegendControl = new RouteLegend({ position: 'bottomright' });
+  _routeLegendControl = new RouteLegend({ position: 'bottomleft' });   // left side: the route card sits on the right
   _routeLegendControl.addTo(map);
 }
 
