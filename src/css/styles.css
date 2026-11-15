@@ -84,6 +84,11 @@
   --mono: ui-monospace, 'SF Mono', monospace;
 }
 
+/* ── SVG icon utility ── */
+.icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
+.icon-16 { width:16px; height:16px; }
+.icon-20 { width:20px; height:20px; }
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -248,6 +253,23 @@ button:focus-visible, .btn:focus-visible {
   background: var(--bg);  /* match app background so tile gaps are invisible */
 }
 
+/* ── Intro fly-in: hide all colored overlays until the animation lands ──
+   Only the base tile layer (.leaflet-tile-pane) stays visible during the zoom.
+   Class is removed by map.js once the flyTo moveend fires. */
+/* Only hide colored image overlays + route lines — keep markers visible so landing
+   sites are readable from the global view before the user clicks the button. */
+body.intro-flying .leaflet-overlay-pane,
+body.intro-flying .leaflet-routePane-pane,
+body.intro-flying .leaflet-hazardPane-pane {
+  opacity: 0 !important;
+}
+/* Smooth fade-in when class is removed */
+.leaflet-overlay-pane,
+.leaflet-routePane-pane,
+.leaflet-hazardPane-pane {
+  transition: opacity 1s ease;
+}
+
 /* ── Right panel ── */
 #right-panel {
   width: var(--right-w);
@@ -357,7 +379,7 @@ button:focus-visible, .btn:focus-visible {
   background: rgba(15, 17, 21, 0.85);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 3px 8px;
   border-radius: 3px;
   pointer-events: none;
@@ -365,7 +387,7 @@ button:focus-visible, .btn:focus-visible {
 
 /* ── Utility ── */
 .panel-heading {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -414,7 +436,7 @@ button:focus-visible, .btn:focus-visible {
 }
 
 .search-result-type {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -422,7 +444,7 @@ button:focus-visible, .btn:focus-visible {
 }
 
 .search-result-coords {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   font-family: var(--mono);
   margin-top: 2px;
@@ -433,65 +455,72 @@ button:focus-visible, .btn:focus-visible {
   margin-top: 12px;
 }
 
+/* Location library cards — editorial ruled, no rounded boxes */
 .loc-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  margin-bottom: 8px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  margin-bottom: 0;
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-left-color 0.15s, background 0.15s;
 }
-
-.loc-card:hover { border-color: var(--accent); }
-.loc-card.expanded { border-color: var(--accent); }
+.loc-card:first-child { border-top: 1px solid var(--border); }
+.loc-card:hover   { border-left-color: var(--muted); background: rgba(255,255,255,0.02); }
+.loc-card.expanded { border-left-color: var(--accent); }
 
 .loc-card-header {
-  padding: 8px 10px;
+  padding: 8px 8px 8px 12px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* Replace colored dot with a small hairline square — categorical, not traffic-light */
 .loc-card-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
+  width: 5px;
+  height: 5px;
+  border-radius: 0;
+  border: 1px solid var(--muted);
+  background: transparent;
   flex-shrink: 0;
+  opacity: 0.5;
 }
-
-.loc-card-dot.safe    { background: var(--pass); }
-.loc-card-dot.caution { background: var(--caution); }
-.loc-card-dot.danger  { background: var(--danger); }
+.loc-card-dot.safe    { border-color: var(--pass);    background: var(--pass);    opacity: 0.6; }
+.loc-card-dot.caution { border-color: var(--caution); background: var(--caution); opacity: 0.6; }
+.loc-card-dot.danger  { border-color: var(--danger);  background: var(--danger);  opacity: 0.6; }
 
 .loc-card-name {
   font-size: 12px;
   font-weight: 600;
   color: var(--text);
   flex: 1;
+  letter-spacing: -0.01em;
 }
 
 .loc-card-type {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
 }
 
 .loc-card-body {
   display: none;
-  padding: 0 10px 10px;
+  padding: 0 10px 10px 14px;
   border-top: 1px solid var(--border);
 }
-
 .loc-card.expanded .loc-card-body { display: block; }
 
 .loc-card-desc {
   font-size: 12px;
   color: var(--muted);
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 8px 0 6px;
+  opacity: 0.85;
 }
 
 .loc-card-coords {
@@ -499,36 +528,39 @@ button:focus-visible, .btn:focus-visible {
   font-size: 11px;
   color: var(--muted);
   margin-bottom: 8px;
+  opacity: 0.6;
 }
 
 .loc-safety-heading {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--caution);
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   margin-bottom: 4px;
+  opacity: 0.7;
 }
 
 .loc-safety-note {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text);
   line-height: 1.5;
   padding: 3px 0;
   display: flex;
   gap: 6px;
+  opacity: 0.8;
 }
-
 .loc-safety-note::before {
-  content: '⚠';
+  content: '!';
   color: var(--caution);
   flex-shrink: 0;
   font-size: 10px;
+  font-weight: 700;
   margin-top: 2px;
+  opacity: 0.9;
 }
-
-.loc-safety-note.info::before { content: 'ℹ'; color: var(--route); }
-.loc-safety-note.ok::before   { content: '✓'; color: var(--pass); }
+.loc-safety-note.info::before { content: 'i'; color: var(--muted); font-style: italic; font-weight: 700; }
+.loc-safety-note.ok::before   { content: '\2713'; color: var(--pass); }
 .loc-safety-note.warn::before { content: '!'; color: var(--danger); font-weight: 700; }
 
 .loc-fly-btn {
@@ -540,7 +572,7 @@ button:focus-visible, .btn:focus-visible {
   border: 1px solid var(--accent);
   color: var(--accent);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
   font-family: var(--font);
   transition: background 0.15s;
@@ -641,7 +673,7 @@ button:focus-visible, .btn:focus-visible {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 5px 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: var(--mono);
   color: var(--text);
   z-index: 700;
@@ -730,10 +762,42 @@ button:focus-visible, .btn:focus-visible {
   background: var(--panel) !important;
   border: 1px solid var(--border) !important;
   color: var(--text) !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   padding: 4px 8px !important;
   border-radius: 4px !important;
   box-shadow: none !important;
+}
+
+/* ── Route colour legend (bottom-right of map, shown when a route is active) ── */
+.route-legend {
+  background: rgba(15, 17, 21, 0.90);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  min-width: 148px;
+  pointer-events: none;
+}
+.route-legend .rl-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.route-legend .rl-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 3px 0;
+  font-size: 11px;
+  color: var(--text);
+}
+.route-legend .rl-line {
+  flex-shrink: 0;
+  width: 36px;
+  height: 10px;
+  overflow: visible;
 }
 
 /* ── Summary card (floating top-right on map) ── */
@@ -742,13 +806,12 @@ button:focus-visible, .btn:focus-visible {
   top: 12px;
   right: 12px;
   width: 240px;
-  background: rgba(24,27,34,0.96);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 12px;
   z-index: 600;
   font-size: 12px;
-  backdrop-filter: blur(4px);
   max-height: calc(100% - 24px);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -846,7 +909,7 @@ button:focus-visible, .btn:focus-visible {
 .check-item.pass    { color: var(--pass); }
 .check-item.caution { color: var(--caution); }
 .check-item.fail    { color: var(--danger); }
-.check-item.info    { color: var(--route); }
+.check-item.info    { color: var(--muted); }
 
 .sum-pov-btn {
   display: block;
@@ -854,17 +917,17 @@ button:focus-visible, .btn:focus-visible {
   margin-top: 10px;
   padding: 6px;
   background: none;
-  border: 1px solid var(--route);
-  color: var(--route);
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 3px;
   font-size: 11px;
   cursor: pointer;
   font-family: var(--font);
-  transition: background 0.15s;
+  transition: border-color 0.15s, color 0.15s;
 }
 
-.sum-pov-btn:hover { background: rgba(63,208,201,0.1); }
-.sum-pov-btn:focus-visible { outline: 2px solid var(--route); }
+.sum-pov-btn:hover { border-color: var(--muted); color: var(--text); background: rgba(255,255,255,.04); }
+.sum-pov-btn:focus-visible { outline: 2px solid var(--accent); }
 
 /* ── Layer panel (right panel) ── */
 .layer-row {
@@ -1046,7 +1109,7 @@ button:focus-visible, .btn:focus-visible {
 .modal-box {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 3px;
   width: min(640px, 90vw);
   max-height: 80vh;
   overflow-y: auto;
@@ -1151,60 +1214,66 @@ button:focus-visible, .btn:focus-visible {
 }
 
 /* ── Science target cards (left panel) ── */
+/* Editorial ruled style — mission log, not AI UI kit */
 .target-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  margin-bottom: 8px;
-  padding: 10px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  margin-bottom: 0;
+  padding: 10px 8px 10px 12px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: border-left-color 0.15s, background 0.15s;
 }
-
-.target-card:hover  { border-color: var(--route); }
-.target-card.active { border-color: var(--route); background: rgba(63,208,201,0.05); }
+.target-card:first-child { border-top: 1px solid var(--border); }
+.target-card:hover  { border-left-color: var(--muted); background: rgba(255,255,255,0.02); }
+.target-card.active { border-left-color: var(--caution); background: rgba(242,177,52,0.04); }
 
 .target-card-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 2px;
 }
 
+/* Plain index mark — no neon circle */
 .target-card-num {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--route);
-  color: var(--bg);
+  font-family: var(--mono);
   font-size: 10px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--muted);
+  letter-spacing: 0.04em;
   flex-shrink: 0;
+  min-width: 14px;
+  opacity: 0.7;
 }
 
 .target-card-name {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--text);
   flex: 1;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
+/* Category tag — subdued, no neon */
 .target-card-kind {
   font-size: 10px;
-  color: var(--accent);
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.09em;
   margin-bottom: 4px;
+  opacity: 0.65;
 }
 
 .target-card-why {
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.5;
-  margin-bottom: 4px;
+  font-size: 11.5px;
+  color: var(--text);
+  opacity: 0.78;
+  line-height: 1.55;
+  margin-bottom: 5px;
 }
 
 .target-card-coords {
@@ -1212,6 +1281,7 @@ button:focus-visible, .btn:focus-visible {
   font-size: 10px;
   color: var(--muted);
   margin-bottom: 2px;
+  opacity: 0.6;
 }
 
 .target-card-source {
@@ -1219,30 +1289,36 @@ button:focus-visible, .btn:focus-visible {
   color: var(--muted);
   font-style: italic;
   margin-bottom: 2px;
+  opacity: 0.6;
 }
 
 .target-card-note {
   font-size: 10px;
   color: var(--caution);
   margin-bottom: 6px;
+  opacity: 0.8;
 }
 
+/* Text-link style button — no neon border box */
 .target-route-btn {
-  display: block;
-  width: 100%;
-  padding: 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 0 3px;
   background: none;
-  border: 1px solid var(--route);
-  color: var(--route);
-  border-radius: 4px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 0;
   font-size: 11px;
   cursor: pointer;
   font-family: var(--font);
-  transition: background 0.15s;
+  letter-spacing: 0.01em;
+  transition: color 0.15s, border-bottom-color 0.15s;
+  width: auto;
 }
-
-.target-route-btn:hover      { background: rgba(63,208,201,0.1); }
-.target-route-btn:focus-visible { outline: 2px solid var(--route); }
+.target-route-btn:hover { color: var(--text); border-bottom-color: var(--muted); }
+.target-route-btn:focus-visible { outline: 2px solid var(--route); outline-offset: 3px; }
 
 /* ── POV photo panel (over map, right side) ── */
 .pov-panel {
@@ -1391,11 +1467,12 @@ button:focus-visible, .btn:focus-visible {
 
 .speed-btn.active,
 .speed-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--muted);
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
 }
 
-.speed-btn:focus-visible { outline: 2px solid var(--accent); }
+.speed-btn:focus-visible { outline: 2px solid var(--route); }
 
 .ctrl-hint {
   font-size: 10px;
@@ -1437,6 +1514,62 @@ button:focus-visible, .btn:focus-visible {
 }
 
 /* ── Outside study area notice (floating over map) ── */
+/* ── Intro "Go to Study Spot" overlay ──
+   Visible only while body.intro-flying; auto-hidden when class is removed on landing. */
+.begin-mission-overlay {
+  display: none;         /* hidden by default */
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 820;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+body.intro-flying .begin-mission-overlay {
+  display: flex;         /* only visible during intro */
+}
+
+.begin-mission-label {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  pointer-events: none;
+}
+
+.btn-begin-mission {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: #fff;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.6);
+  transition: background 0.15s, opacity 0.3s;
+}
+
+.btn-begin-mission:hover {
+  background: var(--primary-hover);
+}
+
+.btn-begin-mission:focus-visible {
+  outline: 2px solid var(--route);
+  outline-offset: 3px;
+}
+
 .outside-area-notice {
   position: absolute;
   bottom: 20px;
@@ -1570,30 +1703,36 @@ body:not([data-page="summary"]) .map-far #pov-panel { display: none !important; 
 
 /* ── Target card: "What to look for" section ── */
 .target-detail-block {
-  margin: 6px 0 2px;
+  margin: 5px 0 4px;
 }
 .target-detail-block summary.target-detail-toggle {
-  font-size: 11px;
-  color: var(--route);
+  font-size: 10.5px;
+  color: var(--muted);
   cursor: pointer;
   list-style: none;
   user-select: none;
+  letter-spacing: 0.03em;
+  opacity: 0.75;
+  transition: opacity 0.15s, color 0.15s;
 }
+.target-detail-block summary.target-detail-toggle:hover { opacity: 1; color: var(--text); }
 .target-detail-block summary.target-detail-toggle::-webkit-details-marker { display: none; }
-.target-detail-block[open] summary.target-detail-toggle { color: var(--caution); }
+.target-detail-block[open] summary.target-detail-toggle { opacity: 1; color: var(--text); }
 .target-detail-text {
   font-size: 11px;
   color: var(--muted);
   margin-top: 5px;
-  line-height: 1.55;
+  line-height: 1.6;
+  opacity: 0.85;
 }
 .target-findings {
   font-size: 11px;
-  color: var(--pass);
+  color: var(--muted);
   margin-top: 5px;
-  line-height: 1.55;
+  line-height: 1.6;
   border-top: 1px solid var(--border);
   padding-top: 5px;
+  opacity: 0.85;
 }
 
 
@@ -1725,3 +1864,6 @@ body:not([data-page="summary"]) .map-far #pov-panel { display: none !important; 
   font-size: 12px;
 }
 .site-popup-btn:hover { background: rgba(127, 180, 255, 0.15); }
+
+/* While the big "Go to Study Spot" button is showing, hide the smaller "Go to Gale Crater" bar: one button, not two */
+body.intro-flying #outside-area-notice { display: none !important; }

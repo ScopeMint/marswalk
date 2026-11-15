@@ -15,7 +15,7 @@
    It only MOVES existing elements, so every button keeps the click behaviour its own script gave it. */
 
 /* Top-bar buttons that go inside the Menu (by id). Buttons with class .app-btn (Install, Offline pack) go too. */
-const TIDY_MENU_BUTTON_IDS = ['btn-how-to-use', 'btn-about', 'btn-assumptions', 'btn-reload'];
+const TIDY_MENU_BUTTON_IDS = ['btn-rover-check', 'btn-how-to-use', 'btn-about', 'btn-assumptions', 'btn-reload'];
 
 /* Left-panel section titles that start folded shut (everything else starts open). */
 const TIDY_CLOSED_SECTIONS = [/mission tools/i, /multi-stop/i];
@@ -75,7 +75,7 @@ function tidyTopBar() {
     menu.className = 'tidy-menu';
     const toggle = document.createElement('button');
     toggle.id = 'btn-menu';
-    toggle.textContent = '☰ Menu';
+    toggle.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-menu"/></svg> Menu';
     toggle.setAttribute('aria-haspopup', 'true');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.title = 'How to use, sources, assumptions, reload example, offline options';

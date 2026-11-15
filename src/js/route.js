@@ -172,19 +172,17 @@ function drawRouteLine(cells) {
     weight:      4,
     opacity:     0.9,
     smoothFactor: 1.5,
-    interactive: false
+    interactive: false,
+    pane:        'routePane',
+    renderer:    STATE.routeRenderer  // SVG renderer in routePane (z-index 580, above all imagery)
   }).addTo(STATE.map);
+  if (typeof showRouteLegend === 'function') showRouteLegend();
 }
 
 /* Zooms/pans so the whole route is visible beside the route card (right) and below any caption (top).
    Skipped while the visor HUD is open (it follows the walker itself). */
-function fitRouteInView(latlngs) {
-  if (!STATE.map || !latlngs || latlngs.length < 2 || document.body.classList.contains('hud-active')) return;
-  // The example route drawn when the page opens must not move the map: the page starts on the whole planet
-  if (STATE.ui.keepView) { STATE.ui.keepView = false; return; }
-  const card = document.getElementById('summary-card');
-  const cardW = Math.max(card ? card.offsetWidth : 0, 280) + 24;   // card may not be drawn yet on the first route
-  STATE.map.flyToBounds(latlngs, { paddingTopLeft: [40, 40], paddingBottomRight: [cardW, 40], maxZoom: 16, duration: 0.8 });
+function fitRouteInView(_latlngs) {
+  // Zoom is locked while a route is active — no auto-pan so the global view is preserved.
 }
 
 function clearRouteLine() {
@@ -193,6 +191,7 @@ function clearRouteLine() {
     _routeLine = null;
   }
   clearPonrMarker();
+  if (typeof hideRouteLegend === 'function') hideRouteLegend();
 }
 
 /* Computes the last index along STATE.route.cells where the astronaut can still turn back
@@ -241,8 +240,8 @@ function updatePonrMarker(ponrIndex) {
   _ponrMarker = L.marker([pt.lat, pt.lon], {
     icon: L.divIcon({
       className: 'ponr-icon',
-      html: '<div class="ponr-pin">↩ Turn back</div>',
-      iconSize: [80, 24],
+      html: '<div class="ponr-pin"><svg class="icon" aria-hidden="true"><use href="#icon-turn-back"/></svg> Turn back point</div>',
+      iconSize: [110, 24],
       iconAnchor: [40, 12]
     }),
     zIndexOffset: 600,

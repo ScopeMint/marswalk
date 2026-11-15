@@ -19,6 +19,7 @@ async function initApp() {
   if (typeof initBrief === 'function') initBrief();             // EVA cue card button
   if (typeof initTour === 'function') initTour();               // guided tour with captions
   if (typeof initTerrain3D === 'function') initTerrain3D();     // 3D HiRISE terrain view
+  if (typeof initRoverCheck === 'function') initRoverCheck();   // planner vs Curiosity's real drive (button goes in the Menu)
 
   // Place habitat marker immediately using CONFIG fallback — grids may not be loaded yet.
   // This ensures the EVA Base is always visible on first load, even on slow connections.
@@ -91,23 +92,12 @@ async function initApp() {
   // Clear, explorable charts and the plain-language route card. Both wrap functions the scripts above set up.
   if (typeof initCharts === 'function') initCharts();
   if (typeof initRouteCard === 'function') initRouteCard();
+  if (typeof initStraightLine === 'function') initStraightLine();   // straight line vs safe route (adds a route-card section; must run after initRouteCard)
 
   // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
   if (typeof initTidy === 'function') initTidy();
   // Then split the screen into four pages (plan / layers / weather / summary). Only shows and hides what exists.
   if (typeof initPages === 'function') initPages();
-
-  // Auto-route the first science target so the example mission is immediately visible on load.
-  if (!STATE.selectedTarget && typeof selectTarget === 'function') {
-    // selectTarget needs the target itself, not its position in the list (a bare 0 was silently ignored)
-    // keepView: plan the example route but leave the map on the whole planet (the user presses "Go to Gale Crater")
-    setTimeout(() => {
-      if (STATE.selectedTarget || !STATE.targets || !STATE.targets[0]) return;
-      STATE.ui.keepView = true;
-      selectTarget(STATE.targets[0]);
-      setTimeout(() => { STATE.ui.keepView = false; }, 6000);   // safety: never leave the flag on if no route comes back
-    }, 900);
-  }
 
   console.log('[main] MarsWalk ready');
 }

@@ -11,7 +11,7 @@
 
 const RC_LABELS = {                                   // card label from ui.js -> plain wording
   'Climb / Descent': 'Uphill / downhill',
-  '↩ Turn-back point': 'Latest point to turn back',
+  'Turn-back point': 'Latest point to turn back',
   'Radiation est.': 'Radiation dose (estimate)',
   'Temp range': 'Outside temperature'
 };
@@ -66,7 +66,9 @@ function rcArrange() {
   const verdict = document.createElement('div');
   const kind = usedPct > 90 ? 'fail' : usedPct > 75 ? 'caution' : 'pass';
   verdict.className = 'rc-verdict ' + kind;
-  verdict.textContent = (kind === 'pass' ? '✓ Fits your ' : kind === 'caution' ? '⚠ Tight for your ' : '✕ Too long for your ') + STATE.evaHours + ' h EVA';
+  const _vIcon = kind === 'pass' ? 'icon-check' : kind === 'caution' ? 'icon-warning' : 'icon-close';
+  const _vText = kind === 'pass' ? 'Fits your ' : kind === 'caution' ? 'Tight for your ' : 'Too long for your ';
+  verdict.innerHTML = svgIcon(_vIcon) + ' ' + _vText + Number(STATE.evaHours) + ' h EVA';
   const sub = document.createElement('small');
   sub.textContent = 'Airlock (' + (CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes) + ' min), walking and ' + CONFIG.eva.workMinutes + ' min of work at the target use ' + (Number.isFinite(usedPct) ? usedPct : '—') + '% of your time.';
   verdict.appendChild(sub);
@@ -128,6 +130,7 @@ function stopRoute() {
   if (typeof _customMarker !== 'undefined' && _customMarker && STATE.map) { STATE.map.removeLayer(_customMarker); }   // "any point" marker
   STATE.route = { status: 'none' };
   STATE.selectedTarget = null; STATE.target = null; STATE.targetCell = null;
+  if (typeof unlockMapZoom === 'function') unlockMapZoom();
   document.querySelectorAll('.target-card.active').forEach(c => c.classList.remove('active'));
   if (typeof clearMapMessage === 'function') clearMapMessage();
   if (typeof clearProfile === 'function') clearProfile('profile-canvas');

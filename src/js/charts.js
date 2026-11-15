@@ -75,7 +75,7 @@ function chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, xTitle, yTitle) {
   ctx.strokeStyle = CHART_COLORS.axis; ctx.strokeRect(plot.x + 0.5, plot.y + 0.5, plot.w, plot.h);
 }
 
-/* Shades the spacewalk window (start hour + length), wrapping past midnight when needed. */
+/* Shades the EVA window (start hour + length), wrapping past midnight when needed. */
 function chartEvaWindow(ctx, plot, xOf) {
   const start = ((STATE.evaStartHour == null ? 8 : STATE.evaStartHour) % 24 + 24) % 24, hours = Math.min(STATE.evaHours || 6, 24);
   [[start, Math.min(start + hours, 24)], [0, Math.max(0, start + hours - 24)]].forEach(([a, b]) => {
@@ -163,7 +163,7 @@ function drawProfile(canvasId, profileData) {
   const xStepM = chartNiceStep(0, total, 6), xTicks = [], yTicks = [];
   for (let d = 0; d <= total + 1e-6; d += xStepM) xTicks.push({ value: d, label: (d / 1000).toFixed(xStepM < 100 ? 2 : xStepM < 1000 ? 1 : 0) });
   for (let e = lo; e <= hi + 1e-6; e += yStep) yTicks.push({ value: e, label: String(Math.round(e)) });
-  chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Distance walked from base (km)', 'Height (m)');
+  chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Distance walked from base (km)', '');
 
   ctx.beginPath(); ctx.moveTo(xOf(data[0].distanceMeters), yOf(data[0].elevationM));
   data.forEach(p => ctx.lineTo(xOf(p.distanceMeters), yOf(p.elevationM)));
@@ -228,7 +228,7 @@ function chartRouteMarker(fraction) {
 
 /* ── 2. Outside temperature through the day ─────────────────────────────── */
 
-/* Draws Curiosity's air temperature by local hour for the two halves of the Mars year, with the spacewalk shaded.
+/* Draws Curiosity's air temperature by local hour for the two halves of the Mars year, with the EVA window shaded.
    Data: src/data/rems-temps.json (scripts/05_prepare_rems.py): median air temperature for each hour of the sol,
    from real hourly Curiosity REMS measurements (NASA PDS, MODRDR), over many sols in each half of the Mars year.
    Gale Crater is south of the equator, so Ls 0-180 is its cooler half-year and Ls 180-360 its warmer one. */
@@ -258,17 +258,28 @@ function drawTempChart(canvasId) {
   chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Local Mars time (hour of the day)', 'Air temp (°C)');
   // Today's half of the Mars year is the one the planner uses, so it is drawn thicker
   const coolNow = chartSeasonUsed() === 'northern_spring_summer', shift = chartLtstShift();
+  // Shaded band: usual day-to-day range (10th to 90th percentile of the sols measured) for today's half-year
+  const used = seasons[chartSeasonUsed()], p10 = used && used.airTempP10C, p90 = used && used.airTempP90C;
+  if (p10 && p90) {
+    const clampY = t => yOf(Math.max(lo, Math.min(hi, t)));
+    ctx.fillStyle = coolNow ? 'rgba(143, 179, 222, 0.16)' : 'rgba(232, 116, 46, 0.14)';
+    ctx.beginPath();
+    for (let q = 0; q <= 96; q++) { const h = q / 4, y = clampY(chartHourly(p90, ((h + shift) % 24 + 24) % 24)); if (q) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
+    for (let q = 96; q >= 0; q--) { const h = q / 4; ctx.lineTo(xOf(h), clampY(chartHourly(p10, ((h + shift) % 24 + 24) % 24))); }
+    ctx.closePath(); ctx.fill();
+  }
   [[warm, CHART_COLORS.orange, coolNow ? 1.5 : 2.5], [cool, CHART_COLORS.blue, coolNow ? 2.5 : 1.5]].forEach(([values, color, width]) => {
     ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
     for (let q = 0; q <= 96; q++) { const h = q / 4, y = yOf(chartHourly(values, ((h + shift) % 24 + 24) % 24)); if (q) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
     ctx.stroke();
   });
   chartLegend(state, [{ color: CHART_COLORS.blue, text: coolName }, { color: CHART_COLORS.orange, text: warmName },
-                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your EVA', shape: 'box' }]
+    .concat(p10 && p90 ? [{ color: coolNow ? 'rgba(143, 179, 222, 0.3)' : 'rgba(232, 116, 46, 0.3)', text: "Usual day-to-day range (today's half-year)", shape: 'box' }] : []));
   if (state.cursor == null) {
     const range = typeof computeTemperatureRange === 'function'
       ? computeTemperatureRange(STATE.evaStartHour == null ? 8 : STATE.evaStartHour, STATE.evaHours || 6, chartSeasonUsed()) : null;
-    state.readout.textContent = range ? 'During your EVA: ' + range.minC + ' °C to ' + range.maxC + ' °C (' + (chartSeasonUsed() === 'northern_spring_summer' ? 'cooler' : 'warmer') + ' half-year, today)' : 'Move over the chart to read any hour';
+    state.readout.textContent = range ? 'During your EVA: ' + range.minC + ' °C to ' + range.maxC + ' °C' + (typeof tempSpreadText === 'function' ? tempSpreadText(range) : '') + ' (' + (chartSeasonUsed() === 'northern_spring_summer' ? 'cooler' : 'warmer') + ' half-year, today)' : 'Move over the chart to read any hour';
   } else {
     const h = Math.max(0, Math.min(24, state.cursor)), hl = ((h + chartLtstShift()) % 24 + 24) % 24, k = chartHourly(cool, hl), w = chartHourly(warm, hl);
     chartCursor(ctx, plot, xOf(h), [{ y: yOf(w), color: CHART_COLORS.orange }, { y: yOf(k), color: CHART_COLORS.blue }]);
@@ -298,7 +309,7 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
   track.forEach((p, i) => { if (i) ctx.lineTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); else ctx.moveTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); });
   ctx.stroke();
   chartLegend(state, [{ color: CHART_COLORS.amber, text: 'Sun today' }, { color: 'rgba(0, 0, 0, 0.6)', text: 'Night (sun below 0°)', shape: 'box' },
-                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your EVA', shape: 'box' }]);
   const fmt = typeof mcFormatHours === 'function' ? mcFormatHours : chartClock;
   if (state.cursor == null) {
     state.readout.textContent = light && Number.isFinite(light.sunriseLmst) ? 'Sunrise ' + fmt(light.sunriseLmst) + ' · sunset ' + fmt(light.sunsetLmst) : 'Move over the chart to read any hour';
@@ -310,7 +321,7 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
     state.readout.textContent = chartClock(best.lmstHours) + ' · sun ' + Math.abs(deg).toFixed(0) + '° ' + (deg >= 0 ? 'above the horizon (daylight)' : 'below the horizon (night)');
   }
   state.canvas.setAttribute('aria-label', 'Height of the sun above the horizon through today at the site, in degrees. ' +
-    'Orange shading marks your spacewalk. Use left and right arrow keys to read times.');
+    'The shaded area marks your EVA window. Use left and right arrow keys to read times.');
 }
 
 /* ── Start ──────────────────────────────────────────────────────────────── */
@@ -320,16 +331,16 @@ function initCharts() {
   if (_charts.ready) return;
   _charts.ready = true;
   document.body.classList.add('charts2');
-  chartFrame('profile', 'profile-canvas', 'Hills along your route',
-    'Height of the ground along the planned route, from the HiRISE terrain model. Left = base, right = target.',
+  chartFrame('profile', 'profile-canvas', 'Hills along your route · HiRISE DTM 1 m/px',
+    'Height of the ground along the planned route. Source: HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (NASA/JPL/University of Arizona, 1 m/px, CC0). Left = base, right = target.',
     () => drawProfile('profile-canvas'),
     () => { const d = _charts.profile.data; return d && d.length > 1 ? [0, d[d.length - 1].distanceMeters] : null; },
     () => { const d = _charts.profile.data; return d && d.length > 1 ? d[d.length - 1].distanceMeters / 100 : 10; });
-  chartFrame('temp', 'temp-canvas', 'Outside temperature through the day',
-    'Air temperature at Gale Crater by hour of the Mars day. Each curve\'s daily low and high are averages measured by Curiosity REMS over thousands of sols; the hours in between follow a typical shape and are approximate.',
+  chartFrame('temp', 'temp-canvas', 'Outside temperature through the day · Curiosity REMS',
+    'Air temperature at Gale Crater by local hour. Each curve is the median of real hourly Curiosity REMS measurements (NASA PDS, MODRDR product) over 186 Mars sols, in each half of the Mars year. Hours between measurements follow a typical diurnal shape and are approximate.',
     () => drawTempChart('temp-canvas'), () => [0, 24], 0.5);
-  chartFrame('sun', 'sun-canvas', 'Sun height today',
-    'How high the sun is above the horizon at the site through today\'s Mars day (Mars24 algorithm). Below 0° is night.',
+  chartFrame('sun', 'sun-canvas', 'Sun height today · Mars24',
+    'How high the sun is above the horizon at the site through today\'s Mars day, calculated from the Mars24 algorithm (Allison & McEwen 2000, Planetary and Space Science). Below 0° is night.',
     () => drawSunChart('sun-canvas'), () => [0, 24], 0.25);
   const all = () => {
     if (_charts.profile) drawProfile('profile-canvas');

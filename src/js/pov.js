@@ -44,7 +44,8 @@ function showPovForTarget(targetId) {
   const closeBtn = document.createElement('button');
   closeBtn.className = 'pov-close-btn';
   closeBtn.id = 'pov-close';
-  closeBtn.textContent = '✕';
+  closeBtn.setAttribute('aria-label', 'Close');
+  closeBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg>';
   header.appendChild(closeBtn);
   panel.appendChild(header);
 
@@ -94,7 +95,7 @@ function _renderPovPlaceholder(panel) {
   panel.innerHTML = `
     <div class="pov-header">
       <span class="pov-title">Surface View</span>
-      <button class="pov-close-btn" id="pov-close">✕</button>
+      <button class="pov-close-btn" id="pov-close" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
     </div>
     <div class="pov-fallback">No surface photo near this target yet.</div>
     <div class="pov-caption">Curiosity's raw images database: mars.nasa.gov/msl/multimedia/raw-images/</div>

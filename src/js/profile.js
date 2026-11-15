@@ -130,7 +130,7 @@ function drawProfile(canvasId, profileData) {
     ctx.font = 'bold 9px system-ui';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText('↩', px, pad.top + 2);
+    ctx.fillText('T.B.', px, pad.top + 2);
     ctx.restore();
   }
 

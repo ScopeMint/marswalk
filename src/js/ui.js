@@ -1,6 +1,14 @@
 /* ui.js — Summary card, layer panel, checklist, EVA budget bar, left panel mission setup.
    Depends on: config.js, state.js, layers.js, safety.js, targets.js, pov.js, profile.js. */
 
+/* Returns an inline SVG icon element string for use in JS-generated HTML.
+   id: symbol id from the inline sprite (e.g. 'icon-check').
+   label: if provided, sets aria-label + role="img"; if omitted, aria-hidden. */
+function svgIcon(id, label) {
+  const a = label ? ` aria-label="${label}" role="img"` : ' aria-hidden="true"';
+  return `<svg class="icon"${a}><use href="#${id}"/></svg>`;
+}
+
 /* ── Summary card ─────────────────────────────────────────────────────────── */
 
 /* Builds or updates the floating summary card (top-right on the map).
@@ -113,7 +121,7 @@ function updateSummaryCard() {
       ponrRow.className = 'sum-row';
       const ponrLabel = document.createElement('span');
       ponrLabel.className = 'sum-label';
-      ponrLabel.textContent = '↩ Turn-back point';
+      ponrLabel.innerHTML = svgIcon('icon-turn-back') + ' Turn-back point';
       const ponrVal = document.createElement('span');
       ponrVal.className = wholeRouteSafe ? 'sum-val sum-pass' : 'sum-val sum-caution';
       ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK'
@@ -137,7 +145,7 @@ function updateSummaryCard() {
     const radVal = document.createElement('span');
     radVal.className = 'sum-val sum-sourced';
     const _dose = rad.doseEstimateMuGy;
-    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy';
+    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy' + doseRangeText(rad);
     radVal.title = rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
@@ -155,8 +163,8 @@ function updateSummaryCard() {
     tempLabel.textContent = 'Temp range';
     const tempVal = document.createElement('span');
     tempVal.className = 'sum-val sum-sourced';
-    tempVal.textContent = temp.minC + '°C to ' + temp.maxC + '°C';
-    tempVal.title = temp.note;
+    tempVal.textContent = temp.minC + '°C to ' + temp.maxC + '°C' + tempSpreadText(temp);
+    tempVal.title = temp.note + '\nSource: ' + temp.source;
     tempRow.appendChild(tempLabel);
     tempRow.appendChild(tempVal);
     card.appendChild(tempRow);
@@ -180,8 +188,10 @@ function updateSummaryCard() {
   checklist.forEach(item => {
     const el = document.createElement('div');
     el.className = 'check-item ' + item.status;
-    const icon = { pass: '✓', caution: '⚠', fail: '✕', info: 'ℹ' }[item.status] || '·';
-    el.textContent = icon + ' ' + item.label;
+    const iconId = { pass: 'icon-check', caution: 'icon-warning', fail: 'icon-close', info: 'icon-info' }[item.status];
+    if (iconId) { const ic = document.createElement('span'); ic.innerHTML = svgIcon(iconId); el.appendChild(ic); }
+    else { el.appendChild(document.createTextNode('· ')); }
+    el.appendChild(document.createTextNode(' ' + item.label));
     if (item.detail) el.title = item.detail + (item.source ? '\nSource: ' + item.source : '');
     card.appendChild(el);
   });
@@ -236,7 +246,7 @@ function _showLayerInfoPopup(btn, text) {
   // Close button
   const closeBtn = document.createElement('button');
   closeBtn.className = 'layer-info-popup-close';
-  closeBtn.textContent = '✕';
+  closeBtn.innerHTML = svgIcon('icon-close', 'Close');
   closeBtn.setAttribute('aria-label', 'Close');
   closeBtn.addEventListener('click', (e) => { e.stopPropagation(); popup.remove(); });
   popup.appendChild(closeBtn);
@@ -353,7 +363,7 @@ function buildLayerPanel() {
     // Info button (opens popup with source/resolution info)
     const infoBtn = document.createElement('button');
     infoBtn.className = 'layer-info-btn';
-    infoBtn.textContent = 'ⓘ';
+    infoBtn.innerHTML = svgIcon('icon-info');  // button already has aria-label via setAttribute
     infoBtn.setAttribute('aria-label', `Info: ${def.label}`);
 
     if (catalogEntry) {
@@ -492,7 +502,7 @@ function _buildAssumptionsModal() {
   title.textContent = 'Assumptions';
   const closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close';
-  closeBtn.textContent = '✕';
+  closeBtn.innerHTML = svgIcon('icon-close', 'Close');
   closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
   header.appendChild(title);
   header.appendChild(closeBtn);
@@ -520,7 +530,7 @@ function _buildAssumptionsModal() {
     { name: 'Downhill slowdown',   value: Math.round(CONFIG.speedModel.downhillPenaltyFactor * 100) + '% of the uphill slowdown', why: 'Walking down a slope is slower than flat but faster than up', type: A },
     { name: 'Rough ground',        value: '+' + Math.round(CONFIG.roughness.timePenaltyFraction * 100) + '% time', why: 'Extra care on rocky, ridged ground', type: A },
     { group: 'EVA timeline' },
-    { name: 'EVA length (default)', value: CONFIG.eva.defaultHours + ' h', why: 'Close to a typical ISS spacewalk; slider 2-8 h', type: A },
+    { name: 'EVA length (default)', value: CONFIG.eva.defaultHours + ' h', why: 'Close to a typical ISS EVA duration; slider 2-8 h', type: A },
     { name: 'Science work at target', value: CONFIG.eva.workMinutes + ' min', why: 'Sampling, imaging and notes at one target', type: A },
     { name: 'Work per stop (multi-stop traverse)', value: (typeof TRAVERSE_WORK_PER_STOP_MIN !== 'undefined' ? TRAVERSE_WORK_PER_STOP_MIN : 30) + ' min', why: 'Shorter stops when visiting several targets', type: A },
     { name: 'EVA time reserve',    value: Math.round(CONFIG.eva.reserveFraction * 100) + '%', why: 'Part of the EVA always kept unused for problems. Also sets the turn-back point', type: A },
@@ -545,6 +555,9 @@ function _buildAssumptionsModal() {
     { name: 'Amber warning level', value: Math.round(S.cautionFraction * 100) + '% of capacity', why: 'Same 25% margin as the EVA time rule', type: A },
     { name: 'Walking energy model', value: 'Pandolf equation', why: 'Load-carriage walking cost (an Earth equation). We scale its load and walking terms by Mars gravity 3.721 / 9.807 m/s²: that scaling is OUR ASSUMPTION', type: 'SOURCE: Pandolf, Givoni & Goldman 1977, J Appl Physiol 43' },
     { name: 'Oxygen per energy',   value: '4.825 kcal per L O₂', why: 'Converts energy used into oxygen breathed', type: 'SOURCE: Weir 1949, J Physiol 109' },
+    { group: 'Rover check (a test of the planner, changes no route)' },
+    { name: 'Rover check leg length', value: `${Math.round(CONFIG.roverCheck.legMinKm * 1000)} m`, why: "Curiosity's drive is cut into legs at least this long before our planner is asked to connect them", type: 'OUR CHOICE' },
+    { name: 'Rover check slope limits', value: CONFIG.roverCheck.limitsDeg.join('°, ') + '°', why: 'The slope slider default, middle and maximum', type: 'OUR CHOICE' },
     { group: 'Measured environment' },
     { name: 'Radiation baseline',  value: rb ? `${rb.doseRateMuGyPerDay} ± ${rb.uncertaintyMuGyPerDay} μGy/day` : '210 ± 40 μGy/day', why: 'Galactic cosmic rays measured by Curiosity RAD at Gale, 2012-2013 (daily 180-225). On the rover, not inside a suit', type: 'SOURCE: Hassler et al. 2014, Science 343, 1244797' },
     { name: 'Air temperature',     value: rt && rt.seasons ? 'REMS hourly medians' : 'REMS', why: 'Curiosity REMS air temperature (~1.6 m), median for each hour of the sol, two halves of the Mars year', type: 'SOURCE: NASA PDS, REMS MODRDR (Gómez-Elvira et al. 2012)' },
@@ -616,7 +629,7 @@ function _buildAboutModal() {
   title.textContent = 'About & Sources';
   const closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close';
-  closeBtn.textContent = '✕';
+  closeBtn.innerHTML = svgIcon('icon-close', 'Close');
   closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
   header.appendChild(title);
   header.appendChild(closeBtn);
@@ -728,7 +741,7 @@ function _buildHowToUseModal() {
   title.textContent = 'How to Use MarsWalk';
   const closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close';
-  closeBtn.textContent = '✕';
+  closeBtn.innerHTML = svgIcon('icon-close', 'Close');
   closeBtn.addEventListener('click', () => { modal.style.display = 'none'; });
   header.appendChild(title);
   header.appendChild(closeBtn);
@@ -736,7 +749,7 @@ function _buildHowToUseModal() {
 
   const sections = [
     {
-      heading: '🗺 What is MarsWalk?',
+      heading: 'What is MarsWalk?',
       items: [
         'MarsWalk is a planning tool for a Marswalk: an EVA (extravehicular activity) on foot on the Martian surface.',
         'It layers NASA data on a map to help you plan a safe walking route to a science target at Gale Crater.',
@@ -745,7 +758,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '🌍 The Map',
+      heading: 'The Map',
       items: [
         'Inside the study area the map shows 25 cm HiRISE images; outside, a global NASA Viking + MOLA basemap.',
         "The orange dashed box is your 4 km × 4 km planning area on Curiosity's real boxwork route. The white dotted line is the rover's actual path.",
@@ -756,7 +769,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '📍 Science Targets (left panel, top section)',
+      heading: 'Science Targets (left panel, top section)',
       items: [
         'The "Science Targets" section lists 5 targets: 4 real places where Curiosity worked on Mount Sharp, and 1 we picked from HiRISE images.',
         'Click a target card to expand it and read about why that location matters scientifically.',
@@ -767,7 +780,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '🗂 Location Library (left panel, bottom section)',
+      heading: 'Location Library (left panel, bottom section)',
       items: [
         'The location library lists our study area and the ten successful Mars landing sites.',
         'Use the search box to find a site by name or mission (try "Curiosity" or "Viking"), or type coordinates like "-4.81, 137.37".',
@@ -777,7 +790,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '🛤 Planning a Route',
+      heading: 'Planning a Route',
       items: [
         '1. The habitat (EVA base) is your starting point. It sits on a flat, wide pad in the southwest of the study area.',
         '2. Click a science target card and press "Plan route" — or click directly on a numbered marker on the map.',
@@ -788,7 +801,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '📊 Summary Card (top-right of map)',
+      heading: 'Summary Card (top-right of map)',
       items: [
         'Distance — total distance of the route in kilometres.',
         'One-way time — estimated walking time to the target in minutes.',
@@ -796,13 +809,13 @@ function _buildHowToUseModal() {
         'Climb / Descent — total height gained and lost along the route in metres.',
         'Walk-back time — estimated time to walk back from the target to the habitat.',
         'EVA used — percentage of your EVA time that the full trip (out + science work + back) will use. Green = safe, amber = tight, red = over budget.',
-        'Radiation est. — estimated radiation dose for the EVA duration, based on Curiosity RAD data [Hassler et al. 2014]. Hover to see the source.',
-        'Temp range — estimated air temperature range during your EVA window, from Curiosity REMS data. Hover to see the source.',
-        'Safety checklist — ✓ pass, ⚠ caution, ✕ fail for each safety check. Hover any item for details.',
+        'Radiation dose (estimate) — estimated radiation dose for the EVA duration, based on Curiosity RAD data [Hassler et al. 2014, doi:10.1126/science.1244797]. Hover the value to see the full source.',
+        'Outside temperature — estimated air temperature range during your EVA window, from real Curiosity REMS measurements (NASA PDS). Hover the value to see the full source.',
+        'Safety checklist — pass / caution / fail for each safety check. Hover any item for details.',
       ]
     },
     {
-      heading: '⚙ EVA Controls (left panel, middle section)',
+      heading: 'EVA Controls (left panel, middle section)',
       items: [
         'Slope limit — the steepest ground (in degrees) the route is allowed to cross. Default 15°, range 5° (nearly flat only) to 25° (very steep). It only decides which ground is blocked: the walking speed on a given hill stays the same.',
         'EVA length — how many hours the Marswalk may last, airlock to airlock. Default 6 hours. The EVA used % bar in the summary card will update.',
@@ -812,11 +825,11 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '🗂 Layers Panel (right panel)',
+      heading: 'Layers Panel (right panel)',
       items: [
         'Each row is a data layer. The switch turns it on or off.',
         'The opacity slider below each layer name adjusts how transparent the layer is.',
-        'The ⓘ button shows the data source, mission, and resolution for that layer.',
+        'The info (i) button shows the data source, mission, and resolution for that layer.',
         'HiRISE imagery — 25 cm orbital photos of the study area. Global basemap (OPM) — NASA Viking + MOLA context outside it.',
         'Slope classes — a colour overlay showing terrain steepness: green = gentle, yellow = moderate, orange = steep, red = very steep. See the SLOPE LEGEND below.',
         'Walk-back time — colour bands showing how many minutes it takes to walk back to the habitat from any point (requires a route to be computed first).',
@@ -825,7 +838,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '📈 Charts (bottom bar)',
+      heading: 'Charts (bottom bar)',
       items: [
         'Elevation Profile (left chart) — shows the height of the terrain along your route from start to finish. Steep sections are highlighted.',
         'Temperature chart — median air temperature Curiosity REMS measured at Gale for each hour of the sol, for the cooler (Ls 0-180) and warmer (Ls 180-360) halves of the Mars year. The shaded region is your EVA window.',
@@ -834,18 +847,18 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '🏠 Safety Checklist Explained',
+      heading: 'Safety Checklist Explained',
       items: [
-        '✓ Pass (green) — this check is satisfied. No action needed.',
-        '⚠ Caution (amber) — the route works but is tight. Consider adjusting your plan.',
-        '✕ Fail (red) — a critical limit is exceeded. The route is not safe as planned.',
-        'ℹ Info (grey) — informational note. Not a pass/fail — just context.',
+        'Pass (green) — this check is satisfied. No action needed.',
+        'Caution (amber) — the route works but is tight. Consider adjusting your plan.',
+        'Fail (red) — a critical limit is exceeded. The route is not safe as planned.',
+        'Info (grey) — informational note. Not a pass/fail — just context.',
         'Hover any checklist item to see the specific numbers and data source behind the check.',
         'Common cautions: route is much longer than a straight line (big detour); steepest slope is within 2° of your limit.',
       ]
     },
     {
-      heading: '📷 Surface Photos',
+      heading: 'Surface Photos',
       items: [
         'Each science target has a "Show surface photo →" button at the bottom of the Summary Card.',
         'The photo panel slides in from the right showing a real Curiosity photograph near that target.',
@@ -855,7 +868,7 @@ function _buildHowToUseModal() {
       ]
     },
     {
-      heading: '⚠ What This Tool Cannot Do',
+      heading: 'What This Tool Cannot Do',
       items: [
         'Single small rocks — the terrain model is 1 m; rocks under ~2 m only show up as extra relief in the Rocks & ridges layer.',
         'Soil softness or dust depth — cannot predict whether the ground will bear weight.',

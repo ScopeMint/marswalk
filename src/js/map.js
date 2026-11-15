@@ -161,9 +161,9 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    center:  [0, 0],     // whole planet: the page opens on all of Mars (see mapFillWorld)
-    zoom:    2,
-    minZoom: 1,          // replaced at once by mapFillWorld: the planet always fills the map area
+    center:  [0, 85],    // centered on Mars — equatorial, ~90°E shows most of the planet
+    zoom:    3,          // shows most of Mars with landing sites readable
+    minZoom: 1,
     maxZoom: 18,
     zoomSnap:            0.25,   // quarter zoom steps, so "planet fills the area" can be exact
     worldCopyJump:       false,
@@ -171,7 +171,7 @@ function initMap() {
     maxBoundsViscosity:  1.0,
     zoomControl:         true,
     attributionControl:  true,
-    fadeAnimation:       false,  // prevents blue/red tile-fade mist during zoom
+    fadeAnimation:       false,  // prevents tile-fade mist
   });
 
   // Drawing order under the markers: whole-Mars picture < basemap tiles < study-area photo < sharp HiRISE tiles
@@ -201,6 +201,33 @@ function initMap() {
   map.on('moveend', checkStudyAreaBounds);
 
   // The page opens on the whole planet. This button (top of the map) takes the user to the study area.
+  // ── Zoom lock while route is active ─────────────────────────────────────────
+  // Three layers so nothing slips through:
+  // 1. Override map.zoomIn / map.zoomOut (zoom control buttons call these directly)
+  // 2. zoomend snap-back (catches scroll wheel, touch, keyboard, anything else)
+  // 3. scrollWheelZoom/touch/keyboard.disable() in lockMapZoom() as first-pass block
+
+  const _showZoomBlockMsg = () => {
+    if (typeof showMapMessage === 'function')
+      showMapMessage('Stop the current route first to change the zoom level.');
+  };
+
+  const _origZoomIn  = map.zoomIn.bind(map);
+  const _origZoomOut = map.zoomOut.bind(map);
+  map.zoomIn  = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomIn(...a);  };
+  map.zoomOut = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomOut(...a); };
+
+  let _snapBusy = false;
+  map.on('zoomend', () => {
+    if (_snapBusy) { _snapBusy = false; return; }
+    if (_routeZoomLock !== null && Math.round(map.getZoom()) !== _routeZoomLock) {
+      _snapBusy = true;
+      map.setZoom(_routeZoomLock, { animate: false });
+      _showZoomBlockMsg();
+    }
+  });
+
+  // Wire the "Return to study area" button
   const galeBtn = document.getElementById('btn-goto-gale');
   if (galeBtn) galeBtn.addEventListener('click', goToGale);
 
@@ -210,17 +237,73 @@ function initMap() {
     keyboard: false, zIndexOffset: 900
   }).on('click', goToGale).addTo(map);
 
+  // "Go to Study Spot" button — triggers the slow fly-in and reveals overlays on landing
+  const beginBtn = document.getElementById('btn-begin-mission');
+  if (beginBtn) {
+    beginBtn.addEventListener('click', () => {
+      beginBtn.style.opacity = '0';
+      beginBtn.style.pointerEvents = 'none';
+      STATE.introFlying = true;
+      map.flyTo([centerLat, centerLon], defaultZoom, { duration: 16 });
+      map.once('moveend', () => {
+        STATE.introFlying = false;
+        document.body.classList.remove('intro-flying');
+        document.dispatchEvent(new Event('marsIntroLanded'));
+      });
+    });
+  }
+
+  // routePane: the main teal route line. hazardPane sits one level above it so hazard
+  // colour segments always render on top of the route — both are above ALL image overlays
+  // (overlayPane = 400) and tile layers (tilePane = 200), and below markers (600) so
+  // the habitat / target icons always stay on top of the route.
+  map.createPane('routePane');
+  map.getPane('routePane').style.zIndex = 580;
+  STATE.routeRenderer = L.svg({ pane: 'routePane' });
+
+  map.createPane('hazardPane');
+  map.getPane('hazardPane').style.zIndex = 590;
+  STATE.hazardRenderer = L.svg({ pane: 'hazardPane' });
+
   STATE.map = map;
+  addRouteLegend(map);
   checkStudyAreaBounds();
   setInterval(mapSyncUnderlays, 500);
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
 
-/* Watches the Leaflet SVG overlay for new path elements (new route line) and
+/* Shared lock state — read by initMap()'s zoomend listener and by lock/unlock below. */
+let _routeZoomLock = null;   // null = unlocked; integer = locked zoom level
+
+/* Locks the map zoom at the current level. Called by targets.js on route start. */
+function lockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  _routeZoomLock = Math.round(m.getZoom());
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.disable();
+  if (m.touchZoom)        m.touchZoom.disable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.disable();
+  if (m.keyboard)         m.keyboard.disable();
+  if (m.boxZoom)          m.boxZoom.disable();
+}
+
+/* Unlocks zoom. Called by routecard.js when route is stopped. */
+function unlockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  _routeZoomLock = null;
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.enable();
+  if (m.touchZoom)        m.touchZoom.enable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.enable();
+  if (m.keyboard)         m.keyboard.enable();
+  if (m.boxZoom)          m.boxZoom.enable();
+}
+
+/* Watches the routePane SVG for new path elements (new route line) and
    plays a draw-on animation so the route feels fast and purposeful. */
 function initRouteAnimation() {
-  const pane = STATE.map && STATE.map.getPanes && STATE.map.getPanes().overlayPane;
+  const pane = STATE.map && STATE.map.getPane && STATE.map.getPane('routePane');
   if (!pane) return;
   const observer = new MutationObserver(mutations => {
     mutations.forEach(m => {
@@ -244,6 +327,43 @@ function initRouteAnimation() {
     });
   });
   observer.observe(pane, { childList: true, subtree: true });
+}
+
+/* ── Route legend (shown only while a route is active) ───────────────────── */
+
+let _routeLegendControl = null;
+
+/* Builds and attaches a small floating route-colour legend at the bottom-right of the map.
+   Hidden by default; shown by showRouteLegend(), hidden by hideRouteLegend(). */
+function addRouteLegend(map) {
+  const RouteLegend = L.Control.extend({
+    onAdd: function() {
+      const el = L.DomUtil.create('div', 'route-legend');
+      el.id = 'route-legend';
+      el.style.display = 'none';
+      el.innerHTML =
+        '<div class="rl-title">Route key</div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#3FD0C9" stroke-width="3"/></svg><span>Route</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#8C7FAD" stroke-width="3" stroke-dasharray="5 3"/></svg><span>Radio shadow</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E8742E" stroke-width="3"/></svg><span>Rocky ground</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E5484D" stroke-width="3"/></svg><span>Near slope limit</span></div>';
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+      return el;
+    }
+  });
+  _routeLegendControl = new RouteLegend({ position: 'bottomright' });
+  _routeLegendControl.addTo(map);
+}
+
+function showRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'block';
+}
+
+function hideRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'none';
 }
 
 /* Adds permanent text labels for terrain features inside the study area.

@@ -14,9 +14,9 @@ const HAZ_NEAR_LIMIT_DEG = 2;      // "near the slope limit" margin (docs/ROUTE_
 const HAZ_MIN_RANGE_M = 30;        // ignore hazard stretches shorter than this
 
 const HAZ_STYLE = {
-  radio: { color: '#B07CFF', label: 'Radio shadow (no direct line to base: relay via rover/orbiter)', icon: '📡' },
-  rocky: { color: '#E8742E', label: 'Rocky / ridged ground (slower, watch footing)', icon: '🪨' },
-  steep: { color: '#E5484D', label: 'Near slope limit', icon: '⛰' }
+  radio: { color: '#8C7FAD', label: 'Radio shadow (no direct line to base: relay via rover/orbiter)', icon: 'icon-radio' },
+  rocky: { color: '#E8742E', label: 'Rocky / ridged ground (slower, watch footing)', icon: 'icon-rock' },
+  steep: { color: '#E5484D', label: 'Near slope limit', icon: 'icon-slope' }
 };
 
 let _hazLayer = null;
@@ -77,23 +77,33 @@ function computeHazards() {
   };
 }
 
-/* Draws hazard ranges as coloured segments on top of the route line. */
+/* Draws hazard ranges as coloured segments on top of the route line.
+   Uses the same renderer as the route line so all paths share one SVG container, then
+   calls bringToFront() to move hazard paths to the end of that SVG (last = on top). */
 function drawHazardSegments(hz) {
   if (_hazLayer && STATE.map) STATE.map.removeLayer(_hazLayer);
   _hazLayer = null;
   if (!hz || !STATE.map) return;
-  _hazLayer = L.layerGroup();
+  const renderer = STATE.routeRenderer;  // shared SVG with route line
+  _hazLayer = L.featureGroup();          // featureGroup exposes bringToFront()
   const cells = STATE.route.cells;
-  [['radio', 9, '2 7'], ['rocky', 6, null], ['steep', 6, null]].forEach(([kind, weight, dash]) => {
+  [['radio', 7, '6 5'], ['rocky', 8, null], ['steep', 8, null]].forEach(([kind, weight, dash]) => {
     hz[kind].forEach(r => {
       const pts = cells.slice(r.i0, r.i1 + 1).map(c => { const p = cellToLatLon(c.row, c.col); return [p.lat, p.lon]; });
       if (pts.length < 2) return;
-      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: kind === 'radio' ? 0.75 : 0.9, dashArray: dash, interactive: true })
+      // Dark casing so colour reads clearly against the teal route and the map
+      L.polyline(pts, { color: '#000000', weight: weight + 4, opacity: 0.35, dashArray: dash, interactive: false, renderer })
+        .addTo(_hazLayer);
+      // Coloured line on top of casing
+      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: 1, dashArray: dash, interactive: true, renderer })
         .bindTooltip(`${HAZ_STYLE[kind].label}<br>${(r.fromM / 1000).toFixed(2)}–${(r.toM / 1000).toFixed(2)} km`, { className: 'target-tooltip', sticky: true })
         .addTo(_hazLayer);
     });
   });
   _hazLayer.addTo(STATE.map);
+  // Move every hazard path to the end of the SVG so they always paint over the route line,
+  // even when the route line was added to the same SVG after hazards were last drawn.
+  _hazLayer.bringToFront();
 }
 
 /* Adds the "Hazards on this route" block to the summary card. */
@@ -131,7 +141,7 @@ function renderHazardSection() {
   if (!any) {
     const ok = document.createElement('div');
     ok.className = 'haz-row haz-clear';
-    ok.textContent = '✓ Clear: direct radio to base the whole way, no rocky or near-limit stretches.';
+    ok.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> Clear: direct radio to base the whole way, no rocky or near-limit stretches.';
     block.appendChild(ok);
   } else if (hz.targetInShadow) {
     const warn = document.createElement('div');

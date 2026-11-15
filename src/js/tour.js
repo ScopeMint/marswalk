@@ -181,7 +181,7 @@ function initTour() {
   if (!bar || document.getElementById('btn-tour')) return;
   const b = document.createElement('button');
   b.id = 'btn-tour';
-  b.textContent = '▶ Tour';
+  b.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Tour';
   b.title = 'Guided 45-second walkthrough with captions';
   b.addEventListener('click', runTour);
   bar.insertBefore(b, bar.querySelector('#btn-how-to-use'));

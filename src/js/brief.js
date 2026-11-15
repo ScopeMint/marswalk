@@ -131,8 +131,8 @@ function buildBrief() {
 
   const turn = document.createElement('div');
   turn.className = 'brief-turn';
-  turn.textContent = wholeSafe ? '↩ TURN-BACK RULE: whole route is inside the turn-back limit. Still abort on any suit alarm, comm loss > 5 min, or buddy issue.'
-    : `↩ TURN-BACK RULE: if not at the target by PET ${briefPet(ponrPet)}, TURN BACK. Also abort on any suit alarm, comm loss > 5 min, or buddy issue.`;
+  turn.textContent = wholeSafe ? 'TURN-BACK RULE: whole route is inside the turn-back limit. Still abort on any suit alarm, comm loss > 5 min, or buddy issue.'
+    : `TURN-BACK RULE: if not at the target by PET ${briefPet(ponrPet)}, TURN BACK. Also abort on any suit alarm, comm loss > 5 min, or buddy issue.`;
   el.appendChild(turn);
 
   const grid = document.createElement('div');
@@ -147,7 +147,7 @@ function buildBrief() {
     ['Walk out / back', `${Math.round(outMin)} / ${Math.round(backMin)} min`],
     ['Energy per astronaut', cons ? `${Math.round(cons.kcal)} kcal (avg ${Math.round(cons.avgW)} W)` : '—'],
     ['O2 / water used', cons ? `${cons.o2Kg.toFixed(2)} kg / ${cons.waterKg.toFixed(2)} kg` : '—'],
-    ['Radiation, this EVA (rover baseline)', rad ? `${rad.doseEstimateMuGy} μGy` : '—']
+    ['Radiation, this EVA (rover baseline)', rad ? `${rad.doseEstimateMuGy} μGy${doseRangeText(rad)}` : '—']
   ];
   nums.forEach(([k, v]) => { const d = document.createElement('div'); d.className = 'brief-num'; d.innerHTML = '<span></span><b></b>'; d.firstChild.textContent = k; d.lastChild.textContent = v; numBox.appendChild(d); });
   grid.append(goBox, numBox);
@@ -171,7 +171,7 @@ function showBrief() {
   box.className = 'brief-box';
   const tools = document.createElement('div');
   tools.className = 'brief-tools';
-  const pr = document.createElement('button'); pr.textContent = '🖨 Print / save PDF'; pr.addEventListener('click', () => window.print());
+  const pr = document.createElement('button'); pr.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg> Print / save PDF'; pr.addEventListener('click', () => window.print());
   const cl = document.createElement('button'); cl.textContent = 'Close'; cl.addEventListener('click', () => modal.remove());
   tools.append(pr, cl);
   box.appendChild(tools);

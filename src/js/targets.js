@@ -98,10 +98,8 @@ function selectTarget(feature) {
   const [lon, lat] = feature.geometry.coordinates;
   STATE.selectedTarget = feature;
 
-  // Fly to target on the map
-  if (STATE.map && !STATE.ui.keepView) {   // keepView: the example route on page load leaves the map on the whole planet
-    STATE.map.flyTo([lat, lon], Math.max(STATE.map.getZoom(), 14), { duration: 0.8 });
-  }
+  // Disable all zoom interactions while this route is active.
+  if (typeof lockMapZoom === 'function') lockMapZoom();
 
   // Highlight the active target card
   document.querySelectorAll('.target-card').forEach(card => {

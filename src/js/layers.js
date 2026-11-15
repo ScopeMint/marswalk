@@ -136,14 +136,20 @@ function addHillshadeOverlay(map) {
   }
   const aoi    = STATE.grids.aoi;
   const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+  const introFlying   = STATE.introFlying;
+  const targetOpacity = STATE.layers.hillshade.opacity;
 
   const overlay = L.imageOverlay('./data/hillshade.png', bounds, {
-    opacity:     STATE.layers.hillshade.opacity,
+    opacity:     introFlying ? 0 : targetOpacity,
     interactive: false
   });
 
   if (STATE.layers.hillshade.visible) overlay.addTo(map);
   STATE.tileLayers.hillshade = overlay;
+
+  if (introFlying && STATE.layers.hillshade.visible) {
+    document.addEventListener('marsIntroLanded', () => overlay.setOpacity(targetOpacity), { once: true });
+  }
   console.log('[layers] hillshade overlay added');
 }
 
@@ -156,18 +162,21 @@ function addSlopeOverlay(map) {
   }
   const aoi = STATE.grids.aoi;
   const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+  const introFlying   = STATE.introFlying;
+  const targetOpacity = STATE.layers.slope.opacity;
 
   const overlay = L.imageOverlay('./data/slope-overlay.png', bounds, {
-    opacity:     STATE.layers.slope.opacity,
+    opacity:     introFlying ? 0 : targetOpacity,
     interactive: false,
-    // Fallback if PNG fails to load:
     errorEvent: () => console.warn('[layers] slope-overlay.png failed to load')
   });
 
-  if (STATE.layers.slope.visible) {
-    overlay.addTo(map);
-  }
+  if (STATE.layers.slope.visible) overlay.addTo(map);
   STATE.tileLayers.slope = overlay;
+
+  if (introFlying && STATE.layers.slope.visible) {
+    document.addEventListener('marsIntroLanded', () => overlay.setOpacity(targetOpacity), { once: true });
+  }
   console.log('[layers] slope overlay added');
 }
 
@@ -181,14 +190,20 @@ function addLosOverlay(map) {
   }
   const aoi    = STATE.grids.aoi;
   const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+  const introFlying   = STATE.introFlying;
+  const targetOpacity = STATE.layers.los.opacity;
 
   const overlay = L.imageOverlay('./data/los-overlay.png', bounds, {
-    opacity:     STATE.layers.los.opacity,
+    opacity:     introFlying ? 0 : targetOpacity,
     interactive: false
   });
 
   if (STATE.layers.los.visible) overlay.addTo(map);
   STATE.tileLayers.los = overlay;
+
+  if (introFlying && STATE.layers.los.visible) {
+    document.addEventListener('marsIntroLanded', () => overlay.setOpacity(targetOpacity), { once: true });
+  }
   console.log('[layers] LOS overlay added');
 }
 

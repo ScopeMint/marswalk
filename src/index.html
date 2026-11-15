@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="./css/charts.css">
   <link rel="stylesheet" href="./css/tidy.css">
   <link rel="stylesheet" href="./css/pages.css">
+  <link rel="stylesheet" href="./css/rovercheck.css">
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#0F1115">
   <meta name="description" content="Plan a safe Marswalk on Curiosity's real boxwork route: HiRISE 1 m terrain, slope-aware routes, suit consumables, radiation, Mars clock. Works offline.">
@@ -26,7 +27,7 @@
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-<body>
+<body class="intro-flying">
 
   <!-- SVG icon sprite — embedded directly (no scripting needed, works offline) -->
   <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"
@@ -87,6 +88,27 @@
     </symbol>
     <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24">
+      <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-nogo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+    </symbol>
+    <symbol id="icon-turn-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 14l-4-4 4-4"/><path d="M5 10h11a4 4 0 0 1 0 8h-1"/>
+    </symbol>
+    <symbol id="icon-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>
+    </symbol>
+    <symbol id="icon-radio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 8.5C5.4 5 10.5 3 12 3s6.6 2 10 5.5"/><path d="M5 12c1.9-2 4.4-3 7-3s5.1 1 7 3"/><path d="M8 15.5c1-1 2.5-1.5 4-1.5s3 .5 4 1.5"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="icon-slope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 20l7.5-13 4 7 2.5-4L22 20H3z"/>
+    </symbol>
+    <symbol id="icon-rock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 20c-1 0-2-1-2-2.5L7 8l3 1 2-3 3 2 3-1 2 7c0 2.5-1 6.5-2 6.5H6z"/>
     </symbol>
   </svg>
 
@@ -230,6 +252,19 @@
       <div id="map-message" class="map-message"
            role="status" aria-live="polite" style="display:none;"></div>
 
+      <!-- Intro call-to-action: shown while body.intro-flying; hidden after zoom lands -->
+      <div id="begin-mission-overlay" class="begin-mission-overlay" aria-live="polite">
+        <p class="begin-mission-label">NASA Space Apps 2026 · MarsWalk EVA Planner</p>
+        <button id="btn-begin-mission" class="btn-begin-mission" aria-label="Zoom to Gale Crater study area">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          Go to Study Spot — Gale Crater
+        </button>
+      </div>
+
       <!-- Outside-study-area notice (shown when map pans away from Gale Crater) -->
       <div id="outside-area-notice" class="outside-area-notice" style="display:none;"
            role="status" aria-live="polite">
@@ -311,6 +346,8 @@
   <script src="./js/walk3d.js"></script>
   <script src="./js/charts.js"></script>
   <script src="./js/routecard.js"></script>
+  <script src="./js/straightline.js"></script>
+  <script src="./js/rovercheck.js"></script>
   <script src="./js/tidy.js"></script>
   <script src="./js/storms.js"></script>
   <script src="./js/pages.js"></script>
