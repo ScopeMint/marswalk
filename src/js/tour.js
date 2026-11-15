@@ -90,11 +90,13 @@ async function runTour() {
       'Walking energy: Pandolf 1977 at Mars gravity · radiation: Curiosity RAD · weather: REMS');
     if (!(await tourWait(TOUR_STEP_MS))) return;
 
+    _tour.el.classList.add('tour-bottom');
     if (typeof showBrief === 'function') showBrief();
     tourCaption('One click prints the EVA cue card: timeline, stations, oxygen left, GO / NO-GO.', 'Uses today\'s real Mars time (Mars24 algorithm)');
     if (!(await tourWait(TOUR_STEP_MS))) return;
     const bm = document.getElementById('brief-modal');
     if (bm) bm.remove();
+    _tour.el.classList.remove('tour-bottom');
 
     const hudBtn = document.querySelector('#top-bar .hud-toggle');
     if (hudBtn) {
@@ -107,6 +109,21 @@ async function runTour() {
     }
     tourCaption('Then the crew walks it, with a visor HUD that counts down time, oxygen and the way home.', 'Simulated replay of the planned route');
     if (!(await tourWait(TOUR_STEP_MS + 2500))) return;
+    if (typeof hudClose === 'function') hudClose();
+
+    const t3dBtn = [...document.querySelectorAll('#top-bar button')].find(b => /3D/.test(b.textContent));
+    if (t3dBtn) {
+      t3dBtn.click();
+      tourCaption('…and rehearses it on the real terrain in 3D, at eye level, before ever leaving the habitat.',
+        'HiRISE 1 m terrain + 25 cm image · vertical exaggeration 1.5× (labelled)');
+      for (let i = 0; i < 60; i++) {
+        const fly = document.querySelector('[data-t3d="fly"]');
+        if (fly && !fly.disabled) { fly.click(); break; }
+        if (!(await tourWait(150))) return;
+      }
+      if (!(await tourWait(TOUR_STEP_MS + 3000))) return;
+      if (typeof t3dClose === 'function') t3dClose();
+    }
 
     tourCaption('MarsWalk: plan it, brief it, walk it. Works offline, because Mars has no internet.', 'NASA Space Apps 2026 · Dark Matter Devs');
     await tourWait(TOUR_STEP_MS);
@@ -121,6 +138,7 @@ function stopTour() {
   _tour.stopped = true;
   document.removeEventListener('keydown', tourEsc);
   if (typeof hudClose === 'function' && document.body.classList.contains('hud-active')) hudClose();
+  if (typeof t3dClose === 'function') { try { t3dClose(); } catch (e) { /* not open */ } }
   const bm = document.getElementById('brief-modal');
   if (bm) bm.remove();
   _tour.el.remove();
