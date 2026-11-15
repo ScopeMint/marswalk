@@ -78,21 +78,20 @@ function computeHazards() {
 }
 
 /* Draws hazard ranges as coloured segments on top of the route line.
-   Each segment is drawn twice: a dark casing first (wider, semi-transparent) so the
-   colour reads clearly against the teal route line underneath. */
+   Uses the same renderer as the route line so all paths share one SVG container, then
+   calls bringToFront() to move hazard paths to the end of that SVG (last = on top). */
 function drawHazardSegments(hz) {
   if (_hazLayer && STATE.map) STATE.map.removeLayer(_hazLayer);
   _hazLayer = null;
   if (!hz || !STATE.map) return;
-  const renderer = STATE.hazardRenderer || STATE.routeRenderer;
-  _hazLayer = L.layerGroup();
+  const renderer = STATE.routeRenderer;  // shared SVG with route line
+  _hazLayer = L.featureGroup();          // featureGroup exposes bringToFront()
   const cells = STATE.route.cells;
-  // weight: how thick the coloured line is; casing adds 4 px on each side
   [['radio', 7, '6 5'], ['rocky', 8, null], ['steep', 8, null]].forEach(([kind, weight, dash]) => {
     hz[kind].forEach(r => {
       const pts = cells.slice(r.i0, r.i1 + 1).map(c => { const p = cellToLatLon(c.row, c.col); return [p.lat, p.lon]; });
       if (pts.length < 2) return;
-      // Dark casing — makes the colour pop against both the blue route and the map background
+      // Dark casing so colour reads clearly against the teal route and the map
       L.polyline(pts, { color: '#000000', weight: weight + 4, opacity: 0.35, dashArray: dash, interactive: false, renderer })
         .addTo(_hazLayer);
       // Coloured line on top of casing
@@ -102,6 +101,9 @@ function drawHazardSegments(hz) {
     });
   });
   _hazLayer.addTo(STATE.map);
+  // Move every hazard path to the end of the SVG so they always paint over the route line,
+  // even when the route line was added to the same SVG after hazards were last drawn.
+  _hazLayer.bringToFront();
 }
 
 /* Adds the "Hazards on this route" block to the summary card. */

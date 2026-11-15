@@ -181,10 +181,10 @@ function initMap() {
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
 
-/* Watches the Leaflet SVG overlay for new path elements (new route line) and
+/* Watches the routePane SVG for new path elements (new route line) and
    plays a draw-on animation so the route feels fast and purposeful. */
 function initRouteAnimation() {
-  const pane = STATE.map && STATE.map.getPanes && STATE.map.getPanes().overlayPane;
+  const pane = STATE.map && STATE.map.getPane && STATE.map.getPane('routePane');
   if (!pane) return;
   const observer = new MutationObserver(mutations => {
     mutations.forEach(m => {
