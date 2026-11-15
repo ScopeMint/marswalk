@@ -172,14 +172,17 @@ function showBrief() {
   const tools = document.createElement('div');
   tools.className = 'brief-tools';
   const pr = document.createElement('button'); pr.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg> Print / save PDF'; pr.addEventListener('click', () => window.print());
-  const cl = document.createElement('button'); cl.textContent = 'Close'; cl.addEventListener('click', () => modal.remove());
+  const closeBrief = () => { modal.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = e => { if (e.key === 'Escape') closeBrief(); };          // Escape closes the card, like the other panels
+  document.addEventListener('keydown', onKey);
+  const cl = document.createElement('button'); cl.textContent = 'Close'; cl.addEventListener('click', closeBrief);
   tools.append(pr, cl);
   box.appendChild(tools);
   const card = buildBrief();
   if (card) box.appendChild(card);
   else { const p = document.createElement('p'); p.className = 'brief-empty'; p.textContent = 'Plan a route first: pick a science target.'; box.appendChild(p); }
   modal.appendChild(box);
-  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  modal.addEventListener('click', e => { if (e.target === modal) closeBrief(); });
   document.body.appendChild(modal);
 }
 

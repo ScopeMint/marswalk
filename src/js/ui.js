@@ -135,7 +135,8 @@ function updateSummaryCard() {
   }
 
   // Radiation estimate
-  const rad = computeRadiation(evaHours);
+  // Dose for the time this walk really takes (airlock + walk out + work + walk back), the same time the cue card uses
+  const rad = computeRadiation(totalMin / 60);
   if (rad) {
     const radRow = document.createElement('div');
     radRow.className = 'sum-row';
@@ -145,8 +146,10 @@ function updateSummaryCard() {
     const radVal = document.createElement('span');
     radVal.className = 'sum-val sum-sourced';
     const _dose = rad.doseEstimateMuGy;
-    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy' + doseRangeText(rad);
-    radVal.title = rad.note + '\nSource: ' + rad.source;
+    const _outH = Math.floor(Math.round(totalMin) / 60), _outM = Math.round(totalMin) % 60;
+    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy' + doseRangeText(rad) +
+      ', ' + _outH + ' h ' + String(_outM).padStart(2, '0') + ' min';
+    radVal.title = 'Dose for the time this walk takes, airlock included. The Weather page shows the dose for the full EVA time allowed.\n' + rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
     card.appendChild(radRow);

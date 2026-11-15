@@ -192,7 +192,7 @@ function pagesWeatherRefresh() {
     const dose = rad.doseEstimateMuGy;                       // same rounding as the route card
     w.rad.value.textContent = '~' + (dose >= 100 ? Math.round(dose / 10) * 10 : Math.round(dose)) + ' μGy' +
       (typeof doseRangeText === 'function' ? doseRangeText(rad) : '');
-    w.rad.note.textContent = 'For ' + evaHours + ' h outside. ' + rad.note + ' Source: ' + rad.source;
+    w.rad.note.textContent = 'For the full ' + evaHours + ' h allowed outside (the slider above). The route card and cue card show the smaller dose for the time your walk really takes. ' + rad.note + ' Source: ' + rad.source;
   } else { w.rad.value.textContent = 'no data'; w.rad.note.textContent = 'The radiation file did not load.'; }
 
   const season = typeof currentSeason === 'function' ? currentSeason() : null;

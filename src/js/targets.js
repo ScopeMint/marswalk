@@ -98,8 +98,9 @@ function selectTarget(feature) {
   const [lon, lat] = feature.geometry.coordinates;
   STATE.selectedTarget = feature;
 
-  // Disable all zoom interactions while this route is active.
-  if (typeof lockMapZoom === 'function') lockMapZoom();
+  // The user may zoom freely while a route shows (the old zoom lock could leave the map stuck on the whole planet).
+  // If the map is still far out, go to the study area so the new route is on screen.
+  if (typeof showStudyAreaForRoute === 'function') showStudyAreaForRoute();
 
   // Highlight the active target card
   document.querySelectorAll('.target-card').forEach(card => {

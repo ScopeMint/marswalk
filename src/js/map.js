@@ -276,7 +276,18 @@ function initMap() {
 /* Shared lock state — read by initMap()'s zoomend listener and by lock/unlock below. */
 let _routeZoomLock = null;   // null = unlocked; integer = locked zoom level
 
-/* Locks the map zoom at the current level. Called by targets.js on route start. */
+/* Brings the study area on screen when a target is picked while the map is still far out (whole-planet view).
+   Uses the "Go to Study Spot" button while the intro is showing, so the intro ends the normal way. */
+function showStudyAreaForRoute() {
+  const map = STATE.map;
+  if (!map) return;
+  const begin = document.getElementById('btn-begin-mission');
+  if (document.body.classList.contains('intro-flying') && begin && !STATE.introFlying) { begin.click(); return; }
+  if (!STATE.introFlying && map.getZoom() < MAP_FAR_ZOOM) goToGale();
+}
+
+/* Locks the map zoom at the current level. NOT CALLED any more (it could trap the user on the whole-planet
+   view with a route they could not see); kept with unlockMapZoom so older calls stay harmless. */
 function lockMapZoom() {
   const m = STATE.map;
   if (!m) return;

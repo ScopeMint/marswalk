@@ -182,12 +182,14 @@ function runSafetyChecklist(route, evaParams) {
   });
 
   // 4. Radiation estimate (always info — no pass/fail without a cited EVA dose limit)
-  const rad = computeRadiation(evaHours);
+  //    Dose for the time this walk really takes, the same time the route card and the cue card use.
+  const rad = computeRadiation(totalUsedMinutes / 60);
   if (rad) {
+    const usedMin = Math.round(totalUsedMinutes);
     items.push({
       label:  'Radiation (baseline estimate)',
       status: 'info',
-      detail: `~${rad.doseEstimateMuGy} μGy for ${evaHours} h EVA`,
+      detail: `~${rad.doseEstimateMuGy} μGy for the ${Math.floor(usedMin / 60)} h ${String(usedMin % 60).padStart(2, '0')} min this EVA takes`,
       source: rad.source,
       note:   rad.note
     });
