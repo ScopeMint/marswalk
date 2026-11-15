@@ -85,3 +85,4 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/interact.js | Claude Code: Mission tools — move EVA base (slope-checked), route to any clicked point, rectangular no-go zones that block cells in the route grid and re-plan (F19, F20) | team to test
 2026-11-14 | src/js/traverse.js | Claude Code: multi-stop traverse planner — times all legs with a second route worker, brute-forces the fastest visiting order, stitches into one route used by every module | team to test
 2026-11-14 | src/js/app.js (showWelcome) | Claude Code: first-visit welcome card with 3-step pitch and tour button (F21) | team to review wording
+2026-11-14 | scripts/12_record_demo.py, media/* | Claude Code: Playwright + ffmpeg recorder that plays the in-app tour (?video=1, 30 s cut) and saves the demo MP4, SRT subtitles and 5 screenshots from the real app (no edited or generated imagery) | team to watch before upload

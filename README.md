@@ -6,6 +6,14 @@ MarsWalk is an installable, offline EVA planner for the first humans on Mars. It
 
 **Live app:** https://scopemint.github.io/marswalk/ (install it from the browser's address bar; it then works with no network)
 
+**Demo video (30 s, English captions):** [`media/marswalk-demo-30s.mp4`](media/marswalk-demo-30s.mp4) · subtitles [`media/marswalk-demo-30s.srt`](media/marswalk-demo-30s.srt)
+
+![Route, safety card, suit model and hazards on Curiosity's real route](media/shot-1-map-route.png)
+
+| EVA cue card | Visor HUD | 3D fly-through |
+|---|---|---|
+| ![cue card](media/shot-2-cue-card.png) | ![visor HUD](media/shot-4-visor-hud.png) | ![3D](media/shot-5-3d-flythrough.png) |
+
 ---
 
 ## Why

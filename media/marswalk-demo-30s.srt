@@ -1,0 +1,31 @@
+1
+00:00:00,017 --> 00:00:03,606
+Today's Mars maps are global. Astronauts will walk a few kilometres.
+
+2
+00:00:03,656 --> 00:00:07,222
+MarsWalk zooms to walking scale: Curiosity's real 2025 boxwork route on Mount Sharp.
+
+3
+00:00:07,272 --> 00:00:10,970
+Pick a science target: Monte Grande Hollow & Nevado Sajama Ridge, where Curiosity drilled a ridge and a hollow.
+
+4
+00:00:11,020 --> 00:00:14,591
+It checks the crew: 673 kcal, 0.21 kg of oxygen, cooling water, radiation, daylight and the turn-back point.
+
+5
+00:00:14,641 --> 00:00:18,637
+One click prints the EVA cue card: timeline, stations, oxygen left, GO / NO-GO.
+
+6
+00:00:18,687 --> 00:00:23,203
+Then the crew walks it, with a visor HUD that counts down time, oxygen and the way home.
+
+7
+00:00:23,253 --> 00:00:29,449
+…and rehearses it on the real terrain in 3D, at eye level, before ever leaving the habitat.
+
+8
+00:00:29,499 --> 00:00:29,950
+MarsWalk: plan it, brief it, walk it. Works offline, because Mars has no internet.

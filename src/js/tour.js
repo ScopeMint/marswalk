@@ -4,7 +4,9 @@
    Doubles as the demo-video script: screen-record it and the captions are the subtitles.
    Depends on: STATE, CONFIG, selectTarget, toggleLayer, showBrief (brief.js), hud.js (hud-toggle button). */
 
-const TOUR_STEP_MS = 5200;           // time each caption stays up
+const TOUR_VIDEO = /[?&]video=1/.test(location.search);   // 30-second demo-video cut (open index.html?video=1)
+const TOUR_STEP_MS = TOUR_VIDEO ? 3600 : 5200;   // time each caption stays up
+const TOUR_LOG = [];                 // {tMs, main, small} for building video subtitles
 const TOUR_TARGET_INDEX = 1;         // Monte Grande hollow / Nevado Sajama ridge (Curiosity's drill pair)
 
 let _tour = null;
@@ -26,6 +28,7 @@ function tourWait(ms) {
 function tourCaption(main, small) {
   const el = _tour && _tour.el;
   if (!el) return;
+  TOUR_LOG.push({ tMs: performance.now(), main, small: small || '' });
   el.querySelector('.tour-main').textContent = main;
   el.querySelector('.tour-small').textContent = small || '';
   el.classList.remove('tour-in');
@@ -56,20 +59,26 @@ async function runTour() {
   const c = CONFIG.studyArea;
 
   try {
-    if (STATE.map) map.setView([c.centerLat, c.centerLon], 9, { animate: false });
+    // Pre-load three.js now so the 3D step starts instantly later (module cache)
+    import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js').catch(() => null);
+    if (STATE.map) map.setView([c.centerLat, c.centerLon], CONFIG.studyArea.defaultZoom - 2, { animate: false });
     tourCaption('Today\'s Mars maps are global. Astronauts will walk a few kilometres.', 'Gale Crater, Mars · global basemap: NASA Viking + MOLA');
     if (!(await tourWait(TOUR_STEP_MS))) return;
 
-    map.flyTo([c.centerLat, c.centerLon], CONFIG.studyArea.defaultZoom, { duration: 3 });
+    map.flyTo([c.centerLat, c.centerLon], CONFIG.studyArea.defaultZoom + 0.5, { duration: 2.5 });
     toggleLayer('traverse', true);
     tourCaption('MarsWalk zooms to walking scale: Curiosity\'s real 2025 boxwork route on Mount Sharp.',
-      '25 cm HiRISE images · 1 m HiRISE terrain · rover path from NASA/JPL');
+      TOUR_VIDEO && STATE.validation
+        ? `25 cm HiRISE images · 1 m terrain matches the rover's own heights to ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m`
+        : '25 cm HiRISE images · 1 m HiRISE terrain · rover path from NASA/JPL');
     if (!(await tourWait(TOUR_STEP_MS))) return;
 
-    tourCaption(STATE.validation
-      ? `Our terrain matches the heights Curiosity itself measured at ${STATE.validation.n} stops, within ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m.`
-      : 'Our terrain is checked against the heights Curiosity itself measured.', 'Validation: HiRISE DTM vs MSL waypoint elevations');
-    if (!(await tourWait(TOUR_STEP_MS))) return;
+    if (!TOUR_VIDEO) {
+      tourCaption(STATE.validation
+        ? `Our terrain matches the heights Curiosity itself measured at ${STATE.validation.n} stops, within ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m.`
+        : 'Our terrain is checked against the heights Curiosity itself measured.', 'Validation: HiRISE DTM vs MSL waypoint elevations');
+      if (!(await tourWait(TOUR_STEP_MS))) return;
+    }
 
     const t = STATE.targets[TOUR_TARGET_INDEX];
     selectTarget(t);
@@ -77,11 +86,13 @@ async function runTour() {
     await tourWaitRoute();
     if (!(await tourWait(TOUR_STEP_MS))) return;
 
-    toggleLayer('relief', true);
-    tourCaption(`It finds the fastest safe walk: ${(STATE.route.distanceMeters / 1000).toFixed(2)} km, never steeper than ${STATE.slopeLimitDeg}°, slowing on rocky ground.`,
-      'Slope + 1 m rock & ridge relief from the HiRISE terrain model');
-    if (!(await tourWait(TOUR_STEP_MS))) return;
-    toggleLayer('relief', false);
+    if (!TOUR_VIDEO) {
+      toggleLayer('relief', true);
+      tourCaption(`It finds the fastest safe walk: ${(STATE.route.distanceMeters / 1000).toFixed(2)} km, never steeper than ${STATE.slopeLimitDeg}°, slowing on rocky ground.`,
+        'Slope + 1 m rock & ridge relief from the HiRISE terrain model');
+      if (!(await tourWait(TOUR_STEP_MS))) return;
+      toggleLayer('relief', false);
+    }
 
     const cons = STATE.consumables;
     tourCaption(cons
@@ -108,7 +119,7 @@ async function runTour() {
       if (play) play.click();
     }
     tourCaption('Then the crew walks it, with a visor HUD that counts down time, oxygen and the way home.', 'Simulated replay of the planned route');
-    if (!(await tourWait(TOUR_STEP_MS + 2500))) return;
+    if (!(await tourWait(TOUR_VIDEO ? 4500 : TOUR_STEP_MS + 2500))) return;
     if (typeof hudClose === 'function') hudClose();
 
     const t3dBtn = [...document.querySelectorAll('#top-bar button')].find(b => /3D/.test(b.textContent));
@@ -118,15 +129,16 @@ async function runTour() {
         'HiRISE 1 m terrain + 25 cm image · vertical exaggeration 1.5× (labelled)');
       for (let i = 0; i < 60; i++) {
         const fly = document.querySelector('[data-t3d="fly"]');
-        if (fly && !fly.disabled) { fly.click(); break; }
+        // wait past the 3D view's first overlay refresh (it resets the camera to orbit), then fly
+        if (fly && !fly.disabled) { await tourWait(700); fly.click(); break; }
         if (!(await tourWait(150))) return;
       }
-      if (!(await tourWait(TOUR_STEP_MS + 3000))) return;
+      if (!(await tourWait(TOUR_VIDEO ? 5000 : TOUR_STEP_MS + 3000))) return;
       if (typeof t3dClose === 'function') t3dClose();
     }
 
     tourCaption('MarsWalk: plan it, brief it, walk it. Works offline, because Mars has no internet.', 'NASA Space Apps 2026 · Dark Matter Devs');
-    await tourWait(TOUR_STEP_MS);
+    await tourWait(TOUR_VIDEO ? 3500 : TOUR_STEP_MS);
   } finally {
     stopTour();
   }

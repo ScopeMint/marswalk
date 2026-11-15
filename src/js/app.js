@@ -78,7 +78,7 @@ function bootFinish() {
 function showWelcome() {
   let seen = false;
   try { seen = localStorage.getItem('marswalk-welcome') === '1'; } catch (e) { seen = false; }
-  if (seen || document.getElementById('welcome')) return;
+  if (seen || /[?&]video=1/.test(location.search) || document.getElementById('welcome')) return;
   const card = document.createElement('div');
   card.id = 'welcome';
   card.className = 'welcome';
