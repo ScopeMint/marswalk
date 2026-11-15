@@ -86,7 +86,7 @@ const CONFIG = {
      Source: Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797
      NOTE: measured on the rover surface, not inside a suit. Suit shielding not modeled. */
   radiation: {
-    baselineMuGyPerDay: 233,  // μGy/day — sourced from Hassler et al. 2014
+    baselineMuGyPerDay: 210,  // μGy/day (0.210 ± 0.040 mGy/day) — Hassler et al. 2014; app reads data/rad-baseline.json
     sourceLabel: 'Hassler et al. (2014), Science 343(6169)'
   },
 

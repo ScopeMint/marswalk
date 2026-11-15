@@ -80,15 +80,6 @@ const LAYER_CATALOG = [
     source: 'Our calculation. Mast and antenna heights are OUR ASSUMPTION.'
   },
   {
-    id: 'rad',
-    name: 'Radiation Zones (Approximate)',
-    description: 'Green = near baseline dose (233 μGy/day, Hassler et al. 2014); red = slightly higher dose at higher elevation (thinner air above). Model: +1.5% per 100 m elevation [OUR ASSUMPTION]. Planning estimate only.',
-    mission: 'MSL/Curiosity RAD + HiRISE elevation',
-    instrument: 'RAD + DTM-derived altitude model',
-    resolution: '10 m/cell',
-    source: 'Base dose: Hassler et al. (2014), Science 343(6169). Elevation scaling: OUR ASSUMPTION.'
-  },
-  {
     id: 'walkback',
     name: 'Walk-back Time',
     description: 'Minutes to walk back to the habitat from any point (slope-aware speed model). Green 0-15, cyan 15-30, amber 30-60, orange 60-90, red over 90 min; clear = unreachable at this slope limit.',
@@ -183,27 +174,6 @@ function addLosOverlay(map) {
   console.log('[layers] LOS overlay added');
 }
 
-/* Adds the radiation zones PNG overlay.
-   Green = baseline dose; red = elevated dose (higher elevation = slightly more radiation).
-   Approximate model [OUR ASSUMPTION: 1.5% per 100m elevation].
-   Must run AFTER loadGrids() so aoi.json bounds are available. */
-function addRadOverlay(map) {
-  if (!STATE.grids || !STATE.grids.aoi) {
-    console.warn('[layers] addRadOverlay: grids not loaded yet');
-    return;
-  }
-  const aoi    = STATE.grids.aoi;
-  const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
-
-  const overlay = L.imageOverlay('./data/rad-overlay.png', bounds, {
-    opacity:     STATE.layers.rad.opacity,
-    interactive: false
-  });
-
-  if (STATE.layers.rad.visible) overlay.addTo(map);
-  STATE.tileLayers.rad = overlay;
-  console.log('[layers] radiation overlay added');
-}
 
 /* Sets the opacity of a named layer. layerId matches STATE.tileLayers keys. */
 function updateLayerOpacity(layerId, opacity) {

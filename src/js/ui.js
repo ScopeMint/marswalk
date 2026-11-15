@@ -271,7 +271,6 @@ function buildLayerPanel() {
     { id: 'slope',     label: 'Slope classes',           defaultOn: false, defaultOpacity: 0.35 },
     { id: 'relief',    label: 'Rocks & ridges (1 m)',    defaultOn: false, defaultOpacity: 0.85 },
     { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
-    { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
     { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisNight', label: 'THEMIS Night IR',       defaultOn: false, defaultOpacity: 0.70 },

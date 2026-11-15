@@ -221,7 +221,7 @@ function hudRender() {
   const backSeconds = walkback && walkback.status === 'ready' ? hudGridValue(walkback.data, currentCell) : NaN;
   const totalSeconds = STATE.evaHours * HUD_SECONDS_PER_HOUR, remainingSeconds = totalSeconds - elapsedSeconds;
   const remainingFraction = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : 0;
-  const dose = typeof computeRadiation === 'function' ? computeRadiation(elapsedSeconds / HUD_SECONDS_PER_HOUR, STATE.solarStormMode) : null;
+  const dose = typeof computeRadiation === 'function' ? computeRadiation(elapsedSeconds / HUD_SECONDS_PER_HOUR) : null;
   el.heading.textContent = fraction >= 1 ? 'AT TARGET' : `${hudNumber(hudBearing(point, nextPoint), 0)}°`;
   el.target.textContent = STATE.selectedTarget && STATE.selectedTarget.properties ? STATE.selectedTarget.properties.name || '--' : '--';
   el.elapsed.textContent = hudClock(elapsedSeconds); el.remaining.textContent = hudClock(remainingSeconds);
@@ -233,7 +233,7 @@ function hudRender() {
   el.eta.textContent = `${hudNumber(Math.max(0, route.timeSeconds - elapsedSeconds) / HUD_SECONDS_PER_MINUTE)} min`;
   el.terrain.textContent = `${hudNumber(hudGridValue(grids.elevation, currentCell))} m / ${hudNumber(hudGridValue(grids.slope, currentCell))}°`;
   el.walkback.textContent = `${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`;
-  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN)} μGy${STATE.solarStormMode ? ' · STORM' : ''}`;
+  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN, 0)} μGy`;
   hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength);
   const done = elapsedSeconds >= hudEndSeconds();
   el.phase.textContent = done ? `Return leg: walk-back ${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`

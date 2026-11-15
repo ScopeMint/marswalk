@@ -52,9 +52,6 @@ async function initApp() {
   if (typeof addLosOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addLosOverlay(STATE.map);
   }
-  if (typeof addRadOverlay === 'function' && STATE.map && STATE.grids.loaded) {
-    addRadOverlay(STATE.map);
-  }
 
   // 5. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();

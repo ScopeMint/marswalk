@@ -34,8 +34,12 @@ async function loadRemsTemps() {
 function computeRadiation(evaHoursUsed) {
   if (!STATE.radBaseline) return null;
   const dose = STATE.radBaseline.doseRateMuGyPerDay * (evaHoursUsed / 24);
+  const range = STATE.radBaseline.rangeMuGyPerDay;
   return {
-    doseEstimateMuGy: Math.round(dose * 10) / 10,
+    // Whole μGy: the baseline itself is ±19%, so decimals would be false precision.
+    doseEstimateMuGy: Math.round(dose),
+    doseLowMuGy:  range ? Math.round(range[0] * evaHoursUsed / 24) : null,
+    doseHighMuGy: range ? Math.round(range[1] * evaHoursUsed / 24) : null,
     source: STATE.radBaseline.citation,
     doi:    STATE.radBaseline.doi,
     note:   STATE.radBaseline.screenNote

@@ -1,49 +1,54 @@
 """
-06_prepare_rad.py — Build data/rad-baseline.json from the Hassler et al. 2014 paper.
-Output: data/rad-baseline.json
+06_prepare_rad.py - Build src/data/rad-baseline.json from Hassler et al. (2014).
 
 HOW TO RUN:
-  python3 scripts/06_prepare_rad.py
+  python scripts/06_prepare_rad.py
 
-SOURCE:
-  Hassler et al. (2014), Science 343(6169): "Mars' Surface Radiation Environment Measured
-  with the Mars Science Laboratory's Curiosity Rover"
-  DOI: 10.1126/science.1244797
+SOURCE (values checked against the paper text, Nov 14 2026):
+  Hassler, D. M. et al. (2014), "Mars' Surface Radiation Environment Measured with the Mars
+  Science Laboratory's Curiosity Rover", Science 343(6169), 1244797, doi:10.1126/science.1244797
 
-  Value: surface absorbed dose rate from galactic cosmic rays.
-  Measurement period: sol 15–350 (August 2012 to June 2013).
-  Measured AT the surface (not deep underground, not inside a suit).
+  - Average total galactic cosmic ray (GCR) dose rate at Gale crater (-4.4 km MOLA):
+      0.210 +/- 0.040 mGy/day  (tissue-like E detector)  -> 210 +/- 40 uGy/day
+  - Daily GCR dose rate varied between 180 and 225 uGy/day (air pressure, season, solar activity).
+  - Dose-equivalent rate: 0.64 +/- 0.12 mSv/day.
+  - Observation period: ~300 sols, 7 August 2012 to 1 June 2013, near solar maximum (cycle 24).
+  - The one solar energetic particle (SEP) event seen on the surface (11-12 April 2013) was small:
+    ~30% over the GCR rate, 0.025 mGy for the whole event. No storm multiplier is used in the app.
 
-NOTE: This is a galactic cosmic ray baseline — it excludes solar energetic particle events.
-      Actual dose during a solar storm can be much higher.
-      We show it as a planning baseline, clearly labeled.
+NOTE: Measured on the rover at the surface. Not inside a suit; suit shielding and solar storms
+      are not modeled.
 """
 
 import json
 import os
 
 RAD_DATA = {
-    'doseRateMuGyPerDay': 233,
-    'uncertaintyMuGyPerDay': 12,
-    'unit': 'μGy/day (micro-gray per day)',
-    'type': 'Surface absorbed dose, galactic cosmic rays',
-    'instrument': 'RAD (Radiation Assessment Detector)',
+    'doseRateMuGyPerDay': 210,
+    'uncertaintyMuGyPerDay': 40,
+    'rangeMuGyPerDay': [180, 225],
+    'doseEquivalentMicroSvPerDay': 640,
+    'doseEquivalentUncertaintyMicroSvPerDay': 120,
+    'unit': 'μGy/day (micro-gray per day, absorbed dose in tissue-like detector)',
+    'type': 'Surface absorbed dose rate, galactic cosmic rays (GCR)',
+    'instrument': 'RAD (Radiation Assessment Detector), E detector (tissue-like)',
     'mission': 'MSL/Curiosity',
-    'location': 'Gale Crater, Mars surface',
-    'measurementPeriod': 'Sol 15–350 (August 2012 – June 2013)',
+    'location': 'Gale Crater, Mars surface (-4.4 km MOLA)',
+    'measurementPeriod': '7 Aug 2012 - 1 Jun 2013 (~300 sols, near solar maximum)',
     'doi': '10.1126/science.1244797',
-    'citation': 'Hassler et al. (2014), Science 343(6169)',
-    'screenNote': 'Measured on the rover at Gale Crater surface. NOT inside a spacesuit. Solar storms and suit shielding not modeled. This is a planning baseline only.',
-    'evaEstimateFormula': 'EVA dose estimate = doseRateMuGyPerDay × (EVA_hours / 24)'
+    'citation': 'Hassler et al. (2014), Science 343(6169), 1244797',
+    'screenNote': 'Average galactic cosmic ray dose measured on the rover at Gale (210 ± 40 μGy/day; '
+                  'daily values 180-225). Not inside a spacesuit. Suit shielding and solar storms are not modeled.',
+    'sepNote': 'The only solar particle event RAD saw on the surface in this period (11-12 April 2013) '
+               'raised the dose rate ~30% and added 0.025 mGy in total. Larger events are possible; '
+               'no storm scenario is modeled.',
+    'evaEstimateFormula': 'EVA dose estimate = doseRateMuGyPerDay x (EVA_hours / 24)',
 }
 
-OUT_FILE = 'data/rad-baseline.json'
-os.makedirs('data', exist_ok=True)
-with open(OUT_FILE, 'w') as f:
-    json.dump(RAD_DATA, f, indent=2)
+OUT_FILE = os.path.join('src', 'data', 'rad-baseline.json')
+with open(OUT_FILE, 'w', encoding='utf-8') as f:
+    json.dump(RAD_DATA, f, indent=2, ensure_ascii=False)
 
 print(f'[06] Saved: {OUT_FILE}')
-print(f'     Baseline: {RAD_DATA["doseRateMuGyPerDay"]} μGy/day')
-print(f'     Source: {RAD_DATA["citation"]}')
-print(f'     For a 6-hour EVA: {RAD_DATA["doseRateMuGyPerDay"] * 6 / 24:.1f} μGy')
-print('     Used by safety.js to compute the radiation estimate card.')
+print(f'     Baseline: {RAD_DATA["doseRateMuGyPerDay"]} +/- {RAD_DATA["uncertaintyMuGyPerDay"]} uGy/day')
+print(f'     For a 6-hour EVA: ~{round(RAD_DATA["doseRateMuGyPerDay"] * 6 / 24)} uGy')

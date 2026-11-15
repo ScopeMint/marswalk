@@ -16,7 +16,7 @@ const MARS_LOCATIONS = [
     riskLevel: 'caution',
     description: 'Site of the Curiosity rover (MSL). Ancient lake sediments and layered rocks inside Mount Sharp record billions of years of Mars climate history. Our primary MarsWalk study area.',
     safetyNotes: [
-      { level: 'info', text: 'Radiation baseline: ~233 μGy/day [Hassler et al. 2014, Science 343]' },
+      { level: 'info', text: 'Radiation baseline: ~210 μGy/day (GCR, on the rover) [Hassler et al. 2014, Science 343]' },
       { level: '',     text: 'Sandy dunes in lower crater — potential wheel/mobility hazard for EVA equipment' },
       { level: '',     text: 'Dust devils observed frequently by Curiosity REMS' }
     ],

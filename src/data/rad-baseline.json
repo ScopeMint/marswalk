@@ -1,17 +1,21 @@
 {
-  "doseRateMuGyPerDay": 233,
-  "uncertaintyMuGyPerDay": 12,
-  "unit": "μGy/day (micro-gray per day)",
-  "type": "Surface absorbed dose, galactic cosmic rays",
-  "instrument": "RAD (Radiation Assessment Detector)",
+  "doseRateMuGyPerDay": 210,
+  "uncertaintyMuGyPerDay": 40,
+  "rangeMuGyPerDay": [
+    180,
+    225
+  ],
+  "doseEquivalentMicroSvPerDay": 640,
+  "doseEquivalentUncertaintyMicroSvPerDay": 120,
+  "unit": "μGy/day (micro-gray per day, absorbed dose in tissue-like detector)",
+  "type": "Surface absorbed dose rate, galactic cosmic rays (GCR)",
+  "instrument": "RAD (Radiation Assessment Detector), E detector (tissue-like)",
   "mission": "MSL/Curiosity",
-  "location": "Gale Crater, Mars surface",
-  "measurementPeriod": "Sol 15–350 (August 2012 – June 2013)",
+  "location": "Gale Crater, Mars surface (-4.4 km MOLA)",
+  "measurementPeriod": "7 Aug 2012 - 1 Jun 2013 (~300 sols, near solar maximum)",
   "doi": "10.1126/science.1244797",
-  "citation": "Hassler et al. (2014), Science 343(6169)",
-  "screenNote": "Measured on the rover at Gale Crater surface. NOT inside a spacesuit. Solar storms and suit shielding not modeled. This is a planning baseline only.",
-  "evaEstimateFormula": "EVA dose estimate = doseRateMuGyPerDay × (EVA_hours / 24)",
-  "solarStormMultiplier": 10,
-  "solarStormNote": "Moderate solar particle event (SPE) scenario. RAD/Curiosity measured SPE events delivering 1–8 mGy in a single day (4–34× baseline). We use 10× as a conservative planning scenario. Hassler et al. (2014), Science 343, Supplementary Table S2.",
-  "solarStormCitation": "Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797"
+  "citation": "Hassler et al. (2014), Science 343(6169), 1244797",
+  "screenNote": "Average galactic cosmic ray dose measured on the rover at Gale (210 ± 40 μGy/day; daily values 180-225). Not inside a spacesuit. Suit shielding and solar storms are not modeled.",
+  "sepNote": "The only solar particle event RAD saw on the surface in this period (11-12 April 2013) raised the dose rate ~30% and added 0.025 mGy in total. Larger events are possible; no storm scenario is modeled.",
+  "evaEstimateFormula": "EVA dose estimate = doseRateMuGyPerDay x (EVA_hours / 24)"
 }
