@@ -135,3 +135,10 @@ body.hud-active .tour-caption { top: 120px; z-index: 2600; }
 .nogo-item { display: flex; justify-content: space-between; align-items: center; font: 12px ui-monospace, Consolas, monospace; color: #F2B134; margin: 3px 0; }
 .nogo-item button { background: none; border: 1px solid #3a4150; color: #A3A8B3; border-radius: 4px; cursor: pointer; padding: 0 6px; }
 .custom-pin { background: #F2B134 !important; color: #0F1115 !important; }
+
+/* ── Multi-stop traverse (traverse.js) ── */
+.trav-list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; padding: 4px 8px; }
+.trav-item { display: flex; gap: 6px; align-items: center; font-size: 12px; color: #E8E6E3; cursor: pointer; }
+.trav-item input { accent-color: #3FD0C9; }
+.trav-go { margin: 6px 8px 2px; width: calc(100% - 16px); color: #3FD0C9; border-color: rgba(63,208,201,.55); font-weight: 600; }
+#trav-result { padding: 2px 8px; }

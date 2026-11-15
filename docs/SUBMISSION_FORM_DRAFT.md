@@ -55,6 +55,11 @@ For a chosen target MarsWalk:
     turn-back rule). This is what an astronaut would carry.
 (6) Replays the walk in a full-screen helmet-visor HUD and in a 3D HiRISE terrain fly-through.
 (7) Shows the real Curiosity photo from each target, so the crew knows what to expect.
+(8) Plans multi-stop traverses: times every leg on the real terrain and picks the fastest
+    visiting order (Base -> stops -> Base), like an Apollo EVA with several science stations.
+(9) Flags hazards along the route: stretches with no direct radio line to base (computed over
+    the terrain), rocky ground and near-limit slopes. Lets the crew move the base, pick any
+    point, and draw no-go zones that the route avoids.
 It installs like a native app and works fully offline. On Mars there is no internet.
 
 WHY WE TRUST THE NUMBERS:

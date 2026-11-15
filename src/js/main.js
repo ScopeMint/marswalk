@@ -30,6 +30,8 @@ async function initApp() {
     initPov()       // pov-images.json → STATE.povImages
   ]);
 
+  if (typeof initTraverse === 'function') initTraverse();       // multi-stop traverse (needs targets)
+
   // 3. Send grid data to worker once so it doesn't need to re-receive ~1 MB on every interaction
   if (STATE.grids.loaded && typeof sendGridsToWorker === 'function') {
     sendGridsToWorker();

@@ -24,6 +24,9 @@ Today's Mars maps (JPL Mars Trek, USGS geologic maps) are built for global and r
 ## Features
 - **Layered map:** HiRISE 25 cm imagery, slope classes, 1 m rock & ridge relief ("boulder" layer), THEMIS day and night thermal IR, Curiosity's real path, radio line-of-sight, relative radiation, walk-back time.
 - **Route planner:** fastest walkable path under a slope limit you choose. It slows on uphill and rocky ground and runs in a Web Worker (~100 ms).
+- **Multi-stop traverse:** tick 2–5 targets. MarsWalk times every leg on the real terrain, compares every visiting order and loads the fastest Base → stops → Base traverse. The safety card, suit model, HUD and cue card all cover the full traverse.
+- **Mission tools:** move the base (slope-checked), route to any point on the map, and draw no-go zones that the route re-plans around.
+- **Hazard call-outs:** distance ranges where the route loses direct radio contact with base (line of sight over the terrain), crosses rocky ground, or nears the slope limit.
 - **Safety card:** distance, time, steepest slope, climb, walk-back time, EVA budget, turn-back point, radiation (Curiosity RAD), temperature (REMS), GO / NO-GO checks.
 - **Suit & crew model:** walking energy from the Pandolf (1977) equation scaled to Mars gravity. It gives oxygen (Weir 1949), CO₂ and sublimator cooling water against suit capacity, with Mars-vs-Earth comparison and buddy-pair totals.
 - **EVA cue card:** a printable timeline in the style of an astronaut wrist checklist. It covers PET and local Mars time, stations, oxygen left, the turn-back rule, and a GO / NO-GO verdict including a daylight check.
