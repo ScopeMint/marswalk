@@ -40,8 +40,6 @@ const STATE = {
   evaHours:        6,    // hours — from CONFIG.eva.defaultHours
   speedKmh:        3,    // km/h — from CONFIG.walk.normalKmh
   evaStartHour:    8,    // local Mars time (0-24)
-  solarStormMode: false,  // when true, radiation estimate uses SPE multiplier from rad-baseline.json
-
   /* Loaded binary grid data (Float32Arrays) */
   grids: {
     loaded:    false,

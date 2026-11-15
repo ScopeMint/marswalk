@@ -710,7 +710,6 @@ body {
 .check-item.caution { color: var(--caution); }
 .check-item.fail    { color: var(--danger); }
 .check-item.info    { color: var(--route); }
-.check-item.storm   { color: #FF9A3C; font-weight: 600; }
 
 .sum-pov-btn {
   display: block;
@@ -1341,7 +1340,6 @@ body {
 /* ── Summary card: extra value colors ── */
 .sum-val.sum-caution { color: var(--caution); }
 .sum-val.sum-danger  { color: var(--danger); font-weight: 700; }
-.sum-row.sum-storm-row { border-left: 3px solid var(--danger); padding-left: 6px; }
 
 /* ── Target card: "What to look for" section ── */
 .target-detail-block {
@@ -1371,65 +1369,6 @@ body {
   padding-top: 5px;
 }
 
-/* ── Solar storm toggle ── */
-.storm-row {
-  margin-top: 4px;
-  padding: 6px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  transition: border-color 0.2s, background 0.2s;
-}
-.storm-row.storm-active {
-  border-color: var(--danger);
-  background: rgba(229, 72, 77, 0.08);
-}
-.ctrl-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-}
-/* Reuse the layer toggle track style for the storm toggle */
-.ctrl-toggle-label .toggle-track {
-  position: relative;
-  display: inline-block;
-  width: 32px;
-  height: 18px;
-  flex-shrink: 0;
-}
-.ctrl-toggle-label input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.ctrl-toggle-label .toggle-track::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--border);
-  border-radius: 9px;
-  transition: background 0.2s;
-}
-.ctrl-toggle-label input:checked + .toggle-track::before { background: var(--danger); }
-.ctrl-toggle-label .toggle-track::after {
-  content: '';
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 14px; height: 14px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s;
-}
-.ctrl-toggle-label input:checked + .toggle-track::after { transform: translateX(14px); }
-.storm-hint {
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 3px;
-}
 
 /* ── Radiation badge ── */
 #rad-badge {
@@ -1450,11 +1389,6 @@ body {
   pointer-events: auto;
   transition: border-color 0.2s, color 0.2s;
   backdrop-filter: blur(4px);
-}
-#rad-badge.storm {
-  border-color: var(--danger);
-  color: var(--danger);
-  font-weight: 700;
 }
 .rad-badge-icon { font-size: 12px; }
 .rad-badge-label {

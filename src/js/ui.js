@@ -115,18 +115,17 @@ function updateSummaryCard() {
   const rad = computeRadiation(evaHours);
   if (rad) {
     const radRow = document.createElement('div');
-    radRow.className = rad.stormMode ? 'sum-row sum-storm-row' : 'sum-row';
+    radRow.className = 'sum-row';
     const radLabel = document.createElement('span');
     radLabel.className = 'sum-label';
-    radLabel.textContent = rad.stormMode ? '☀ Radiation (STORM)' : 'Radiation est.';
+    radLabel.textContent = 'Radiation est.';
     const radVal = document.createElement('span');
-    radVal.className = rad.stormMode ? 'sum-val sum-danger' : 'sum-val sum-sourced';
+    radVal.className = 'sum-val sum-sourced';
     radVal.textContent = rad.doseEstimateMuGy + ' μGy';
     radVal.title = rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
     card.appendChild(radRow);
-    // Update the persistent badge
     _updateRadBadge(rad);
   }
 
@@ -164,7 +163,7 @@ function updateSummaryCard() {
   checklist.forEach(item => {
     const el = document.createElement('div');
     el.className = 'check-item ' + item.status;
-    const icon = { pass: '✓', caution: '⚠', fail: '✕', info: 'ℹ', storm: '☀' }[item.status] || '·';
+    const icon = { pass: '✓', caution: '⚠', fail: '✕', info: 'ℹ' }[item.status] || '·';
     el.textContent = icon + ' ' + item.label;
     if (item.detail) el.title = item.detail + (item.source ? '\nSource: ' + item.source : '');
     card.appendChild(el);
@@ -191,7 +190,6 @@ function _updateRadBadge(rad) {
   if (!badge || !val) return;
   val.textContent = rad.doseEstimateMuGy + ' μGy';
   badge.style.display = 'flex';
-  badge.classList.toggle('storm', !!rad.stormMode);
   badge.title = rad.note + '\nSource: ' + rad.source;
 }
 
@@ -756,16 +754,6 @@ function _initEvaControls() {
     });
   }
 
-  // Solar storm toggle
-  const stormToggle = document.getElementById('solar-storm-toggle');
-  if (stormToggle) {
-    stormToggle.addEventListener('change', () => {
-      STATE.solarStormMode = stormToggle.checked;
-      const stormRow = document.getElementById('solar-storm-row');
-      if (stormRow) stormRow.classList.toggle('storm-active', STATE.solarStormMode);
-      updateSummaryCard();
-    });
-  }
 }
 
 /* ── Init ───────────────────────────────────────────────────────────────────── */

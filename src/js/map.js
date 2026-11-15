@@ -150,9 +150,6 @@ function initMap() {
     });
   }
 
-  // Geographic labels — help judges quickly understand the terrain context
-  addTerrainLabels(map);
-
   STATE.map = map;
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
