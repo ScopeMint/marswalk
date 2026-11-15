@@ -46,7 +46,8 @@ function updateSummaryCard() {
     if (isFinite(wb) && wb > 0) walkbackMin = wb / 60;
   }
 
-  const totalMin    = outMin + workMin + walkbackMin;
+  const airlockMin  = CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes;  // same as the EVA cue card
+  const totalMin    = airlockMin + outMin + workMin + walkbackMin;
   const budgetFrac  = totalMin / (evaHours * 60);
   const budgetPct   = Math.min(100, Math.round(budgetFrac * 100));
 
@@ -115,8 +116,10 @@ function updateSummaryCard() {
       ponrLabel.textContent = '↩ Turn-back point';
       const ponrVal = document.createElement('span');
       ponrVal.className = wholeRouteSafe ? 'sum-val sum-pass' : 'sum-val sum-caution';
-      ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK' : ponrDistKm + ' km from base';
-      ponrVal.title = 'Past this point you cannot complete the EVA within your time budget (including work time and 25% reserve). The amber flag on the map marks this position.';
+      ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK'
+        : ponrIdx === 0 ? 'at base: EVA too short for this target'
+        : ponrDistKm + ' km from base';
+      ponrVal.title = 'Furthest point on the route where the crew can still do the planned science work and walk home inside the EVA time (airlock time included) while keeping the 25% reserve. If the target is beyond it, turn back here. The flag on the map marks this position.';
       ponrRow.appendChild(ponrLabel);
       ponrRow.appendChild(ponrVal);
       card.appendChild(ponrRow);
@@ -441,7 +444,7 @@ function _buildAssumptionsModal() {
     { name: 'Science work at target', value: CONFIG.eva.workMinutes + ' min', why: 'Sampling, imaging and notes at one target', type: A },
     { name: 'Work per stop (multi-stop traverse)', value: (typeof TRAVERSE_WORK_PER_STOP_MIN !== 'undefined' ? TRAVERSE_WORK_PER_STOP_MIN : 30) + ' min', why: 'Shorter stops when visiting several targets', type: A },
     { name: 'EVA time reserve',    value: Math.round(CONFIG.eva.reserveFraction * 100) + '%', why: 'Part of the EVA always kept unused for problems. Also sets the turn-back point', type: A },
-    { name: 'Airlock out / in',    value: (typeof BRIEF_EGRESS_MIN !== 'undefined' ? BRIEF_EGRESS_MIN : 15) + ' / ' + (typeof BRIEF_INGRESS_MIN !== 'undefined' ? BRIEF_INGRESS_MIN : 15) + ' min', why: 'Suit checks and airlock time on the EVA cue card', type: A },
+    { name: 'Airlock out / in',    value: CONFIG.eva.egressMinutes + ' / ' + CONFIG.eva.ingressMinutes + ' min', why: 'Suit checks and airlock time. Counted in EVA used, the turn-back point and the cue card', type: A },
     { group: 'Radio' },
     { name: 'Habitat radio mast',  value: (C ? HAZ_MAST_HEIGHT_M : 10) + ' m', why: 'Height used for line-of-sight radio checks', type: A },
     { name: 'Suit antenna height', value: (C ? HAZ_SUIT_ANTENNA_M : 2) + ' m', why: 'Antenna on the backpack, above the helmet', type: A },

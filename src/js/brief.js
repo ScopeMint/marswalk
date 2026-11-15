@@ -5,8 +5,8 @@
    Depends on: CONFIG, STATE, cellToLatLon, getCellValue, computePointOfNoReturn, computeRadiation. */
 
 const BRIEF_STATIONS = [0.25, 0.5, 0.75];   // check-points at 25/50/75% of the walk out [OUR ASSUMPTION]
-const BRIEF_EGRESS_MIN = 15;                 // airlock exit + suit checks before walking [OUR ASSUMPTION]
-const BRIEF_INGRESS_MIN = 15;                // airlock entry after return [OUR ASSUMPTION]
+const BRIEF_EGRESS_MIN = CONFIG.eva.egressMinutes;    // airlock exit + suit checks before walking [OUR ASSUMPTION]
+const BRIEF_INGRESS_MIN = CONFIG.eva.ingressMinutes;  // airlock entry after return [OUR ASSUMPTION]
 
 /* Formats minutes as a PET (phased elapsed time) string "H:MM". */
 function briefPet(min) {

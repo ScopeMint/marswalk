@@ -219,7 +219,9 @@ function hudRender() {
   h.walkedM = walkedM;
   const grids = STATE.grids || {}, walkback = STATE.walkback;
   const backSeconds = walkback && walkback.status === 'ready' ? hudGridValue(walkback.data, currentCell) : NaN;
-  const totalSeconds = STATE.evaHours * HUD_SECONDS_PER_HOUR, remainingSeconds = totalSeconds - elapsedSeconds;
+  // EVA time also covers airlock exit before the walk (CONFIG.eva.egressMinutes), so it is already spent at replay start.
+  const totalSeconds = STATE.evaHours * HUD_SECONDS_PER_HOUR;
+  const remainingSeconds = totalSeconds - CONFIG.eva.egressMinutes * HUD_SECONDS_PER_MINUTE - elapsedSeconds;
   const remainingFraction = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : 0;
   const dose = typeof computeRadiation === 'function' ? computeRadiation(elapsedSeconds / HUD_SECONDS_PER_HOUR) : null;
   el.heading.textContent = fraction >= 1 ? 'AT TARGET' : `${hudNumber(hudBearing(point, nextPoint), 0)}°`;
@@ -253,7 +255,7 @@ function hudStatus(position, pathLength, elapsedSeconds) {
   const limitSeconds = pathLength > 0 ? limitPosition / pathLength * _hud.route.timeSeconds : NaN;
   let status = !known ? 'CAUTION' : wholeRouteSafe ? 'GO' : position > limitPosition ? 'TURN BACK'
     : position >= limitPosition - pathLength * HUD_CAUTION_FRACTION ? 'CAUTION' : 'GO';
-  if (elapsedSeconds >= STATE.evaHours * HUD_SECONDS_PER_HOUR) status = 'TURN BACK';
+  if (elapsedSeconds + CONFIG.eva.egressMinutes * HUD_SECONDS_PER_MINUTE >= STATE.evaHours * HUD_SECONDS_PER_HOUR) status = 'TURN BACK';
   _hud.el.status.textContent = status;
   _hud.el.status.className = `hud-status hud-${status === 'GO' ? 'go' : status === 'CAUTION' ? 'caution' : 'danger'}`;
   _hud.el.countdown.textContent = wholeRouteSafe ? 'Whole route is inside the turn-back limit' : known ? `Point of no return in ${hudNumber(Math.max(0, limitSeconds - elapsedSeconds) / HUD_SECONDS_PER_MINUTE)} min`

@@ -196,6 +196,7 @@ function computePointOfNoReturn() {
   const W       = STATE.grids.aoi ? STATE.grids.aoi.width : STATE.grids.width;
   const evaLimit = STATE.evaHours * 3600 * (1 - CONFIG.eva.reserveFraction);
   const workSec  = CONFIG.eva.workMinutes * 60;
+  const airlockSec = (CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes) * 60;  // same as the EVA cue card
 
   let ponrIndex = 0;
   for (let i = 1; i < cells.length; i++) {
@@ -206,7 +207,7 @@ function computePointOfNoReturn() {
     const walkbackSec = STATE.walkback.data[idx];
     if (!isFinite(walkbackSec) || walkbackSec <= 0) continue;
 
-    if (cumTimeSec + workSec + walkbackSec <= evaLimit) {
+    if (airlockSec + cumTimeSec + workSec + walkbackSec <= evaLimit) {
       ponrIndex = i;
     } else {
       break;

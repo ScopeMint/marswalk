@@ -79,6 +79,8 @@ const CONFIG = {
     minHours:        2,     // slider minimum
     maxHours:        8,     // slider maximum
     workMinutes:     60,    // time at the science target [OUR ASSUMPTION]
+    egressMinutes:   15,    // airlock exit + suit checks before walking [OUR ASSUMPTION]
+    ingressMinutes:  15,    // airlock entry after return [OUR ASSUMPTION]
     reserveFraction: 0.25   // must keep 25% of EVA unused [OUR ASSUMPTION]
   },
 

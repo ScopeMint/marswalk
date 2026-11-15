@@ -123,7 +123,8 @@ function runSafetyChecklist(route, evaParams) {
   // Use real Dijkstra walkback time if passed in; fallback to symmetric (outbound = walkback)
   const backMinutes  = (evaParams.walkbackMinutes && evaParams.walkbackMinutes > 0)
     ? evaParams.walkbackMinutes : outMinutes;
-  const totalUsedMinutes = outMinutes + workMinutesUsed + backMinutes;
+  const airlockMinutes = CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes;  // same as the EVA cue card
+  const totalUsedMinutes = airlockMinutes + outMinutes + workMinutesUsed + backMinutes;
   const totalEvaMinutes  = evaHours * 60;
   const budgetFraction   = totalUsedMinutes / totalEvaMinutes;
 
