@@ -816,56 +816,84 @@ function flyToLocation(lat, lon, zoom) {
 
 function expandLibraryCard(id) {
   document.querySelectorAll('.loc-card').forEach(card => {
-    card.classList.toggle('expanded', card.dataset.id === id);
-    if (card.dataset.id === id) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const isTarget = card.dataset.id === id;
+    if (isTarget && !card.querySelector('.loc-card-body')) {
+      // Lazy-inject body before expanding (same logic as the click handler)
+      const loc = MARS_LOCATIONS.find(l => l.id === id);
+      if (loc) {
+        card.insertAdjacentHTML('beforeend', _buildLocCardBody(loc)); // data: MARS_LOCATIONS constant
+        const flyBtn = card.querySelector('.loc-fly-btn');
+        if (flyBtn) flyBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          flyToLocation(loc.lat, loc.lon, loc.zoom);
+        });
+      }
     }
+    card.classList.toggle('expanded', isTarget);
+    if (isTarget) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 }
 
 /* ── Location library (left panel) ───────────────────────────────────── */
 
-/* innerHTML safety: all values from MARS_LOCATIONS constant — no user input. */
+/* Builds the full HTML body for one location card (called lazily on first expand). */
+function _buildLocCardBody(loc) {
+  const elevStr = (loc.elevM >= 0 ? '+' : '') + loc.elevM.toLocaleString() + ' m (MOLA)';
+  const safetyHtml = loc.safetyNotes.map(n =>
+    `<div class="loc-safety-note ${n.level}">${n.text}</div>`
+  ).join('');
+  return `<div class="loc-card-body">
+    <div class="loc-card-desc">${loc.description}</div>
+    <div class="loc-card-coords">${formatCoord(loc.lat, loc.lon)}  |  ${elevStr}</div>
+    <div class="loc-safety-heading">Astronaut Safety Notes</div>
+    ${safetyHtml}
+    <button class="loc-fly-btn" data-id="${loc.id}">Fly to this location →</button>
+    ${loc.isStudyArea ? '' : '<div class="loc-note-outside-area">⚠ EVA planning (route, slope, safety) only works for the Gale Crater study area</div>'}
+    <div class="loc-missions">${loc.missions}</div>
+    <div class="loc-missions" style="font-style:normal;margin-top:2px;">Source: ${loc.source}</div>
+  </div>`;
+}
+
+/* Renders only the card headers for all 52 locations on startup.
+   Card bodies are injected lazily on first expand to keep initial paint fast.
+   innerHTML safety: all values from MARS_LOCATIONS constant — no user input. */
 function renderLibrary() {
   const container = document.getElementById('location-library');
   if (!container) return;
 
-  container.innerHTML = MARS_LOCATIONS.map(loc => {
-    const elevStr = (loc.elevM >= 0 ? '+' : '') + loc.elevM.toLocaleString() + ' m (MOLA)';
-    const safetyHtml = loc.safetyNotes.map(n =>
-      `<div class="loc-safety-note ${n.level}">${n.text}</div>`
-    ).join('');
-
-    return `<div class="loc-card" data-id="${loc.id}">
+  container.innerHTML = MARS_LOCATIONS.map(loc =>
+    `<div class="loc-card" data-id="${loc.id}">
       <div class="loc-card-header">
         <div class="loc-card-dot ${loc.riskLevel}"></div>
         <div class="loc-card-name">${loc.name}</div>
         <div class="loc-card-type">${loc.type}</div>
       </div>
-      <div class="loc-card-body">
-        <div class="loc-card-desc">${loc.description}</div>
-        <div class="loc-card-coords">${formatCoord(loc.lat, loc.lon)}  |  ${elevStr}</div>
-        <div class="loc-safety-heading">Astronaut Safety Notes</div>
-        ${safetyHtml}
-        <button class="loc-fly-btn" data-id="${loc.id}">Fly to this location →</button>
-        ${loc.isStudyArea ? '' : '<div class="loc-note-outside-area">⚠ EVA planning (route, slope, safety) only works for the Gale Crater study area</div>'}
-        <div class="loc-missions">${loc.missions}</div>
-        <div class="loc-missions" style="font-style:normal;margin-top:2px;">Source: ${loc.source}</div>
-      </div>
-    </div>`;
-  }).join('');
+    </div>`
+  ).join('');
 
   container.querySelectorAll('.loc-card-header').forEach(header => {
     header.addEventListener('click', () => {
-      header.closest('.loc-card').classList.toggle('expanded');
-    });
-  });
+      const card = header.closest('.loc-card');
+      const wasExpanded = card.classList.contains('expanded');
 
-  container.querySelectorAll('.loc-fly-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const loc = MARS_LOCATIONS.find(l => l.id === btn.dataset.id);
-      if (loc) flyToLocation(loc.lat, loc.lon, loc.zoom);
+      // Lazy-inject body HTML on first expand
+      if (!wasExpanded && !card.querySelector('.loc-card-body')) {
+        const loc = MARS_LOCATIONS.find(l => l.id === card.dataset.id);
+        if (loc) {
+          card.insertAdjacentHTML('beforeend', _buildLocCardBody(loc));
+          // Wire fly button now that it exists in DOM
+          const flyBtn = card.querySelector('.loc-fly-btn');
+          if (flyBtn) {
+            flyBtn.addEventListener('click', e => {
+              e.stopPropagation();
+              if (loc) flyToLocation(loc.lat, loc.lon, loc.zoom);
+            });
+          }
+        }
+      }
+
+      card.classList.toggle('expanded', !wasExpanded);
+      if (!wasExpanded) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   });
 }

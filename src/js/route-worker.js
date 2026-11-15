@@ -262,17 +262,33 @@ function smoothPathForDisplay(path, keepEveryN) {
 
 /* ── Message handler ──────────────────────────────────────────────────────── */
 
+/* Cached grid arrays — set once via 'init_grids', reused for all subsequent messages.
+   Avoids re-sending ~1 MB of grid data on every slider change or route request. */
+let _elevArr = null, _slopeArr = null, _roughArr = null;
+
 let _walkbackDist = null;  // cached walkback result, reused for route extraction
 let _lastAoi = null, _lastHabitat = null, _lastSlopeLimit = null, _lastSpeed = null;
 
 self.onmessage = function(e) {
   const msg = e.data;
 
+  /* One-time grid initialisation — main thread sends buffers once after grids load. */
+  if (msg.type === 'init_grids') {
+    _elevArr  = new Float32Array(msg.elevBuf);
+    _slopeArr = new Float32Array(msg.slopeBuf);
+    _roughArr = new Float32Array(msg.roughBuf);
+    _lastAoi  = msg.aoi;
+    return;
+  }
+
   if (msg.type === 'compute_walkback') {
-    const elevArr   = new Float32Array(msg.elevBuf);
-    const slopeArr  = new Float32Array(msg.slopeBuf);
-    const roughArr  = new Float32Array(msg.roughBuf);
-    const aoi       = msg.aoi;
+    /* Accept inline buffers from older callers; otherwise fall back to cached arrays. */
+    const elevArr  = msg.elevBuf  ? new Float32Array(msg.elevBuf)  : _elevArr;
+    const slopeArr = msg.slopeBuf ? new Float32Array(msg.slopeBuf) : _slopeArr;
+    const roughArr = msg.roughBuf ? new Float32Array(msg.roughBuf) : _roughArr;
+    if (!elevArr) { self.postMessage({ type: 'route_error', message: 'Grid data not ready. Refresh the page.' }); return; }
+
+    const aoi       = msg.aoi || _lastAoi;
     const habitat   = { row: msg.habitatRow, col: msg.habitatCol };
     const slimLimit = msg.slopeLimit;
     const speedKmh  = msg.speedKmh;
@@ -289,10 +305,12 @@ self.onmessage = function(e) {
   }
 
   else if (msg.type === 'compute_route') {
-    const elevArr  = new Float32Array(msg.elevBuf);
-    const slopeArr = new Float32Array(msg.slopeBuf);
-    const roughArr = new Float32Array(msg.roughBuf);
-    const aoi      = msg.aoi;
+    const elevArr  = msg.elevBuf  ? new Float32Array(msg.elevBuf)  : _elevArr;
+    const slopeArr = msg.slopeBuf ? new Float32Array(msg.slopeBuf) : _slopeArr;
+    const roughArr = msg.roughBuf ? new Float32Array(msg.roughBuf) : _roughArr;
+    if (!elevArr) { self.postMessage({ type: 'route_error', message: 'Grid data not ready. Refresh the page.' }); return; }
+
+    const aoi      = msg.aoi || _lastAoi;
     const habitat  = { row: msg.habitatRow, col: msg.habitatCol };
     const target   = { row: msg.targetRow,  col: msg.targetCol  };
     const slopeLimit = msg.slopeLimit;
@@ -300,7 +318,7 @@ self.onmessage = function(e) {
 
     // Recompute walkback if parameters changed
     const paramsChanged = !_walkbackDist ||
-      !_lastAoi ||
+      !_lastHabitat ||
       _lastHabitat.row !== habitat.row || _lastHabitat.col !== habitat.col ||
       _lastSlopeLimit !== slopeLimit    || _lastSpeed !== speedKmh;
 

@@ -22,7 +22,12 @@ async function initApp() {
     initPov()       // pov-images.json → STATE.povImages
   ]);
 
-  // 3. Terrain overlays — all need aoi.json bounds, so must run AFTER loadGrids()
+  // 3. Send grid data to worker once so it doesn't need to re-receive ~1 MB on every interaction
+  if (STATE.grids.loaded && typeof sendGridsToWorker === 'function') {
+    sendGridsToWorker();
+  }
+
+  // 4. Terrain overlays — all need aoi.json bounds, so must run AFTER loadGrids()
   //    hillshade first (bottom), then slope, then LOS and radiation on top
   if (typeof addHillshadeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addHillshadeOverlay(STATE.map);
@@ -37,10 +42,10 @@ async function initApp() {
     addRadOverlay(STATE.map);
   }
 
-  // 4. Needs grids: place habitat and start the walk-back map
+  // 5. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();
 
-  // 5. Show initial radiation badge (before any route is computed)
+  // 6. Show initial radiation badge (before any route is computed)
   if (typeof computeRadiation === 'function' && STATE.radBaseline) {
     const initRad = computeRadiation(STATE.evaHours);
     if (initRad && typeof _updateRadBadge === 'function') _updateRadBadge(initRad);

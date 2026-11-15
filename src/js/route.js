@@ -23,6 +23,22 @@ function initRouteWorker() {
   }
 }
 
+/* Sends grid buffers to the worker once so it can cache them.
+   Call this once after grids load — subsequent walkback/route messages don't need to resend
+   the ~1 MB of binary data on every slider change. */
+function sendGridsToWorker() {
+  if (!_routeWorker || !STATE.grids.loaded) return;
+  const elevBuf  = STATE.grids.elevation.buffer.slice(0);
+  const slopeBuf = STATE.grids.slope.buffer.slice(0);
+  const roughBuf = STATE.grids.roughness.buffer.slice(0);
+  _routeWorker.postMessage({
+    type: 'init_grids',
+    elevBuf, slopeBuf, roughBuf,
+    aoi: STATE.grids.aoi
+  }, [elevBuf, slopeBuf, roughBuf]);
+  console.log('[route] grid buffers sent to worker');
+}
+
 /* Sends a compute_walkback message to the worker.
    Called when: habitat moves, slope limit changes, speed changes, grids first loaded. */
 function triggerWalkback(habitatLatLon) {
@@ -38,20 +54,14 @@ function triggerWalkback(habitatLatLon) {
 
   if (!_routeWorker) return;  // Worker not available, skip background walkback
 
-  // Clone grid buffers for transfer (Worker takes ownership, so we need copies)
-  const elevBuf  = STATE.grids.elevation.buffer.slice(0);
-  const slopeBuf = STATE.grids.slope.buffer.slice(0);
-  const roughBuf = STATE.grids.roughness.buffer.slice(0);
-
   _routeWorker.postMessage({
-    type:         'compute_walkback',
-    elevBuf, slopeBuf, roughBuf,
-    aoi:          STATE.grids.aoi,
-    habitatRow:   cell.row,
-    habitatCol:   cell.col,
-    slopeLimit:   STATE.slopeLimitDeg,
-    speedKmh:     STATE.speedKmh
-  }, [elevBuf, slopeBuf, roughBuf]);
+    type:       'compute_walkback',
+    aoi:        STATE.grids.aoi,
+    habitatRow: cell.row,
+    habitatCol: cell.col,
+    slopeLimit: STATE.slopeLimitDeg,
+    speedKmh:   STATE.speedKmh
+  });
 }
 
 /* Sends a compute_route message to the worker.
@@ -82,21 +92,16 @@ function triggerRoute(targetLatLon) {
 
   if (_routeWorker) {
     showMapMessage('Computing route...');
-    const elevBuf  = STATE.grids.elevation.buffer.slice(0);
-    const slopeBuf = STATE.grids.slope.buffer.slice(0);
-    const roughBuf = STATE.grids.roughness.buffer.slice(0);
-
     _routeWorker.postMessage({
-      type:         'compute_route',
-      elevBuf, slopeBuf, roughBuf,
-      aoi:          STATE.grids.aoi,
-      habitatRow:   habitatCell.row,
-      habitatCol:   habitatCell.col,
-      targetRow:    targetCell.row,
-      targetCol:    targetCell.col,
-      slopeLimit:   STATE.slopeLimitDeg,
-      speedKmh:     STATE.speedKmh
-    }, [elevBuf, slopeBuf, roughBuf]);
+      type:       'compute_route',
+      aoi:        STATE.grids.aoi,
+      habitatRow: habitatCell.row,
+      habitatCol: habitatCell.col,
+      targetRow:  targetCell.row,
+      targetCol:  targetCell.col,
+      slopeLimit: STATE.slopeLimitDeg,
+      speedKmh:   STATE.speedKmh
+    });
   } else {
     showMapMessage('Route worker not available. Refresh the page.');
   }
