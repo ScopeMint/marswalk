@@ -4,7 +4,7 @@ const T3D_VERTICES = 200; // 2x2 mean of the 400x400 input; approximately 20 m s
 const T3D_POLL_MS = 500; // Check live mission changes only while open.
 const T3D_CLEARANCE_METERS = 2, T3D_FLIGHT_METERS = 25; // Display offsets, not terrain measurements.
 const T3D_RAD = Math.PI / 180; // Degrees to radians.
-const T3D_CYAN = '#3FD0C9', T3D_ORANGE = '#B07D4A'; // Mission overlay colors (--route, --accent).
+const T3D_CYAN = '#3FD0C9', T3D_ORANGE = '#8FB3DE'; // Mission overlay colors (--route, --accent).
 let _t3d = null;
 
 /* Creates the header entry and accessible, self-contained terrain dialog once. */

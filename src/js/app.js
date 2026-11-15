@@ -85,6 +85,10 @@ function showWelcome() {
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-label', 'Welcome to MarsWalk');
   card.innerHTML = `
+    <figure class="welcome-hero">
+      <img src="./data/pov/pov-3-nevado-sajama.jpg" alt="Curiosity Mastcam photo of cemented boxwork ridge rock at Nevado Sajama, Mount Sharp" width="1024" height="913">
+      <figcaption>Boxwork ridge rock at Nevado Sajama, photographed by Curiosity's Mastcam on sol 4711 (Nov 2025). Credit: NASA/JPL-Caltech/MSSS</figcaption>
+    </figure>
     <div class="welcome-kicker">WELCOME, EVA PLANNER</div>
     <div class="welcome-title">Plan a safe Marswalk on Curiosity's real route</div>
     <ol class="welcome-steps">
@@ -92,6 +96,7 @@ function showWelcome() {
       <li><b>Read the plan</b>: safest route, oxygen, radiation, daylight, turn-back point.</li>
       <li><b>Brief &amp; walk it</b>: print the EVA cue card, replay it in the visor HUD or in 3D.</li>
     </ol>
+    <p class="welcome-note">Built with public NASA data and images for NASA Space Apps 2026. Not affiliated with or endorsed by NASA.</p>
     <div class="welcome-actions">
       <button type="button" class="welcome-tour">▶ Take the 45-second tour</button>
       <button type="button" class="welcome-close">Explore on my own</button>

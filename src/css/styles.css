@@ -34,13 +34,15 @@
 }
 
 :root {
-  /* ── UI colors ── warm-grey mission-ops palette */
-  --bg:      #100E0D;   /* very dark warm brown-black */
-  --panel:   #191614;   /* warm dark panel */
-  --border:  #2D2A28;   /* warm border */
-  --text:    #EAE7E2;   /* warm off-white */
-  --muted:   #9E9890;   /* warm grey */
-  --accent:  #B07D4A;   /* desaturated Martian ochre — restrained use */
+  /* ── UI colors ── cool neutral mission-ops palette (no orange: orange reads as "AI template") */
+  --bg:      #0B0E12;   /* near-black, cool */
+  --panel:   #12161C;   /* panel */
+  --border:  #252C36;   /* hairline border */
+  --text:    #E7EAEE;   /* off-white */
+  --muted:   #919AA7;   /* cool grey */
+  --accent:  #8FB3DE;   /* steel blue — restrained use (focus, active, highlights) */
+  --primary: #1F3F66;   /* filled primary button (navy) — white text passes 4.5:1 */
+  --primary-hover: #28507F;
   --route:   #3FD0C9;   /* teal — route line, consistent across 2D/3D/HUD */
   --pass:    #46C37B;
   --caution: #F2B134;
@@ -142,9 +144,9 @@ button:focus-visible, .btn:focus-visible {
   outline-offset: 2px;
 }
 
-/* Primary: filled ochre — single key CTA per view */
+/* Primary: filled navy — single key CTA per view */
 .btn-primary {
-  background: var(--accent);
+  background: var(--primary);
   color: #fff;
   border: none;
   padding: 0 14px;
@@ -403,7 +405,7 @@ button:focus-visible, .btn:focus-visible {
   transition: background 0.15s;
 }
 .search-result:last-child { border-bottom: none; }
-.search-result:hover, .search-result.active { background: rgba(217,98,43,0.12); }
+.search-result:hover, .search-result.active { background: rgba(143, 179, 222,0.12); }
 
 .search-result-name {
   font-size: 13px;
@@ -544,7 +546,7 @@ button:focus-visible, .btn:focus-visible {
   transition: background 0.15s;
 }
 
-.loc-fly-btn:hover { background: rgba(217,98,43,0.12); }
+.loc-fly-btn:hover { background: rgba(143, 179, 222,0.12); }
 
 .loc-missions {
   font-size: 10px;
@@ -652,7 +654,7 @@ button:focus-visible, .btn:focus-visible {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--primary);
   border: 2px solid var(--text);
   color: var(--text);
   display: flex;
