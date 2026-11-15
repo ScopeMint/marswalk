@@ -131,7 +131,8 @@ function showErrorBanner(message) {
     el.id = 'error-banner';
     document.body.appendChild(el);
   }
-  el.textContent = '⚠ ' + message;
+  el.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-warning"/></svg> ';
+  el.appendChild(document.createTextNode(message));
   el.style.display = 'block';
 }
 
@@ -143,7 +144,7 @@ function showSyntheticTerrainNotice() {
   el.id = 'synthetic-notice';
   el.className = 'synthetic-notice';
   el.title = 'Terrain is synthetic (placeholder). Route numbers computed from this model only. Replace with real HiRISE/CTX DTM before submission.';
-  el.textContent = '⚠ Synthetic terrain';
+  el.textContent = 'Synthetic terrain';
   el.addEventListener('click', () => el.remove());
   const mapContainer = document.getElementById('map-container') || document.body;
   mapContainer.appendChild(el);

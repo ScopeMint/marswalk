@@ -199,6 +199,7 @@ function initMap() {
   STATE.hazardRenderer = L.svg({ pane: 'hazardPane' });
 
   STATE.map = map;
+  addRouteLegend(map);
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
@@ -230,6 +231,43 @@ function initRouteAnimation() {
     });
   });
   observer.observe(pane, { childList: true, subtree: true });
+}
+
+/* ── Route legend (shown only while a route is active) ───────────────────── */
+
+let _routeLegendControl = null;
+
+/* Builds and attaches a small floating route-colour legend at the bottom-right of the map.
+   Hidden by default; shown by showRouteLegend(), hidden by hideRouteLegend(). */
+function addRouteLegend(map) {
+  const RouteLegend = L.Control.extend({
+    onAdd: function() {
+      const el = L.DomUtil.create('div', 'route-legend');
+      el.id = 'route-legend';
+      el.style.display = 'none';
+      el.innerHTML =
+        '<div class="rl-title">Route key</div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#3FD0C9" stroke-width="3"/></svg><span>Route</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#8C7FAD" stroke-width="3" stroke-dasharray="5 3"/></svg><span>Radio shadow</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E8742E" stroke-width="3"/></svg><span>Rocky ground</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E5484D" stroke-width="3"/></svg><span>Near slope limit</span></div>';
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+      return el;
+    }
+  });
+  _routeLegendControl = new RouteLegend({ position: 'bottomright' });
+  _routeLegendControl.addTo(map);
+}
+
+function showRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'block';
+}
+
+function hideRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'none';
 }
 
 /* Adds permanent text labels for terrain features inside the study area.

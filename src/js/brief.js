@@ -131,8 +131,8 @@ function buildBrief() {
 
   const turn = document.createElement('div');
   turn.className = 'brief-turn';
-  turn.textContent = wholeSafe ? '↩ TURN-BACK RULE: whole route is inside the turn-back limit. Still abort on any suit alarm, comm loss > 5 min, or buddy issue.'
-    : `↩ TURN-BACK RULE: if not at the target by PET ${briefPet(ponrPet)}, TURN BACK. Also abort on any suit alarm, comm loss > 5 min, or buddy issue.`;
+  turn.textContent = wholeSafe ? 'TURN-BACK RULE: whole route is inside the turn-back limit. Still abort on any suit alarm, comm loss > 5 min, or buddy issue.'
+    : `TURN-BACK RULE: if not at the target by PET ${briefPet(ponrPet)}, TURN BACK. Also abort on any suit alarm, comm loss > 5 min, or buddy issue.`;
   el.appendChild(turn);
 
   const grid = document.createElement('div');
@@ -171,7 +171,7 @@ function showBrief() {
   box.className = 'brief-box';
   const tools = document.createElement('div');
   tools.className = 'brief-tools';
-  const pr = document.createElement('button'); pr.textContent = '🖨 Print / save PDF'; pr.addEventListener('click', () => window.print());
+  const pr = document.createElement('button'); pr.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg> Print / save PDF'; pr.addEventListener('click', () => window.print());
   const cl = document.createElement('button'); cl.textContent = 'Close'; cl.addEventListener('click', () => modal.remove());
   tools.append(pr, cl);
   box.appendChild(tools);

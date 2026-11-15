@@ -176,6 +176,7 @@ function drawRouteLine(cells) {
     pane:        'routePane',
     renderer:    STATE.routeRenderer  // SVG renderer in routePane (z-index 580, above all imagery)
   }).addTo(STATE.map);
+  if (typeof showRouteLegend === 'function') showRouteLegend();
 }
 
 /* Zooms/pans so the whole route is visible beside the route card (right) and below any caption (top).
@@ -190,6 +191,7 @@ function clearRouteLine() {
     _routeLine = null;
   }
   clearPonrMarker();
+  if (typeof hideRouteLegend === 'function') hideRouteLegend();
 }
 
 /* Computes the last index along STATE.route.cells where the astronaut can still turn back
@@ -238,8 +240,8 @@ function updatePonrMarker(ponrIndex) {
   _ponrMarker = L.marker([pt.lat, pt.lon], {
     icon: L.divIcon({
       className: 'ponr-icon',
-      html: '<div class="ponr-pin">↩ Turn back</div>',
-      iconSize: [80, 24],
+      html: '<div class="ponr-pin"><svg class="icon" aria-hidden="true"><use href="#icon-turn-back"/></svg> Turn back point</div>',
+      iconSize: [110, 24],
       iconAnchor: [40, 12]
     }),
     zIndexOffset: 600,

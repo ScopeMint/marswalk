@@ -75,7 +75,7 @@ function chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, xTitle, yTitle) {
   ctx.strokeStyle = CHART_COLORS.axis; ctx.strokeRect(plot.x + 0.5, plot.y + 0.5, plot.w, plot.h);
 }
 
-/* Shades the spacewalk window (start hour + length), wrapping past midnight when needed. */
+/* Shades the EVA window (start hour + length), wrapping past midnight when needed. */
 function chartEvaWindow(ctx, plot, xOf) {
   const start = ((STATE.evaStartHour == null ? 8 : STATE.evaStartHour) % 24 + 24) % 24, hours = Math.min(STATE.evaHours || 6, 24);
   [[start, Math.min(start + hours, 24)], [0, Math.max(0, start + hours - 24)]].forEach(([a, b]) => {
@@ -163,7 +163,7 @@ function drawProfile(canvasId, profileData) {
   const xStepM = chartNiceStep(0, total, 6), xTicks = [], yTicks = [];
   for (let d = 0; d <= total + 1e-6; d += xStepM) xTicks.push({ value: d, label: (d / 1000).toFixed(xStepM < 100 ? 2 : xStepM < 1000 ? 1 : 0) });
   for (let e = lo; e <= hi + 1e-6; e += yStep) yTicks.push({ value: e, label: String(Math.round(e)) });
-  chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Distance walked from base (km)', 'Height (m)');
+  chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Distance walked from base (km)', '');
 
   ctx.beginPath(); ctx.moveTo(xOf(data[0].distanceMeters), yOf(data[0].elevationM));
   data.forEach(p => ctx.lineTo(xOf(p.distanceMeters), yOf(p.elevationM)));
@@ -228,7 +228,7 @@ function chartRouteMarker(fraction) {
 
 /* ── 2. Outside temperature through the day ─────────────────────────────── */
 
-/* Draws Curiosity's air temperature by local hour for the two halves of the Mars year, with the spacewalk shaded.
+/* Draws Curiosity's air temperature by local hour for the two halves of the Mars year, with the EVA window shaded.
    Data: src/data/rems-temps.json (scripts/05_prepare_rems.py): median air temperature for each hour of the sol,
    from real hourly Curiosity REMS measurements (NASA PDS, MODRDR), over many sols in each half of the Mars year.
    Gale Crater is south of the equator, so Ls 0-180 is its cooler half-year and Ls 180-360 its warmer one. */
@@ -274,7 +274,7 @@ function drawTempChart(canvasId) {
     ctx.stroke();
   });
   chartLegend(state, [{ color: CHART_COLORS.blue, text: coolName }, { color: CHART_COLORS.orange, text: warmName },
-                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your EVA', shape: 'box' }]
     .concat(p10 && p90 ? [{ color: coolNow ? 'rgba(143, 179, 222, 0.3)' : 'rgba(232, 116, 46, 0.3)', text: "Usual day-to-day range (today's half-year)", shape: 'box' }] : []));
   if (state.cursor == null) {
     const range = typeof computeTemperatureRange === 'function'
@@ -309,7 +309,7 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
   track.forEach((p, i) => { if (i) ctx.lineTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); else ctx.moveTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); });
   ctx.stroke();
   chartLegend(state, [{ color: CHART_COLORS.amber, text: 'Sun today' }, { color: 'rgba(0, 0, 0, 0.6)', text: 'Night (sun below 0°)', shape: 'box' },
-                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your EVA', shape: 'box' }]);
   const fmt = typeof mcFormatHours === 'function' ? mcFormatHours : chartClock;
   if (state.cursor == null) {
     state.readout.textContent = light && Number.isFinite(light.sunriseLmst) ? 'Sunrise ' + fmt(light.sunriseLmst) + ' · sunset ' + fmt(light.sunsetLmst) : 'Move over the chart to read any hour';
@@ -321,7 +321,7 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
     state.readout.textContent = chartClock(best.lmstHours) + ' · sun ' + Math.abs(deg).toFixed(0) + '° ' + (deg >= 0 ? 'above the horizon (daylight)' : 'below the horizon (night)');
   }
   state.canvas.setAttribute('aria-label', 'Height of the sun above the horizon through today at the site, in degrees. ' +
-    'Orange shading marks your spacewalk. Use left and right arrow keys to read times.');
+    'The shaded area marks your EVA window. Use left and right arrow keys to read times.');
 }
 
 /* ── Start ──────────────────────────────────────────────────────────────── */

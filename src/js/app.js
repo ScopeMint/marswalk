@@ -98,7 +98,7 @@ function showWelcome() {
     </ol>
     <p class="welcome-note">Built with public NASA data and images for NASA Space Apps 2026. Not affiliated with or endorsed by NASA.</p>
     <div class="welcome-actions">
-      <button type="button" class="welcome-tour">▶ Take the 45-second tour</button>
+      <button type="button" class="welcome-tour"><svg class="icon" aria-hidden="true"><use href="#icon-play"/></svg> Take the 45-second tour</button>
       <button type="button" class="welcome-close">Explore on my own</button>
     </div>`;
   document.body.appendChild(card);
@@ -116,7 +116,7 @@ function initAppShell() {
 
   const installBtn = document.createElement('button');
   installBtn.className = 'app-btn';
-  installBtn.textContent = '⤓ Install app';
+  installBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg> Install app';
   installBtn.hidden = true;
   let deferred = null;
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; installBtn.hidden = false; });
@@ -132,7 +132,7 @@ function initAppShell() {
 
   const packBtn = document.createElement('button');
   packBtn.className = 'app-btn';
-  packBtn.textContent = '⇩ Offline pack';
+  packBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-download"/></svg> Offline pack';
   packBtn.title = 'Store every HiRISE map tile (≈13 MB) on this device so the whole map works with no network.';
   group.appendChild(packBtn);
 
@@ -153,7 +153,7 @@ function initAppShell() {
     if (e.data.type === 'offline-pack-progress') {
       packBtn.textContent = `Downloading… ${Math.round(e.data.done / e.data.total * 100)}%`;
     } else if (e.data.type === 'offline-pack-done') {
-      packBtn.textContent = `✓ Offline ready (${e.data.total} tiles)`;
+      packBtn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> Offline ready (' + Number(e.data.total) + ' tiles)';
     }
   });
 }
