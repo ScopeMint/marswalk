@@ -1513,7 +1513,7 @@ button:focus-visible, .btn:focus-visible {
 /* ── Point of No Return marker ── */
 .ponr-pin {
   background: rgba(242, 177, 52, 0.92);
-  color: #0F1115;
+  color: var(--bg);
   font-size: 10px;
   font-weight: 700;
   padding: 3px 7px;
@@ -1595,9 +1595,9 @@ button:focus-visible, .btn:focus-visible {
 
 /* ── Real-site layers (site-layers.js) ───────────────────────────────────── */
 .rover-pin {
-  background: #0F1115;
-  color: #3FD0C9;
-  border: 1.5px solid #3FD0C9;
+  background: var(--bg);
+  color: var(--route);
+  border: 1.5px solid var(--route);
   border-radius: 4px;
   font: 700 10px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   text-align: center;
@@ -1607,7 +1607,7 @@ button:focus-visible, .btn:focus-visible {
 .themis-overlay { image-rendering: auto; mix-blend-mode: normal; }
 .sum-val.sum-pass { color: var(--pass, #46C37B); }
 .modal-ref-list { padding-left: 20px; line-height: 1.6; }
-.modal-ref-list a { color: #3FD0C9; text-decoration: underline; word-break: break-word; }
+.modal-ref-list a { color: var(--route); text-decoration: underline; word-break: break-word; }
 
 /* ── Coordinate grid (graticule.js) ── */
 .grid-label {
@@ -1651,13 +1651,13 @@ button:focus-visible, .btn:focus-visible {
   height: 8px;
   border-radius: 50%;
   background: #7FB4FF;
-  border: 2px solid #0F1115;
+  border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px #7FB4FF;
   cursor: pointer;
 }
 .site-pin span, .site-box-label span {
   display: none;                    /* names appear only when zoomed in enough (classes set by landing-sites.js) */
-  background: rgba(15, 17, 21, 0.88);
+  background: rgba(16, 14, 13, 0.88);
   color: #7FB4FF;
   border: 1px solid #7FB4FF;
   border-radius: 3px;
@@ -1668,11 +1668,11 @@ button:focus-visible, .btn:focus-visible {
 .sites-box-labels .site-box-label span { display: inline-block; font-weight: 700; letter-spacing: 0.04em; }
 .site-box-label { pointer-events: none; }
 .site-popup-wrap .leaflet-popup-content-wrapper,
-.site-popup-wrap .leaflet-popup-tip { background: #181B22; color: #E8E6E3; border: 1px solid #2A2F3A; }
+.site-popup-wrap .leaflet-popup-tip { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
 .site-popup { font-size: 12px; line-height: 1.45; }
 .site-popup-title { font-size: 15px; font-weight: 700; color: #7FB4FF; margin-bottom: 4px; }
 .site-popup-row { margin-bottom: 3px; }
-.site-popup-label { color: #A3A8B3; }
+.site-popup-label { color: var(--muted); }
 .site-popup-btn {
   margin-top: 6px;
   padding: 4px 10px;
