@@ -98,6 +98,8 @@ async function initApp() {
   if (typeof initTidy === 'function') initTidy();
   // Then split the screen into four pages (plan / layers / weather / summary). Only shows and hides what exists.
   if (typeof initPages === 'function') initPages();
+  if (typeof initWeatherExtra === 'function') initWeatherExtra();   // extra REMS cards on the Weather page (needs initPages)
+  if (typeof initStory === 'function') initStory();                 // extra About sections: why this site, reference checks, limits (story.js)
 
   console.log('[main] MarsWalk ready');
 }

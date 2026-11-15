@@ -15,7 +15,8 @@ place where Curiosity studied boxwork ridges in 2025-26 on Mount Sharp. It layer
 NASA missions at walking scale: HiRISE 1 m terrain (checked against Curiosity's own elevations to
 2.4 m), 25 cm imagery, THEMIS thermal, Curiosity RAD/REMS and the rover's real path. It plans the
 safest walk to a science target, computes oxygen, cooling water, radiation, daylight and the
-turn-back point, prints an astronaut cue card, and replays the walk in a helmet-visor HUD.
+turn-back point, prints an astronaut cue card, and replays the walk in a helmet-visor HUD. A Rover
+check runs our planner along Curiosity's real drive: it connects 17 of 19 legs at a 15 degree limit.
 
 ===========================================================================
 3. LINK TO PROJECT DEMO (ONE public link — video or slide deck)
@@ -65,6 +66,13 @@ For a chosen target MarsWalk:
 (9) Flags hazards along the route: stretches with no direct radio line to base (computed over
     the terrain), rocky ground and near-limit slopes. Lets the crew move the base, pick any
     point, and draw no-go zones that the route avoids.
+(10) Rover check: cuts Curiosity's real drive into 19 legs and runs our planner on each one at 15, 20
+    and 25 degrees. Connected legs show green on the map, legs we cannot connect show red.
+(11) "Why not walk straight?": the straight line next to the safe route, with the % detour and the
+    stretches steeper than the crew's limit drawn in red.
+(12) Four pages (Plan, Layers, Weather, Summary). The Weather page adds ground temperature, air
+    pressure and UV for the current Mars month from 4,745 sols of REMS daily reports. Radiation and
+    temperature show their measured ranges, not just one number.
 It installs like a native app and works fully offline. On Mars there is no internet.
 
 WHY WE TRUST THE NUMBERS:
@@ -74,6 +82,11 @@ WHY WE TRUST THE NUMBERS:
   15 degree default slope limit; the steepest cell it crossed is 19.7 degrees (computed live in the app).
 - Every science number was re-checked against the original source: radiation against the Hassler et
   al. (2014) paper text, temperatures from raw REMS files in NASA's Planetary Data System.
+- Slope test: 500 random cells recomputed by hand match our slope grid exactly (scripts/14_check_slope.py).
+- Rover check: our planner connects 17 of 19 legs of Curiosity's real drive at 15 degrees, 19 of 19 at
+  20 and 25 degrees.
+- Energy check: our walking-energy average (about 280 kcal/h on target 5) sits inside the 100-500 kcal/h
+  measured on Skylab and Apollo-era EVAs (Waligora & Horrigan 1974).
 - The Mars clock passes 80 tests (GISS worked example + every photo's sol and time).
 - Every number on screen is either cited or labelled "OUR ASSUMPTION"; the Assumptions panel lists
   every model value (about 35), read live from the code.
@@ -111,7 +124,8 @@ Four NASA missions, seven instruments/products:
 5. MSL Curiosity Navcam / Mastcam raw images — point-of-view photos per target.
 6. MSL Curiosity RAD — surface dose baseline (Hassler et al. 2014, Science 343).
 7. MSL Curiosity REMS — hourly air temperature (MODRDR product, NASA PDS Atmospheres Node), median by
-   local true solar time for the two halves of the Mars year.
+   local true solar time for the two halves of the Mars year. REMS daily report (CAB/INTA-CSIC):
+   ground temperature, pressure and UV category by Mars month (context only).
 Context basemap: Viking MDIM 2.1 + MGS MOLA (via OpenPlanetaryMap).
 
 ===========================================================================
@@ -151,15 +165,24 @@ or real screenshots.
 - Pandolf, Givoni & Goldman (1977), J. Appl. Physiol. 43(4), 577-581, doi:10.1152/jappl.1977.43.4.577
 - Weir (1949), J. Physiol. 109, 1-9, doi:10.1113/jphysiol.1949.sp004363
 - Edwards et al. (2011), THEMIS mosaics, JGR 116, E10008, doi:10.1029/2010JE003755
-- Mars landing-site coordinates: https://en.wikipedia.org/wiki/List_of_artificial_objects_on_Mars
+- Mars landing sites (names, dates, coordinates): NASA GISS Mars24 lander list, https://www.giss.nasa.gov/tools/mars24/help/landers.html
+- Kuchynka et al. (2014), Icarus 229, 340-347, doi:10.1016/j.icarus.2013.11.015 (Viking and Pathfinder coordinates)
 - Siebach & Grotzinger (2014), JGR Planets 119, doi:10.1002/2013JE004508 (boxwork)
 - NASA/JPL news, Curiosity starts unpacking boxwork formations (June 2025)
+- NASA/JPL news, Curiosity Rover Sees Martian 'Spiderwebs' Up Close (Feb 2026)
+- Horn (1981), Proc. IEEE 69(1), 14-47, doi:10.1109/PROC.1981.11918 (slope method comparison)
+- Carr & McGee (2009), PLoS ONE 4(8), e6614, doi:10.1371/journal.pone.0006614 (Apollo walking reference)
+- Waligora & Horrigan (1974), Metabolic cost of extravehicular activities, NTRS 19750006325
+- Guo et al. (2015), Astrophys. J. 810, 24, doi:10.1088/0004-637X/810/1/24 (RAD dose variations)
+- NASA, Apollo 17 Mission Details: https://www.nasa.gov/mission_pages/apollo/missions/apollo17.html
+- NASA Curiosity mission page (rover size): https://science.nasa.gov/mission/msl-curiosity/
+- NASA CHAPEA (habitat floor area): https://www.nasa.gov/humans-in-space/chapea/
 - Curiosity blog posts, sols 4641-4648, 4695-4701, 4709-4715, 4716-4722 (science.nasa.gov)
 - NASA Mars Fact Sheet (gravity): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
 - OpenPlanetaryMap: https://www.openplanetary.org/opm
 - Leaflet 1.9.4 (BSD-2-Clause): https://leafletjs.com ; three.js r160 (MIT): https://threejs.org
 - Rover photos: NASA/JPL-Caltech/MSSS raw images (image IDs listed in src/data/pov-images.json)
-- Add here any font, icon set or 3D model added by the ui-polish branch (see docs/SOURCES.md)
+- IBM Plex Sans (SIL Open Font License 1.1): https://github.com/IBM/plex
 Full list with licences: docs/SOURCES.md
 
 ===========================================================================

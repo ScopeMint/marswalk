@@ -83,6 +83,23 @@ Solar storms page (src/data/space-weather.json, src/js/storms.js). All read from
   OUR CALCULATION (labelled on screen): dose on the walk home in a 2017-type storm = 210 uGy/day x (2 to 3) x time.
   OUR INTERPRETATION (labelled on screen): comparing "time to be back inside" with NASA's 2-hour EVA figure.
 
+MSL Curiosity REMS daily weather report (Centro de Astrobiologia, CAB/INTA-CSIC REMS team)
+  Used for: Weather page cards for ground temperature, air pressure and UV category by Mars month
+  (src/data/rems-daily.json, scripts/13_prepare_rems_daily.py, src/js/weatherextra.js).
+  https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json (fetched 2026-11-15, 4,745 sols, sol 1-4995)
+  Method: each sol goes into one of 12 "Mars months" (30 degrees of Ls); median, 10th and 90th percentile per month.
+  Values outside a physical range are dropped and counted. The feed says it is for outreach purposes: shown as context,
+  not used in any route or safety number. Instrument: Gomez-Elvira et al. (2012), doi:10.1007/s11214-012-9921-1.
+  Checked: the report has no humidity and no wind value for any sol (the script counts them), so neither is shown.
+
+Rover check panel (src/js/rovercheck.js) and "Why not walk straight?" (src/js/straightline.js)
+  No new data. Both reuse the MMGIS Curiosity traverse (above) and the HiRISE DTM grids (above).
+  Rover check: the traverse is cut into legs of at least 0.3 km and our planner is run on each leg at 15, 20 and 25 deg
+  (leg length and limits are OUR CHOICE, listed in the Assumptions panel). Results on 2026-11-15: 17 of 19 legs connected
+  at 15 deg, 19 of 19 at 20 and 25 deg; rover sols 3940-5041.
+  Straight line: the slope grid is read at every 10 m cell along the straight line; the red stretches are cells
+  steeper than the crew's own slope limit.
+
 ===========================================================================
 2. PAPERS AND REFERENCE NUMBERS
 ===========================================================================
@@ -107,6 +124,36 @@ Science target context
   Curiosity blog sols 4695-4701: https://science.nasa.gov/blog/curiosity-blog-sols-4695-4701-searching-for-answers-at-monte-grande/
   Curiosity blog sols 4709-4715: https://science.nasa.gov/blog/curiosity-blog-sols-4709-4715-drilling-high-and-low-in-the-boxwork-unit
   Curiosity blog sols 4716-4722: https://science.nasa.gov/blog/curiosity-blog-sols-4716-4722-drilling-success-at-nevado-sajama/
+
+REFERENCE CHECKS shown in the About panel (src/js/story.js). Each was read at the URL on 2026-11-15.
+NASA/JPL (23 Jun 2025), "NASA's Curiosity Mars Rover Starts Unpacking Boxwork Formations"
+  https://www.jpl.nasa.gov/news/nasas-curiosity-mars-rover-starts-unpacking-boxwork-formations/
+  and NASA/JPL (23 Feb 2026), "NASA's Curiosity Rover Sees Martian 'Spiderwebs' Up Close"
+  https://www.nasa.gov/missions/mars-science-laboratory/curiosity-rover/nasas-curiosity-rover-sees-martian-spiderwebs-up-close/
+  Used for: "Why this site": groundwater through fractures left minerals that hardened the ridges; wind hollowed the
+  rest; about six months in the boxwork; three samples plus a fourth; clay minerals in a ridge, carbonates in a hollow.
+Siebach, K. L. & Grotzinger, J. P. (2014), Volumetric estimates of ancient water on Mount Sharp based on boxwork
+  deposits, Gale Crater, Mars, JGR Planets 119, doi:10.1002/2013JE004508 (already in the target texts).
+  Note: the publisher page returned 403 to our checker on 2026-11-15; the claim used is the one the NASA stories make.
+Horn, B. K. P. (1981), Hill shading and the reflectance map, Proc. IEEE 69(1), 14-47, doi:10.1109/PROC.1981.11918
+  Used for: comparing slope methods only. Our slope is the simple central-difference gradient (numpy.gradient).
+  scripts/14_check_slope.py: 500 random cells recomputed by hand match slope.bin (largest difference 0.0000 deg);
+  Horn's 3x3 method would differ by a median of 0.35 deg, 90th percentile 1.10 deg, on our grid.
+Carr, C. E. & McGee, J. (2009), The Apollo Number: Space Suits, Self-Support, and the Walk-Run Transition,
+  PLoS ONE 4(8), e6614, doi:10.1371/journal.pone.0006614
+  Used for: walking-speed reference. Only measured lunar speed in the paper's text: Armstrong's run on Apollo 11,
+  22 m in about 25 s, about 3.2 km/h. Our 2/3/4 km/h presets stay OUR ASSUMPTION and were not changed.
+Waligora, J. M. & Horrigan, D. J. (1974), Metabolic cost of extravehicular activities, Proc. Skylab Life Sciences
+  Symposium Vol. 2 (NASA NTRS 19750006325), https://ntrs.nasa.gov/citations/19750006325
+  Used for: energy sanity check. Abstract: EVA rates ranged from 100 to 500 kcal/h in 1/6-g and zero-g EVAs and were
+  similar to Apollo lunar EVA rates. The app compares our Pandolf average (W x 3600 / 4184 = kcal/h) with that range.
+Guo, J. et al. (2015), Modeling the variations of dose rate measured by RAD during the first MSL Martian year:
+  2012-2014, Astrophys. J. 810, 24, doi:10.1088/0004-637X/810/1/24 (arXiv:1507.03473)
+  Used for: text only. Surface dose varies with daily and seasonal pressure changes and with solar modulation of
+  cosmic rays. No new multiplier; the baseline stays 210 +/- 40 uGy/day (Hassler 2014, near solar maximum).
+NASA, Apollo 17 Mission Details, https://www.nasa.gov/mission_pages/apollo/missions/apollo17.html
+  Used for: Apollo 17 comparison. EVA 2 lasted 7 h 37 min (the longest); three EVAs totalled 22 h 4 min;
+  the Lunar Roving Vehicle traversed 30.5 km in total. (Other sources give 35.7 km; we use NASA's page.)
 
 ===========================================================================
 3. SOFTWARE AND LIBRARIES
@@ -158,8 +205,10 @@ TEAM ADDITIONS (Nov 14 evening, main branch)
   NASA/JPL-Caltech MMGIS waypoints (first waypoint): MSL_waypoints.json and
   https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json
   Check: every landing point falls inside the bounds of the NASA mosaic it is drawn on (script stops a site if not).
-[TO VERIFY] "Thomas Mutch / Gerald Soffen / Carl Sagan / Columbia / Challenger Memorial Station", "Bradbury Landing",
-  "Octavia E. Butler Landing" place names: taken from the NASA GISS Mars24 page above; team to re-read before submission.
+[CONFIRMED 2026-11-15] Place names, read again on https://www.giss.nasa.gov/tools/mars24/help/landers.html :
+  Viking 1 = Thomas Mutch Memorial Station, Viking 2 = Gerald Soffen Memorial Station, Pathfinder = Carl Sagan Memorial
+  Station, Spirit = Columbia Memorial Station, Opportunity = Challenger Memorial Station, Curiosity = Bradbury Landing,
+  Perseverance = Octavia E. Butler Landing. The page gives no site name for Phoenix or InSight.
 
 [CONFIRMED] First-person walk view (src/js/walk3d.js): where each part of the picture comes from
   Ground shape: src/data/elevation.bin (HiRISE DTM DTEEC_019698_1750_019988_1750_U01, 10 m cells), no vertical exaggeration.
@@ -185,8 +234,9 @@ TEAM ADDITIONS (Nov 14 evening, main branch)
   OUR ASSUMPTION (concept only, not a NASA design): vault shape, airlock size, windows, solar arrays, terrace, layout,
     and the camp's position 22 m behind and 7 m beside the route start. The camp is built along the hillside contour
     read from the HiRISE elevation grid.
-[TO VERIFY] Rover size 3.0 x 2.7 x 2.2 m = Curiosity's published size (about 10 ft long, 9 ft wide, 7 ft tall; NASA Curiosity
-  fact sheet). Team to confirm on nasa.gov before submission. The rover's loop around the camp and its speed are ILLUSTRATIVE.
+[CONFIRMED 2026-11-15, CORRECTED] Rover size: NASA says "10 feet long, 9 feet wide and 7 feet tall", not including
+  the arm (https://science.nasa.gov/mission/msl-curiosity/). That is 3.05 x 2.74 x 2.13 m. The model height was 2.2 m;
+  changed to 2.1 m in walk3d.js (CAMP_ROVER_H). The rover's loop around the camp and its speed are ILLUSTRATIVE.
 
 [SUPERSEDED 2026-11-15] Temperature data, daily-record version (scripts/11_rems_from_nasa_record.py).
   Replaced by REAL HOURLY REMS data from NASA PDS (scripts/05_prepare_rems.py, see section 1): peak 15:00 LTST,
@@ -199,7 +249,7 @@ TEAM ADDITIONS (Nov 14 evening, main branch)
     Ls 180-360 (2,193 sols): high  -4.4 C, low -70.7 C   (warmer half-year at Gale: southern spring and summer)
   APPROXIMATE: the hour-by-hour shape between the low and the high (the record has no hourly values).
     The shape kept from the first version peaks at 11:00 and bottoms at 03:00; real air temperature usually peaks in the
-    early afternoon and bottoms near sunrise. [TO VERIFY against hourly PDS REMS data if time allows.]
+    early afternoon and bottoms near sunrise. [RESOLVED: the hourly PDS REMS data in section 1 replaced this shape.]
   WHAT WAS WRONG BEFORE: the hand-typed first version had the seasons the wrong way round (Ls 0-180 "milder", high -2 C).
     The spacewalk temperature on the route card was about 17 C too warm at midday. The data keys in the file
     (northern_spring_summer = Ls 0-180, northern_autumn_winter = Ls 180-360) are unchanged so no code had to move.

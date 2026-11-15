@@ -5,6 +5,7 @@ const T3D_POLL_MS = 500; // Check live mission changes only while open.
 const T3D_CLEARANCE_METERS = 2, T3D_FLIGHT_METERS = 25; // Display offsets, not terrain measurements.
 const T3D_RAD = Math.PI / 180; // Degrees to radians.
 const T3D_CYAN = '#3FD0C9', T3D_ORANGE = '#8FB3DE'; // Mission overlay colors (--route, --accent).
+const T3D_CAUTION = '#F2B134';                         // turn-back flag (--caution)
 let _t3d = null;
 
 /* Creates the header entry and accessible, self-contained terrain dialog once. */
@@ -125,7 +126,7 @@ function t3dPoll() {
       if (typeof STATE === 'undefined' || !STATE.grids.loaded || !STATE.grids.aoi) return;
       t3dBuild();
     }
-    const signature = JSON.stringify([STATE.route, STATE.habitat, STATE.targets, STATE.selectedTarget && STATE.selectedTarget.geometry]);
+    const signature = JSON.stringify([STATE.route, STATE.habitat, STATE.targets, STATE.selectedTarget && STATE.selectedTarget.geometry, STATE.walkback && STATE.walkback.status, STATE.evaHours]);
     if (signature !== s.signature) { s.signature = signature; t3dOverlays(); }
     if (typeof t3dPlanUpdate === 'function') t3dPlanUpdate(true);
     t3dSun();
@@ -280,6 +281,11 @@ function t3dOverlays() {
     s.group.add(new T.Mesh(new T.TubeGeometry(curve, Math.min(16000, Math.max(200, Math.ceil(lengthMeters / 3))), 3, 5, false),   // 3 m wide line: drawn thick so it can be seen from far away, not a real width
       new T.MeshBasicMaterial({ color: T3D_CYAN })));
   }
+  // Turn-back point: same rule as the 2D map, cue card and HUD (computePointOfNoReturn in route.js, timed with cellTimeSeconds).
+  const ponr = s.curve && typeof computePointOfNoReturn === 'function' ? computePointOfNoReturn() : null;
+  const ponrCell = Number.isInteger(ponr) && ponr < route.cells.length - 1 ? route.cells[ponr] : null;
+  if (ponrCell) t3dPin(t3dPoint(((ponrCell.col + 0.5) / s.aoi.width - 0.5) * s.widthMeters,
+    ((ponrCell.row + 0.5) / s.aoi.height - 0.5) * s.depthMeters), 'TURN-BACK POINT', T3D_CAUTION, 40);
   t3dTraverse(); t3dFlyReady(!!s.curve);
   if (s.mode === 'fly') t3dMode('orbit');
 }

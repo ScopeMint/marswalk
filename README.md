@@ -29,6 +29,17 @@ Today's Mars maps (JPL Mars Trek, USGS geologic maps) are built for global and r
 | **Real photos** | Curiosity Navcam and Mastcam frames from the sol the rover stood at each target. |
 | **Real time** | Live Mars clock (NASA GISS Mars24 algorithm): today's Curiosity sol, local Mars time, season, sunrise and sunset at the site. Covered by 80 passing tests. |
 
+## How we know the numbers are right
+| Check | Result | How to repeat it |
+|---|---|---|
+| Terrain vs Curiosity | 227 rover stops agree with our elevation grid to **2.4 m RMS** (after a 12.8 m datum offset) | computed live in the app (About panel) |
+| Slope grid | 500 random cells recomputed by hand match `slope.bin` exactly; Horn's 3x3 method would differ by a median of 0.35° | `python scripts/14_check_slope.py` |
+| Planner vs the rover | Run between Curiosity's real stops, our planner connects **17 of 19** legs at 15° and **19 of 19** at 20° and 25° | Menu → Rover check |
+| Energy | Our Pandolf average for target 5 is about 280 kcal/h; measured Skylab and Apollo-era EVA rates were 100-500 kcal/h (Waligora & Horrigan 1974) | About panel, "Energy: reference check" |
+| Data files | Radiation 210 ± 40 μGy/day (Hassler et al. 2014); hourly air temperature from NASA PDS REMS; 44 automatic checks pass | `python scripts/07_check_data.py` |
+
+Every source, with a checked link, is in [`docs/SOURCES.md`](docs/SOURCES.md). Our own guesses are labelled OUR ASSUMPTION in the app.
+
 ## Features
 - **Layered map:** HiRISE 25 cm imagery, slope classes, 1 m rock & ridge relief ("boulder" layer), THEMIS day and night thermal IR, Curiosity's real path, radio line-of-sight, walk-back time.
 - **Route planner:** fastest walkable path under a slope limit you choose. It slows on uphill and rocky ground and runs in a Web Worker (~100 ms).

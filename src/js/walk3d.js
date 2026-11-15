@@ -37,7 +37,7 @@ const CAMP_MAST_M = 10;                                  // same 10 m mast the C
 const CAMP_BEHIND_M = 22, CAMP_SIDE_M = 7;               // habitat sits behind and beside the route start [OUR ASSUMPTION]
 const CAMP_PAD_RADIUS_M = 15;                            // no rock bumps within this distance of the habitat [OUR ASSUMPTION]
 const CAMP_PAD_LONG_M = 12.5, CAMP_PAD_SHORT_M = 7;      // levelled terrace under the habitat (half-lengths) [OUR ASSUMPTION]
-const CAMP_ROVER_L = 3.0, CAMP_ROVER_W = 2.7, CAMP_ROVER_H = 2.2;   // Curiosity's size: about 10 x 9 x 7 ft (NASA)
+const CAMP_ROVER_L = 3.0, CAMP_ROVER_W = 2.7, CAMP_ROVER_H = 2.1;   // Curiosity: 10 ft long, 9 ft wide, 7 ft tall (NASA mission page) = 3.0 x 2.7 x 2.1 m
 const CAMP_ROVER_LOOP_M = 34, CAMP_ROVER_MPS = 0.7;      // rover drives a slow loop around the camp [ILLUSTRATIVE]
 let _walk = null;
 
