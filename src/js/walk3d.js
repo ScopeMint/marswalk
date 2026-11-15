@@ -438,7 +438,7 @@ function walkMarkers() {
     w.stops.push({ x, z, props });
   };
   const hab = STATE.habitat || { lat: CONFIG.studyArea.defaultHabitatLat, lon: CONFIG.studyArea.defaultHabitatLon };
-  add(hab.lon, hab.lat, 'EVA BASE', '#B07D4A', null);
+  add(hab.lon, hab.lat, 'EVA BASE', '#8FB3DE', null);
   (STATE.targets || []).forEach((f, i) => {
     if (!f.geometry || f.geometry.type !== 'Point') return;
     const p = f.properties || {};

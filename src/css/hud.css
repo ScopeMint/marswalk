@@ -118,7 +118,7 @@
   width: min(680px, 52vw);
   text-align: center;
 }
-.hud-phase   { color: var(--accent, #B07D4A); font-size: clamp(13px, 1.4vw, 18px); margin-bottom: 4px; letter-spacing: .06em; }
+.hud-phase   { color: var(--accent, #8FB3DE); font-size: clamp(13px, 1.4vw, 18px); margin-bottom: 4px; letter-spacing: .06em; }
 .hud-status  { font-size: clamp(20px, 2.8vw, 32px); font-weight: 600; letter-spacing: .15em; }
 .hud-go      { color: var(--pass,    #46C37B); }
 .hud-caution { color: var(--caution, #F2B134); }

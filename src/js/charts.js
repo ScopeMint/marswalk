@@ -14,7 +14,7 @@
 const CHART_HEAD_PX = 50;                                   // height of the two-line header above each plot (see charts.css)
 const CHART_PAD = { top: 10, right: 14, bottom: 34, left: 54 };   // room for tick labels and axis titles
 const CHART_COLORS = { bg: '#0F1115', grid: '#262B35', axis: '#A3A8B3', text: '#E8E6E3', teal: '#3FD0C9',
-                       orange: '#D9622B', amber: '#F2B134', blue: '#7FB4FF' };
+                       orange: '#E8908A', amber: '#F2B134', blue: '#7FB4FF', accent: '#8FB3DE' };   // 'orange' key = warm-season curve (soft red)
 const CHART_STEEP_GRADE_DEG = 10;                           // route sections steeper than this are drawn amber [OUR ASSUMPTION]
 /* Data key for TODAY's half of the Mars year at Gale (safety.js currentSeason): Ls 0-180 -> 'northern_spring_summer',
    Ls 180-360 -> 'northern_autumn_winter'. The planner's temperature check uses the same season. */
@@ -80,8 +80,8 @@ function chartEvaWindow(ctx, plot, xOf) {
   const start = ((STATE.evaStartHour == null ? 8 : STATE.evaStartHour) % 24 + 24) % 24, hours = Math.min(STATE.evaHours || 6, 24);
   [[start, Math.min(start + hours, 24)], [0, Math.max(0, start + hours - 24)]].forEach(([a, b]) => {
     if (b <= a) return;
-    ctx.fillStyle = 'rgba(217, 98, 43, 0.16)'; ctx.fillRect(xOf(a), plot.y, xOf(b) - xOf(a), plot.h);
-    ctx.fillStyle = 'rgba(217, 98, 43, 0.7)'; ctx.fillRect(xOf(a), plot.y, 1, plot.h); ctx.fillRect(xOf(b) - 1, plot.y, 1, plot.h);
+    ctx.fillStyle = 'rgba(143, 179, 222, 0.16)'; ctx.fillRect(xOf(a), plot.y, xOf(b) - xOf(a), plot.h);
+    ctx.fillStyle = 'rgba(143, 179, 222, 0.7)'; ctx.fillRect(xOf(a), plot.y, 1, plot.h); ctx.fillRect(xOf(b) - 1, plot.y, 1, plot.h);
   });
 }
 
@@ -264,7 +264,7 @@ function drawTempChart(canvasId) {
     ctx.stroke();
   });
   chartLegend(state, [{ color: CHART_COLORS.blue, text: coolName }, { color: CHART_COLORS.orange, text: warmName },
-                      { color: 'rgba(217, 98, 43, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
   if (state.cursor == null) {
     const range = typeof computeTemperatureRange === 'function'
       ? computeTemperatureRange(STATE.evaStartHour == null ? 8 : STATE.evaStartHour, STATE.evaHours || 6, chartSeasonUsed()) : null;
@@ -298,7 +298,7 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
   track.forEach((p, i) => { if (i) ctx.lineTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); else ctx.moveTo(xOf(p.lmstHours), yOf(p.sunElevationDeg)); });
   ctx.stroke();
   chartLegend(state, [{ color: CHART_COLORS.amber, text: 'Sun today' }, { color: 'rgba(0, 0, 0, 0.6)', text: 'Night (sun below 0°)', shape: 'box' },
-                      { color: 'rgba(217, 98, 43, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
+                      { color: 'rgba(143, 179, 222, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
   const fmt = typeof mcFormatHours === 'function' ? mcFormatHours : chartClock;
   if (state.cursor == null) {
     state.readout.textContent = light && Number.isFinite(light.sunriseLmst) ? 'Sunrise ' + fmt(light.sunriseLmst) + ' · sunset ' + fmt(light.sunsetLmst) : 'Move over the chart to read any hour';

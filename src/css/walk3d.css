@@ -25,7 +25,7 @@
 .walk-top { position: absolute; z-index: 4; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start;
   gap: 16px; padding: 18px 28px; pointer-events: none; background: linear-gradient(rgba(8, 9, 12, 0.75), transparent); }
 .walk-top button { pointer-events: auto; }
-.walk-kicker { color: #D9622B; font: 11px ui-monospace, Consolas, monospace; letter-spacing: .2em; }
+.walk-kicker { color: #8FB3DE; font: 11px ui-monospace, Consolas, monospace; letter-spacing: .2em; }
 .walk-top h2 { margin: 3px 0 0; font-size: clamp(17px, 2vw, 24px); font-weight: 600; letter-spacing: -.01em; }
 .walk-top-right { display: flex; align-items: center; gap: 10px; }
 .walk-pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(242, 177, 52, 0.6); color: #F2B134; background: rgba(15, 17, 21, 0.7);

@@ -27,9 +27,9 @@ function drawProfile(canvasId, profileData) {
 
   const T = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   const C = {
-    bg: T.bg || '#100E0D', muted: T.muted || '#9E9890', route: T.route || '#3FD0C9',
-    accent: T.accent || '#B07D4A', caution: T.caution || '#F2B134', danger: T.danger || '#E5484D',
-    border: T.border || '#2D2A28',
+    bg: T.bg || '#0B0E12', muted: T.muted || '#919AA7', route: T.route || '#3FD0C9',
+    accent: T.accent || '#8FB3DE', caution: T.caution || '#F2B134', danger: T.danger || '#E5484D',
+    border: T.border || '#252C36',
   };
 
   const ctx   = canvas.getContext('2d');
@@ -193,9 +193,9 @@ function clearProfile(canvasId) {
   const ctx = canvas.getContext('2d');
   const _Tc = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = _Tc.bg || '#100E0D';
+  ctx.fillStyle = _Tc.bg || '#0B0E12';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle    = _Tc.muted || '#9E9890';
+  ctx.fillStyle    = _Tc.muted || '#919AA7';
   ctx.font         = '12px system-ui';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
@@ -214,8 +214,8 @@ function drawTempChart(canvasId) {
 
   const _T = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   const TC = {
-    bg: _T.bg || '#100E0D', muted: _T.muted || '#9E9890',
-    route: _T.route || '#3FD0C9', accent: _T.accent || '#B07D4A', border: _T.border || '#2D2A28',
+    bg: _T.bg || '#0B0E12', muted: _T.muted || '#919AA7',
+    route: _T.route || '#3FD0C9', accent: _T.accent || '#8FB3DE', border: _T.border || '#252C36',
   };
 
   const ctx   = canvas.getContext('2d');

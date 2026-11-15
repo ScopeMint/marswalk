@@ -165,6 +165,8 @@ function drawRouteLine(cells) {
     return [pt.lat, pt.lon];
   });
 
+  fitRouteInView(latlngs);
+
   _routeLine = L.polyline(latlngs, {
     color:       '#3FD0C9',  // var(--route)
     weight:      4,
@@ -172,6 +174,15 @@ function drawRouteLine(cells) {
     smoothFactor: 1.5,
     interactive: false
   }).addTo(STATE.map);
+}
+
+/* Zooms/pans so the whole route is visible beside the route card (right) and below any caption (top).
+   Skipped while the visor HUD is open (it follows the walker itself). */
+function fitRouteInView(latlngs) {
+  if (!STATE.map || !latlngs || latlngs.length < 2 || document.body.classList.contains('hud-active')) return;
+  const card = document.getElementById('summary-card');
+  const cardW = Math.max(card ? card.offsetWidth : 0, 280) + 24;   // card may not be drawn yet on the first route
+  STATE.map.flyToBounds(latlngs, { paddingTopLeft: [40, 40], paddingBottomRight: [cardW, 40], maxZoom: 16, duration: 0.8 });
 }
 
 function clearRouteLine() {

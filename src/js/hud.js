@@ -281,7 +281,7 @@ function hudDrawProfile(fraction) {
     const y = height - pad - (max > min ? (p.elevationMeters - min) / (max - min) : 0.5) * (height - pad * 2);
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   });
-  ctx.stroke(); ctx.strokeStyle = '#D9622B'; ctx.beginPath();
+  ctx.stroke(); ctx.strokeStyle = '#8FB3DE'; ctx.beginPath();
   const x = pad + fraction * (width - pad * 2);
   ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
 }
