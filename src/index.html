@@ -27,6 +27,68 @@
 </head>
 <body>
 
+  <!-- SVG icon sprite — embedded directly (no scripting needed, works offline) -->
+  <svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/><line x1="12" y1="11" x2="12" y2="17"/>
+    </symbol>
+    <symbol id="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10.3 4.2a2 2 0 0 1 3.4 0l7.5 13A2 2 0 0 1 19.5 20h-15a2 2 0 0 1-1.7-2.8z"/><line x1="12" y1="9" x2="12" y2="13.5"/><circle cx="12" cy="16.5" r="0.75" fill="currentColor"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="4 12 9 17 20 7"/>
+    </symbol>
+    <symbol id="icon-radiation" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="2"/><path d="M12 10A6 6 0 0 1 17.2 13"/><path d="M12 10A6 6 0 0 0 6.8 13"/><line x1="8.9" y1="17.5" x2="12" y2="14"/><line x1="15.1" y1="17.5" x2="12" y2="14"/><path d="M15.1 17.5A6 6 0 0 0 17.2 13"/><path d="M8.9 17.5A6 6 0 0 1 6.8 13"/>
+    </symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="20.5" y2="20.5"/>
+    </symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/>
+    </symbol>
+    <symbol id="icon-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 5 16 12 9 19"/>
+    </symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="5 9 12 16 19 9"/>
+    </symbol>
+    <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/>
+    </symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 12 12 17 22 12"/><polyline points="2 17 12 22 22 17"/>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16.5 14.5"/>
+    </symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 6 5 12 11 18"/>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>
+    </symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </symbol>
+    <symbol id="icon-collapse-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="13 5 7 12 13 19"/><polyline points="19 5 13 12 19 19"/>
+    </symbol>
+    <symbol id="icon-collapse-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="11 5 17 12 11 19"/><polyline points="5 5 11 12 5 19"/>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.2" y1="19.8" x2="5.6" y2="18.4"/><line x1="18.4" y1="5.6" x2="19.8" y2="4.2"/>
+    </symbol>
+  </svg>
+
   <!-- ── Top bar ── -->
   <header id="top-bar" role="banner">
     <span class="brand">MarsWalk</span>
@@ -72,14 +134,14 @@
 
         <div class="control-row">
           <label class="control-label" for="eva-hours-slider">
-            Spacewalk duration: <span id="eva-hours-val">6</span> h
+            <abbr title="Extravehicular activity — a Marswalk outside the habitat">EVA</abbr> duration: <span id="eva-hours-val">6</span> h
           </label>
           <input type="range" id="eva-hours-slider"
                  min="2" max="8" value="6" step="0.5"
                  class="ctrl-slider"
-                 title="Total hours available for the spacewalk. The EVA used % bar shows how much of this you will use."
+                 title="Total hours available for the EVA. The EVA used % bar shows how much of this you will use."
                  aria-label="EVA length in hours">
-          <div class="ctrl-hint">Total time available for the spacewalk</div>
+          <div class="ctrl-hint">Total time available for the EVA</div>
         </div>
 
         <div class="control-row">
@@ -124,7 +186,7 @@
 
       <!-- Library search bar (moved from top bar) -->
       <div id="lib-search-wrap" class="lib-search-wrap" role="search">
-        <span class="lib-search-icon" aria-hidden="true">⌕</span>
+        <svg class="lib-search-icon" aria-hidden="true" width="14" height="14" focusable="false"><use href="#icon-search"/></svg>
         <input id="search-input" type="text"
                placeholder="Search 52 locations…"
                autocomplete="off" spellcheck="false"
@@ -159,7 +221,7 @@
       <!-- Outside-study-area notice (shown when map pans away from Gale Crater) -->
       <div id="outside-area-notice" class="outside-area-notice" style="display:none;"
            role="status" aria-live="polite">
-        <span class="outside-area-text">⚠ EVA planning only available at Gale Crater — zoom into the orange box</span>
+        <span class="outside-area-text"><svg aria-hidden="true" width="13" height="13" focusable="false" style="vertical-align:-2px;margin-right:4px"><use href="#icon-warning"/></svg>EVA planning only available at Gale Crater — zoom into the study area box</span>
         <button class="outside-area-btn" id="btn-goto-gale"
                 aria-label="Return to Gale Crater study area">Return to study area →</button>
       </div>

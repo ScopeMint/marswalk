@@ -86,3 +86,25 @@ const STATE = {
     assumptionsOpen:  false
   }
 };
+
+/* Read CSS theme tokens for canvas drawing — call once per repaint context.
+   Keeps all colors in styles.css; canvas code never hard-codes hex values. */
+function getThemeTokens() {
+  const s = getComputedStyle(document.documentElement);
+  const g = k => s.getPropertyValue(k).trim();
+  return {
+    bg:          g('--bg'),
+    panel:       g('--panel'),
+    border:      g('--border'),
+    text:        g('--text'),
+    muted:       g('--muted'),
+    accent:      g('--accent'),
+    route:       g('--route'),
+    pass:        g('--pass'),
+    caution:     g('--caution'),
+    danger:      g('--danger'),
+    skyHorizon:  g('--mars-sky-horizon'),
+    skyZenith:   g('--mars-sky-zenith'),
+    ground:      g('--mars-ground'),
+  };
+}
