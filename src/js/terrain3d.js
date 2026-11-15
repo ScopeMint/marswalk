@@ -35,7 +35,6 @@ function initTerrain3D() {
       <p class="t3d-help">Drag: rotate · Scroll: zoom<br>Right / Shift-drag: pan · Pinch: zoom<br>Arrow keys: rotate · + / −: zoom</p>
     </aside>
     <div class="t3d-legend"><span class="t3d-base-key">● EVA base</span><span class="t3d-route-key">━ Planned route / targets</span><span>┄ Curiosity traverse</span></div>
-    <div class="t3d-readout" data-t3d="readout">Hover terrain for elevation, slope and distance from base</div>
     <div class="t3d-notice" data-t3d="notice" role="status"></div>
     <footer class="t3d-footer">3D: HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (1 m, shown at 20 m mesh) + HiRISE orthoimage ESP_019988_1750. Vertical exaggeration as shown.</footer>`;
   document.body.appendChild(root);
@@ -448,12 +447,7 @@ function t3dFrame(nowMs) {
 function t3dHover() {
   const s = _t3d; s.ray.setFromCamera(s.pointer, s.camera);
   const hit = s.ray.intersectObject(s.mesh)[0];
-  if (!hit) { s.el.readout.textContent = 'Hover terrain for elevation, slope and distance from base'; return; }
-  const a = s.aoi, col = t3dClamp(Math.floor((hit.point.x / s.widthMeters + 0.5) * a.width), 0, a.width - 1);
-  const row = t3dClamp(Math.floor((hit.point.z / s.depthMeters + 0.5) * a.height), 0, a.height - 1);
-  const elevationMeters = getCellValue(STATE.grids.elevation, row, col), slopeDeg = getCellValue(STATE.grids.slope, row, col);
-  const distanceMeters = s.base ? Math.hypot(hit.point.x - s.base.x, hit.point.z - s.base.z) : NaN;
-  s.el.readout.textContent = `Elevation ${Number.isFinite(elevationMeters) ? elevationMeters.toFixed(1) + ' m' : 'no data'} · Slope ${Number.isFinite(slopeDeg) ? slopeDeg.toFixed(1) + '°' : 'no data'} · Base ${Number.isFinite(distanceMeters) ? Math.round(distanceMeters) + ' m (straight line)' : 'outside area'}`;
+  if (!hit) return;
 }
 
 /* Displays independent data warnings without replacing other notices. */
