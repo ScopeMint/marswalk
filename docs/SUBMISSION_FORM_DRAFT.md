@@ -20,7 +20,10 @@ turn-back point, prints an astronaut cue card, and replays the walk in a helmet-
 ===========================================================================
 3. LINK TO PROJECT DEMO (ONE public link — video or slide deck)
 ===========================================================================
-[Fill in Sunday: YouTube unlisted link — record the in-app "▶ Tour" (its captions are the subtitles)]
+https://scopemint.github.io/marswalk/media/marswalk-demo-30s.mp4
+(30 s, 1920x1080, English captions on screen; .srt also in media/. Works once GitHub Pages is on.
+ Backup: upload media/marswalk-demo-30s.mp4 + .srt to YouTube as unlisted and paste that link instead.)
+Screenshots to upload: media/shot-1-map-route.png, shot-2-cue-card.png, shot-3-traverse.png, shot-4-visor-hud.png, shot-5-3d-flythrough.png
 
 ===========================================================================
 4. LINK TO FINAL PROJECT (public GitHub Pages link — no login)
