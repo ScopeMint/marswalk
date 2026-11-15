@@ -45,6 +45,8 @@ function initHud() {
         <dt>Current elevation / slope</dt><dd data-hud="terrain"></dd>
         <dt>Walk-back to habitat</dt><dd data-hud="walkback"></dd>
         <dt>est. dose (rover baseline)</dt><dd data-hud="dose"></dd>
+        <dt>O2 left (suit model)</dt><dd data-hud="o2"></dd>
+        <dt>Radio link to base</dt><dd data-hud="comm"></dd>
       </dl>
       <div class="hud-bottom"><div class="hud-phase" data-hud="phase" role="status"></div>
         <div class="hud-status" data-hud="status" role="status"></div>
@@ -217,6 +219,7 @@ function hudRender() {
   el.terrain.textContent = `${hudNumber(hudGridValue(grids.elevation, currentCell))} m / ${hudNumber(hudGridValue(grids.slope, currentCell))}°`;
   el.walkback.textContent = `${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`;
   el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN)} μGy${STATE.solarStormMode ? ' · STORM' : ''}`;
+  hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength);
   const done = elapsedSeconds >= hudEndSeconds();
   el.phase.textContent = done ? `Return leg: walk-back ${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`
     : fraction >= 1 ? `SCIENCE WORK · ${hudClock(hudEndSeconds() - elapsedSeconds)} left` : 'OUTBOUND WALK';
@@ -290,4 +293,30 @@ function hudRemoveMarker() {
 function hudSetFullscreenMap(on) {
   document.body.classList.toggle('hud-active', on);
   if (STATE.map) setTimeout(() => STATE.map.invalidateSize(), 50);
+}
+
+/* Shows suit O2 left (from consumables.js) and the radio link state (from hazards.js) at the current position. */
+function hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength) {
+  const c = STATE.consumables;
+  if (el.o2) {
+    if (c && c.outCumJ && c.outCumJ.length > 1) {
+      const n = c.outCumJ.length - 1;
+      const k = Math.min(n, Math.floor(fraction * n));
+      let usedJ = c.outCumJ[k];
+      if (fraction >= 1) {
+        const sciS = Math.min(CONFIG.eva.workMinutes * 60, Math.max(0, elapsedSeconds - _hud.route.timeSeconds));
+        usedJ = c.outJ + c.workJ * sciS / (CONFIG.eva.workMinutes * 60);
+      }
+      const left = 1 - usedJ * c.o2KgPerJ / CONFIG.suit.o2CapacityKg;
+      el.o2.textContent = `${hudNumber(left * 100, 0)}%`;
+    } else el.o2.textContent = '--';
+  }
+  if (el.comm) {
+    const hz = STATE.hazards;
+    if (!hz) { el.comm.textContent = '--'; return; }
+    const m = fraction * (_hud.route.distanceMeters || 0);
+    const shadow = hz.radio.some(r => m >= r.fromM && m <= r.toM);
+    el.comm.textContent = shadow ? 'RELAY (no direct line)' : 'DIRECT';
+    el.comm.style.color = shadow ? '#B07CFF' : '#46C37B';
+  }
 }
