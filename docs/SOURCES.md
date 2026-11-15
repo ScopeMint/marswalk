@@ -40,6 +40,9 @@ MSL Curiosity RAD: Hassler, D. M. et al. (2014), Mars' Surface Radiation Environ
     - dose-equivalent rate 0.64 +/- 0.12 mSv/day
     - period 7 Aug 2012 - 1 Jun 2013 (~300 sols, near solar maximum)
     - the one surface SEP event (11-12 Apr 2013): ~30% above GCR, 0.025 mGy per event
+  Space weather context: NASA (10 June 2024), "NASA Watches Mars Light Up During Epic Solar Storm":
+    RAD measured 8,100 micrograys at the surface in the 20 May 2024 storm (about 30 chest X-rays).
+    https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/
   CORRECTED 2026-11-14: earlier drafts used "233 +/- 12 uGy/day" and a "10x solar storm, 1-8 mGy,
   Table S2" scenario. Neither appears in the paper; both were removed.
 

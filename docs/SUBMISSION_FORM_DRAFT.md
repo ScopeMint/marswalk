@@ -52,7 +52,8 @@ For a chosen target MarsWalk:
 (2) Computes a walk-back-time field from the habitat and the point of no return on the route.
 (3) Runs a suit & crew model: walking energy from the Pandolf (1977) equation scaled to Mars
     gravity, oxygen (Weir 1949), CO2 and cooling water against suit capacity, for a buddy pair.
-(4) Checks radiation (Curiosity RAD surface baseline: 210 +/- 40 uGy/day, Hassler et al. 2014),
+(4) Checks radiation (Curiosity RAD surface baseline: 210 +/- 40 uGy/day, Hassler et al. 2014; space-weather
+    context from the largest storm RAD measured, 8,100 uGy on 20 May 2024),
     air temperature (real REMS hourly measurements for today's Mars season at Gale), daylight (live Mars24 clock: today's sol, local Mars time, sunrise and sunset), and the
     EVA time budget with a 25% reserve, then gives GO / NO-GO.
 (5) Prints an EVA cue card (timeline in elapsed time and local Mars time, stations, oxygen left,
@@ -141,6 +142,7 @@ or real screenshots.
 - Curiosity raw images: https://mars.nasa.gov/msl/multimedia/raw-images/
 - THEMIS mosaics via Mars Trek: https://trek.nasa.gov/mars/ ; Edwards et al. (2011), JGR 116, E10008
 - Hassler et al. (2014), Science 343(6169), 1244797, doi:10.1126/science.1244797 (RAD)
+- NASA (10 June 2024), NASA Watches Mars Light Up During Epic Solar Storm (RAD 8,100 microgray event): https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/
 - REMS MODRDR data, NASA PDS Atmospheres Node: https://atmos.nmsu.edu/PDS/data/mslrem_1001/
 - Gomez-Elvira et al. (2012), REMS, Space Sci. Rev. 170, 583-640, doi:10.1007/s11214-012-9921-1
 - REMS daily summaries, CAB/INTA-CSIC: https://cab.inta-csic.es/rems/en/

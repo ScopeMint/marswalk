@@ -42,6 +42,14 @@ RAD_DATA = {
     'sepNote': 'The only solar particle event RAD saw on the surface in this period (11-12 April 2013) '
                'raised the dose rate ~30% and added 0.025 mGy in total. Larger events are possible; '
                'no storm scenario is modeled.',
+    'largestSurfaceEvent': {
+        'date': '2024-05-20',
+        'doseMuGy': 8100,
+        'note': 'Largest solar-storm dose RAD has measured on the surface since landing: 8,100 μGy for a person '
+                'standing next to the rover (NASA: about 30 chest X-rays), about 39 days of normal background in one event.',
+        'source': 'NASA, "NASA Watches Mars Light Up During Epic Solar Storm", 10 June 2024',
+        'url': 'https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/',
+    },
     'evaEstimateFormula': 'EVA dose estimate = doseRateMuGyPerDay x (EVA_hours / 24)',
 }
 

@@ -42,7 +42,10 @@ function computeRadiation(evaHoursUsed) {
     doseHighMuGy: range ? Math.round(range[1] * evaHoursUsed / 24) : null,
     source: STATE.radBaseline.citation,
     doi:    STATE.radBaseline.doi,
-    note:   STATE.radBaseline.screenNote
+    note:   STATE.radBaseline.screenNote +
+            (STATE.radBaseline.largestSurfaceEvent
+              ? ' Space weather: ' + STATE.radBaseline.largestSurfaceEvent.note + ' (' + STATE.radBaseline.largestSurfaceEvent.source + ')'
+              : '')
   };
 }
 
