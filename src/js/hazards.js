@@ -77,18 +77,26 @@ function computeHazards() {
   };
 }
 
-/* Draws hazard ranges as coloured segments on top of the route line. */
+/* Draws hazard ranges as coloured segments on top of the route line.
+   Each segment is drawn twice: a dark casing first (wider, semi-transparent) so the
+   colour reads clearly against the teal route line underneath. */
 function drawHazardSegments(hz) {
   if (_hazLayer && STATE.map) STATE.map.removeLayer(_hazLayer);
   _hazLayer = null;
   if (!hz || !STATE.map) return;
+  const renderer = STATE.hazardRenderer || STATE.routeRenderer;
   _hazLayer = L.layerGroup();
   const cells = STATE.route.cells;
-  [['radio', 9, '2 7'], ['rocky', 6, null], ['steep', 6, null]].forEach(([kind, weight, dash]) => {
+  // weight: how thick the coloured line is; casing adds 4 px on each side
+  [['radio', 7, '6 5'], ['rocky', 8, null], ['steep', 8, null]].forEach(([kind, weight, dash]) => {
     hz[kind].forEach(r => {
       const pts = cells.slice(r.i0, r.i1 + 1).map(c => { const p = cellToLatLon(c.row, c.col); return [p.lat, p.lon]; });
       if (pts.length < 2) return;
-      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: kind === 'radio' ? 0.75 : 0.9, dashArray: dash, interactive: true })
+      // Dark casing — makes the colour pop against both the blue route and the map background
+      L.polyline(pts, { color: '#000000', weight: weight + 4, opacity: 0.35, dashArray: dash, interactive: false, renderer })
+        .addTo(_hazLayer);
+      // Coloured line on top of casing
+      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: 1, dashArray: dash, interactive: true, renderer })
         .bindTooltip(`${HAZ_STYLE[kind].label}<br>${(r.fromM / 1000).toFixed(2)}–${(r.toM / 1000).toFixed(2)} km`, { className: 'target-tooltip', sticky: true })
         .addTo(_hazLayer);
     });

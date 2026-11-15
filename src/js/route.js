@@ -172,7 +172,8 @@ function drawRouteLine(cells) {
     weight:      4,
     opacity:     0.9,
     smoothFactor: 1.5,
-    interactive: false
+    interactive: false,
+    renderer:    STATE.routeRenderer  // keeps route above tiles during zoom animation
   }).addTo(STATE.map);
 }
 
