@@ -159,13 +159,22 @@ NASA, Apollo 17 Mission Details, https://www.nasa.gov/mission_pages/apollo/missi
 3. SOFTWARE AND LIBRARIES
 ===========================================================================
 
-Leaflet 1.9.4 (BSD-2-Clause) — map. Self-hosted copy in src/vendor/. https://leafletjs.com
-three.js r160 (MIT) — 3D terrain view. Self-hosted copy in src/vendor/. https://threejs.org
+Leaflet 1.9.4 (BSD-2-Clause) — map. Self-hosted copy in src/vendor/leaflet.js + leaflet.css.
+  Default marker images (marker-icon.png, marker-shadow.png) in src/vendor/images/ are part of the
+  Leaflet distribution and covered by the same BSD-2-Clause license. https://leafletjs.com
+three.js r160 (MIT) — 3D terrain view. Self-hosted copy in src/vendor/three.module.js. https://threejs.org
 Electron 33 (MIT) + electron-builder (MIT) — Windows desktop app shell (desktop/).
-Python: numpy, scipy, rasterio, Pillow — data pipeline (scripts/).
+Python: numpy, scipy, rasterio, Pillow — data pipeline scripts only; not shipped with the web app.
 USGS Astrogeology STAC API — data discovery. https://stac.astrogeology.usgs.gov/api/
 IBM Plex Sans (SIL Open Font License 1.1) — UI font, self-hosted in src/vendor/fonts/ (static Latin-1 woff2,
   weights 400/500/600/700 + italic), from the official IBM Plex GitHub release https://github.com/IBM/plex
+OpenPlanetaryMap (OPM) basemap tiles — CC-BY 4.0 license, https://www.openplanetary.org/opm
+  Underlying data: NASA Viking MDIM 2.1 (public domain) + MGS MOLA (public domain) + CARTO styling.
+  Attribution shown in the map: "OpenPlanetaryMap | Data: NASA Viking MDIM 2.1, MOLA (NASA/USGS/CARTO)"
+SVG icon sprite (src/vendor/icons.svg + inline in index.html) — original work by the team, public domain.
+  Conventions inspired by Lucide (ISC license); no Lucide paths were copied.
+App icons (src/icons/*.png) — drawn programmatically via scripts/10_make_app_assets.py using Python
+  Pillow (HPND license). Simple geometric shapes only; no AI-generated imagery, no third-party graphics.
 
 ===========================================================================
 4. RESEARCH / INSPIRATION (read during planning, nothing copied)
@@ -205,10 +214,11 @@ TEAM ADDITIONS (Nov 14 evening, main branch)
   NASA/JPL-Caltech MMGIS waypoints (first waypoint): MSL_waypoints.json and
   https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json
   Check: every landing point falls inside the bounds of the NASA mosaic it is drawn on (script stops a site if not).
-[CONFIRMED 2026-11-15] Place names, read again on https://www.giss.nasa.gov/tools/mars24/help/landers.html :
+[CONFIRMED 2026-11-15] Place names, re-read on https://www.giss.nasa.gov/tools/mars24/help/landers.html :
   Viking 1 = Thomas Mutch Memorial Station, Viking 2 = Gerald Soffen Memorial Station, Pathfinder = Carl Sagan Memorial
   Station, Spirit = Columbia Memorial Station, Opportunity = Challenger Memorial Station, Curiosity = Bradbury Landing,
   Perseverance = Octavia E. Butler Landing. The page gives no site name for Phoenix or InSight.
+  Copyright note: these are factual geographic designations assigned by NASA/IAU; not creative works.
 
 [CONFIRMED] First-person walk view (src/js/walk3d.js): where each part of the picture comes from
   Ground shape: src/data/elevation.bin (HiRISE DTM DTEEC_019698_1750_019988_1750_U01, 10 m cells), no vertical exaggeration.
@@ -236,7 +246,7 @@ TEAM ADDITIONS (Nov 14 evening, main branch)
     read from the HiRISE elevation grid.
 [CONFIRMED 2026-11-15, CORRECTED] Rover size: NASA says "10 feet long, 9 feet wide and 7 feet tall", not including
   the arm (https://science.nasa.gov/mission/msl-curiosity/). That is 3.05 x 2.74 x 2.13 m. The model height was 2.2 m;
-  changed to 2.1 m in walk3d.js (CAMP_ROVER_H). The rover's loop around the camp and its speed are ILLUSTRATIVE.
+  corrected to 2.1 m in walk3d.js (CAMP_ROVER_H). The rover's loop around the camp and its speed are ILLUSTRATIVE.
 
 [SUPERSEDED 2026-11-15] Temperature data, daily-record version (scripts/11_rems_from_nasa_record.py).
   Replaced by REAL HOURLY REMS data from NASA PDS (scripts/05_prepare_rems.py, see section 1): peak 15:00 LTST,
