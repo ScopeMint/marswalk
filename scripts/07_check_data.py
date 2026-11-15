@@ -11,13 +11,17 @@ import sys
 import json
 import numpy as np
 
-DATA_DIR = 'data'
+DATA_DIR = os.path.join('src', 'data')   # the app's data folder (run from the repo root)
+
+FAILURES = []   # every failed check, so the summary can never say "all passed" after a FAIL
+
 
 def check(label, condition, detail=''):
     if condition:
         print(f'  PASS  {label}')
     else:
         print(f'  FAIL  {label}{(" — " + detail) if detail else ""}')
+        FAILURES.append(label)
     return condition
 
 def main():
@@ -125,6 +129,8 @@ def main():
         check('  has doi',                'doi' in rad)
         check('  dose in plausible range', 50 < rad.get('doseRateMuGyPerDay', 0) < 500,
               str(rad.get('doseRateMuGyPerDay')))
+        check('  matches Hassler et al. 2014 (210 uGy/day)', rad.get('doseRateMuGyPerDay') == 210,
+              str(rad.get('doseRateMuGyPerDay')))
     else:
         all_pass = False
     print()
@@ -147,12 +153,21 @@ def main():
                     day_max = max(temps[10], temps[11], temps[12])
                     check(f'  {skey}: night colder than day', night_min < day_max,
                           f'night={night_min}°C day={day_max}°C')
+                    peak_h = max(range(24), key=lambda h: temps[h])
+                    check(f'  {skey}: afternoon peak (12-16 h local solar time, as REMS measures)',
+                          12 <= peak_h <= 16, f'peak at {peak_h}:00')
+            seas = rems['seasons']
+            if 'northern_spring_summer' in seas and 'northern_autumn_winter' in seas:
+                a = max(seas['northern_spring_summer']['airTempC'])
+                b = max(seas['northern_autumn_winter']['airTempC'])
+                check('  Ls 180-360 warmer than Ls 0-180 at Gale (perihelion, southern summer)', b > a,
+                      f'max {b}°C vs {a}°C')
     else:
         all_pass = False
     print()
 
     # ── Summary ───────────────────────────────────────────────────────────────
-    if all_pass:
+    if all_pass and not FAILURES:
         print('=== ALL CHECKS PASSED — data files are ready ===\n')
     else:
         print('=== SOME CHECKS FAILED — fix the issues above before continuing ===\n')
