@@ -942,7 +942,9 @@ button:focus-visible, .btn:focus-visible {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  padding: 10px 4px 4px;
+  padding: 4px 4px 6px;
+  margin-top: 10px;
+  border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 6px;
