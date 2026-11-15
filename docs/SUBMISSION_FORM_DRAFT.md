@@ -10,172 +10,134 @@ MarsWalk
 ===========================================================================
 2. HIGH-LEVEL PROJECT SUMMARY (keep short — this is the hook)
 ===========================================================================
-MarsWalk is a web-based EVA planning tool that layers five kinds of NASA science mission data at
-astronaut walking scale. A crew member picks a science target near Gale Crater / Mount Sharp, and
-the app draws a slope-aware walking route with a full safety summary: distance, time, EVA budget,
-radiation baseline, and temperature range — in under one second. It fills the gap between global
-Mars maps (JPL Mars Trek, USGS planetary mapping) and the hyper-local needs of a single Marswalk.
+MarsWalk is an installable, offline EVA planner for the first humans on Mars, built on the real
+place where Curiosity studied boxwork ridges in 2025-26 on Mount Sharp. It layers data from four
+NASA missions at walking scale: HiRISE 1 m terrain (checked against Curiosity's own elevations to
+2.4 m), 25 cm imagery, THEMIS thermal, Curiosity RAD/REMS and the rover's real path. It plans the
+safest walk to a science target, computes oxygen, cooling water, radiation, daylight and the
+turn-back point, prints an astronaut cue card, and replays the walk in a helmet-visor HUD.
 
 ===========================================================================
 3. LINK TO PROJECT DEMO (ONE public link — video or slide deck)
 ===========================================================================
-[Fill in Sunday: YouTube unlisted link or Google Drive link — test logged out first]
+[Fill in Sunday: YouTube unlisted link — record the in-app "▶ Tour" (its captions are the subtitles)]
 
 ===========================================================================
 4. LINK TO FINAL PROJECT (public GitHub Pages link — no login)
 ===========================================================================
-[Fill in Sunday after enabling GitHub Pages and testing in private window]
-Format will be: https://[your-username].github.io/[repo-name]/
+https://scopemint.github.io/marswalk/   (enable Pages: repo Settings -> Pages -> main / root; test in a private window)
 
 ===========================================================================
 5. DETAILED PROJECT DESCRIPTION
 ===========================================================================
 
 WHAT IT DOES:
-MarsWalk combines data from five NASA science missions into a single interactive planning interface
-sized for a single Marswalk — a ~6 km × 6 km area around the boxwork formations at Gale Crater /
-Mount Sharp, the site studied by Curiosity rover since 2012.
+MarsWalk turns layered NASA data into the decisions a suited astronaut must make on a Marswalk:
+which way to walk, how long it takes, what it costs the suit, and when to turn back.
 
-A planner picks one of four to six named science targets. MarsWalk then:
-(1) Loads a topographic grid (10 m cells) derived from a NASA/USGS elevation model and computes
-    slope and roughness for every cell.
-(2) Runs an A-star pathfinding algorithm (in a background Web Worker so the page never freezes)
-    to find the fastest walkable route from the habitat to the target — blocked by cells steeper
-    than the crew's slope limit.
-(3) Computes a "walk-back time map" showing how many minutes it would take to return home from
-    any point in the study area — the key safety check that existing tools do not provide.
-(4) Checks the full EVA budget: out + 60-minute work time + walk back must leave at least 25%
-    of EVA time unused as a safety reserve.
-(5) Shows an estimated radiation dose for the EVA based on the published Curiosity RAD baseline,
-    and the temperature range during the EVA window from Curiosity REMS data.
-(6) Displays real Curiosity Mastcam/Navcam photos near each science target so the crew knows
-    what to expect on arrival.
-(7) Makes every number traceable: each data point has a source label or is marked "our assumption"
-    on screen. An Assumptions panel lists all modeled parameters.
+Site: a 4 km x 4 km box on Curiosity's actual 2025-26 boxwork traverse (4.81 S, 137.37 E). The
+challenge's own example science goal. Targets are where Curiosity really parked on the drill sols:
+Altadena (sol 4571), the Monte Grande hollow / Nevado Sajama ridge pair (sols ~4695-4718), the
+boxwork entry (sol 4548) and the rover's latest position (sol 5073), plus one boxwork field no rover
+has visited, which we found in HiRISE images. Human science where robots have not gone.
+
+For a chosen target MarsWalk:
+(1) Finds the fastest walkable route through 160,000 terrain cells of 10 m, built from the HiRISE
+    1 m Digital Terrain Model. It blocks slopes above the crew's limit and slows on uphill and on
+    rocky ground (1 m "rock & ridge relief" from the same DTM). It runs in a Web Worker in ~0.1 s.
+(2) Computes a walk-back-time field from the habitat and the point of no return on the route.
+(3) Runs a suit & crew model: walking energy from the Pandolf (1977) equation scaled to Mars
+    gravity, oxygen (Weir 1949), CO2 and cooling water against suit capacity, for a buddy pair.
+(4) Checks radiation (Curiosity RAD surface baseline, with a solar-storm scenario), temperature
+    (REMS), daylight (live Mars24 clock: today's sol, local Mars time, sunrise and sunset), and the
+    EVA time budget with a 25% reserve, then gives GO / NO-GO.
+(5) Prints an EVA cue card (timeline in elapsed time and local Mars time, stations, oxygen left,
+    turn-back rule). This is what an astronaut would carry.
+(6) Replays the walk in a full-screen helmet-visor HUD and in a 3D HiRISE terrain fly-through.
+(7) Shows the real Curiosity photo from each target, so the crew knows what to expect.
+It installs like a native app and works fully offline. On Mars there is no internet.
+
+WHY WE TRUST THE NUMBERS:
+- Our terrain matches the elevations Curiosity itself reported at 227 stops: 2.4 m RMS after a
+  constant 12.8 m datum offset (computed live in the app).
+- Curiosity's own path stays on slopes our model rates as walkable.
+- The Mars clock passes 80 tests (GISS worked example + every photo's sol and time).
+- Every number on screen is either cited or labelled "OUR ASSUMPTION"; Assumptions panel lists all.
 
 WHAT WE HOPE TO ACHIEVE:
-To show that the gap between global-scale Mars maps and walking-scale EVA planning can be bridged
-with real NASA data, open web tools, and careful engineering — and to give future mission planners
-a concrete, openly licensed prototype they can build on.
+A concrete, open prototype of the walking-scale planning layer that Mars mission planners and crews
+will need. It can be re-run for any site with a HiRISE DTM: the data pipeline only needs a new box.
 
 HOW WE BUILT IT:
-Static website (HTML, CSS, plain JavaScript, Leaflet map library) hosted on GitHub Pages.
-Python scripts process raw NASA data files once into small binary grid files (~4 MB total).
-Route math runs in a browser Web Worker. No server, no API keys, no login required — the app
-opens instantly from a public link.
+Python scripts read only the needed window from cloud-optimised NASA/USGS GeoTIFFs (no huge
+downloads) and produce small binary grids, overlays and 865 map tiles. The app is static HTML/CSS/
+JavaScript with Leaflet and three.js. Routing runs in a Web Worker; a service worker makes it an
+offline Progressive Web App. No server, no API keys, no login.
 
 TOOLS AND LANGUAGES:
-- Languages: JavaScript (application), Python (data preparation), HTML/CSS (interface)
-- Libraries: Leaflet.js (map display, BSD-2-Clause)
-- Data processing: Python / NumPy / rasterio (or GDAL)
-- Hosting: GitHub Pages
-- Code assistance: Claude Code (see AI Use field)
+- JavaScript, HTML/CSS (app); Python with numpy, scipy, rasterio, Pillow (data pipeline)
+- Leaflet 1.9.4 (BSD-2), three.js r160 (MIT); GitHub Pages hosting
+- Code assistance: Claude Code and OpenAI Codex (see AI field)
 
-WHAT WE LEARNED / CHALLENGES:
-The hardest step was acquiring a real elevation file for a specific 6 km box on Mars. Tile imagery
-(the pictures in JPL Mars Trek) looks like topography but contains no elevation numbers — getting
-actual Digital Terrain Models required working with NASA/USGS planetary data formats (GeoTIFF,
-IMG). The route pathfinding on a 360,000-cell grid also required careful performance tuning to
-stay under one second. We also learned that honesty about data limits (what the model cannot see,
-where assumptions were made) is both scientifically correct and builds judge trust.
+CHALLENGES / WHAT WE LEARNED:
+Map tiles look like terrain but hold no heights; we needed a real DTM and found a 1 m HiRISE DTM
+covering Curiosity's route as a cloud-optimised file. Placing targets honestly meant matching
+named drill sites to the rover's real end-of-drive positions by sol. We also learned to check our
+own model against the rover's measurements before trusting it.
 
 ===========================================================================
 6. NASA DATA USED (required for global award eligibility — be specific)
 ===========================================================================
-
-We use data from FOUR NASA missions and FIVE instruments:
-
-1. Mars Reconnaissance Orbiter (MRO) — HiRISE instrument
-   What: Digital Terrain Model (elevation, ~1 m/post) and optical imagery (~0.25 m/px)
-   Used for: topographic grid (elevation, slope, roughness), base map imagery at close zoom
-   Source: University of Arizona HiRISE DTM catalog (https://www.uahirise.org/dtm/) and
-           NASA Mars Trek tile service (https://trek.nasa.gov/mars/)
-
-2. Mars Reconnaissance Orbiter (MRO) — CTX instrument
-   What: Stereo-derived elevation model (~20 m/post) and optical imagery (~5 m/px)
-   Used for: elevation fallback and base map imagery at wider zoom
-   Source: Murray Lab CTX stereo mosaic (https://murray-lab.caltech.edu/CTX/) and Mars Trek
-
-3. Mars Reconnaissance Orbiter (MRO) — CRISM instrument [if data obtained]
-   What: Mineral identification summary maps
-   Used for: spectral / minerals layer showing hydrated mineral locations
-   Source: PDS Geosciences Node CRISM archive
-
-4. Mars Odyssey — THEMIS instrument
-   What: Thermal infrared day and night mosaics (~100 m/px)
-   Used for: thermal layer showing relative surface temperature patterns
-   Source: NASA Mars Trek tile service
-
-5. Mars Science Laboratory (Curiosity rover) — RAD instrument
-   What: Published surface absorbed dose rate at Gale Crater
-   Used for: per-EVA radiation dose estimate in the safety card
-   Source: Hassler et al. (2014), Science, doi:10.1126/science.1244797
-
-6. Mars Science Laboratory (Curiosity rover) — REMS instrument
-   What: Air and ground temperature data by time of day at Gale Crater
-   Used for: temperature range display during the EVA time window
-   Source: NASA PDS REMS dataset / CAB-INTA-CSIC REMS portal (https://cab.inta-csic.es/rems/en/)
-
-7. Mars Science Laboratory (Curiosity rover) — Mastcam / Navcam cameras
-   What: Surface imagery near Mount Sharp science targets
-   Used for: point-of-view photos in the target drawer
-   Source: NASA raw image archive (https://mars.nasa.gov/msl/multimedia/raw-images/)
-
-All imagery tiles are served live via NASA/JPL Mars Trek (https://trek.nasa.gov/mars/).
-Full citations and links are in docs/SOURCES.md and displayed in the app's About & Sources panel.
+Four NASA missions, seven instruments/products:
+1. MRO HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (1 m) — elevation, slope, rock & ridge relief,
+   3D terrain. Via USGS Astrogeology STAC (CC0).
+2. MRO HiRISE orthoimage ESP_019988_1750 (0.25 m) — map tiles and 3D texture.
+3. Mars Odyssey THEMIS Day/Night IR controlled mosaics (100 m) — thermal layers, via NASA Mars Trek.
+4. MSL Curiosity traverse + waypoints (NASA/JPL MMGIS) — rover path, target positions, validation.
+5. MSL Curiosity Navcam / Mastcam raw images — point-of-view photos per target.
+6. MSL Curiosity RAD — surface dose baseline (Hassler et al. 2014, Science 343).
+7. MSL Curiosity REMS — temperature by local time.
+Context basemap: Viking MDIM 2.1 + MGS MOLA (via OpenPlanetaryMap).
 
 ===========================================================================
 7. SPACE AGENCY PARTNER AND OTHER DATA / TOOLS
 ===========================================================================
-
-NASA data and tools:
-- NASA/JPL Mars Trek tile service (map tiles)
-- NASA Planetary Data System (PDS) — RAD and REMS datasets
-- USGS Astropedia — planetary data products
-
-Other:
-- University of Arizona HiRISE DTM catalog
-- Murray Lab at Caltech — CTX stereo mosaic
-- CAB-INTA-CSIC — REMS data portal
-
-Open-source libraries:
-- Leaflet.js (BSD-2-Clause, https://leafletjs.com)
-- Python / NumPy / rasterio (for data preparation scripts)
+- NASA Mars Trek tile service; NASA/JPL MMGIS; NASA raw-image service; NASA GISS Mars24 algorithm
+- USGS Astrogeology analysis-ready data + STAC API (HiRISE DTM/orthoimages)
+- University of Arizona HiRISE team (DTM producer)
+- CAB-INTA-CSIC REMS team; OpenPlanetaryMap
+- Libraries: Leaflet (BSD-2), three.js (MIT); Python numpy/scipy/rasterio/Pillow
 
 ===========================================================================
 8. USE OF ARTIFICIAL INTELLIGENCE
 ===========================================================================
-
-Tool: Claude Code by Anthropic (claude-sonnet-4-6).
-
-What the AI did: Wrote application code (HTML, CSS, JavaScript), Python data preparation scripts,
-and planning documents (architecture, route model, UI spec) based on detailed specifications
-provided by the team. All AI-generated files are logged in docs/AI_USE.md in the repository.
-
-What the humans did: Chose the science concept, selected the location and science targets,
-verified all data sources and citations, manually tested the application in multiple browsers,
-recorded the demo video, and wrote the final submission text.
-
-No AI-generated images or video are used anywhere in the project. All imagery is real NASA mission
-data with proper credits. All scientific claims are sourced from published papers or NASA mission
-data, not generated by AI.
+Claude Code (Anthropic) wrote most of the application code and the Python data scripts from our
+specifications. OpenAI Codex wrote three modules from written specs: the visor HUD, the Mars24
+clock (with tests) and the 3D terrain view. Every AI-written file is logged in docs/AI_USE.md.
+Humans chose the concept, the site and the science targets, checked every source and citation,
+tested the app, and recorded the demo. No AI-generated images or video: all imagery is NASA data
+or real screenshots.
 
 ===========================================================================
-9. REFERENCES (copy from docs/SOURCES.md when confirmed Saturday)
+9. REFERENCES
 ===========================================================================
-
-[Fill in Sunday from docs/SOURCES.md — paste each confirmed source as a line]
-
-Minimum to include:
-- Hassler et al. (2014) — RAD dose rate — doi:10.1126/science.1244797
-- HiRISE DTM source — uahirise.org/dtm/
-- CTX stereo mosaic — murray-lab.caltech.edu/CTX/ (if used)
-- MOLA — PDS Geosciences Node (if used)
-- THEMIS — Mars Trek / Mars Odyssey mission
-- REMS — PDS / CAB-INTA-CSIC
-- Curiosity images — mars.nasa.gov/msl/multimedia/raw-images/
-- Leaflet.js — leafletjs.com — BSD-2-Clause
-- Mars Trek — trek.nasa.gov/mars/
+- HiRISE DTM DTEEC_019698_1750_019988_1750_U01: https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_019698_1750_019988_1750_U01
+- McEwen et al. (2007), HiRISE, JGR 112, E05S02, doi:10.1029/2005JE002605
+- Curiosity MMGIS traverse/waypoints: https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/
+- Curiosity raw images: https://mars.nasa.gov/msl/multimedia/raw-images/
+- THEMIS mosaics via Mars Trek: https://trek.nasa.gov/mars/ ; Edwards et al. (2011), JGR 116, E10008
+- Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797 (RAD)
+- Martinez et al. (2017), JGR Planets (REMS); https://cab.inta-csic.es/rems/en/
+- Allison & McEwen (2000), Planet. Space Sci. 48, 215-235; https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
+- Pandolf, Givoni & Goldman (1977), J. Appl. Physiol. 43(4), 577-581
+- Weir (1949), J. Physiol. 109, 1-9
+- Siebach & Grotzinger (2014), JGR Planets 119, doi:10.1002/2013JE004508 (boxwork)
+- NASA/JPL news, Curiosity starts unpacking boxwork formations (June 2025)
+- Curiosity blog posts, sols 4641-4648, 4695-4701, 4709-4715, 4716-4722 (science.nasa.gov)
+- NASA Mars Fact Sheet (gravity): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+- OpenPlanetaryMap: https://www.openplanetary.org/opm
+- Leaflet: https://leafletjs.com ; three.js: https://threejs.org
+Full list with licences: docs/SOURCES.md
 
 ===========================================================================
 10. CHECKBOXES

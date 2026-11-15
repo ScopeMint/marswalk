@@ -91,7 +91,7 @@ const LAYER_CATALOG = [
   {
     id: 'walkback',
     name: 'Walk-back Time',
-    description: 'Minutes to walk back to the habitat from any point, using the slope-aware speed model.',
+    description: 'Minutes to walk back to the habitat from any point (slope-aware speed model). Green 0-15, cyan 15-30, amber 30-60, orange 60-90, red over 90 min; clear = unreachable at this slope limit.',
     mission: 'Computed from elevation + slope grids',
     instrument: 'Route model [our assumption]',
     resolution: '10 m/cell',

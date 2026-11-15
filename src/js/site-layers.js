@@ -123,6 +123,48 @@ function setSiteLayerOpacity(layer, opacity) {
   return false;
 }
 
+/* Walk-back time bands in minutes (matches docs/ROUTE_AND_SAFETY_MODEL.md section 4a). */
+const WALKBACK_BANDS = [
+  { maxMin: 15,       rgba: [70, 195, 123, 150] },   // 0-15 min: green
+  { maxMin: 30,       rgba: [63, 208, 201, 140] },   // 15-30: cyan
+  { maxMin: 60,       rgba: [242, 177, 52, 150] },   // 30-60: amber
+  { maxMin: 90,       rgba: [232, 116, 46, 165] },   // 60-90: orange
+  { maxMin: Infinity, rgba: [229, 72, 77, 175] }     // 90+: red
+];
+
+/* Draws STATE.walkback.data into a canvas image overlay. Unreachable cells stay transparent. */
+function _buildWalkbackOverlay(map) {
+  const aoi = STATE.grids.aoi;
+  const data = STATE.walkback && STATE.walkback.data;
+  if (!aoi || !data) return;
+  const cv = document.createElement('canvas');
+  cv.width = aoi.width; cv.height = aoi.height;
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(aoi.width, aoi.height);
+  for (let i = 0; i < data.length; i++) {
+    const min = data[i] / 60;
+    if (!isFinite(min) || min < 0) continue;
+    const band = WALKBACK_BANDS.find(b => min <= b.maxMin);
+    img.data.set(band.rgba, i * 4);
+  }
+  ctx.putImageData(img, 0, 0);
+  const old = STATE.tileLayers.walkback;
+  const wasOn = old ? map.hasLayer(old) : STATE.layers.walkback.visible;
+  if (old) map.removeLayer(old);
+  const overlay = L.imageOverlay(cv.toDataURL(), _aoiBounds(), { opacity: STATE.layers.walkback.opacity, interactive: false, className: 'walkback-overlay' });
+  if (wasOn) overlay.addTo(map);
+  STATE.tileLayers.walkback = overlay;
+}
+
+/* Watches for a new walk-back field (habitat, speed or slope limit changed) and redraws the overlay. */
+function _watchWalkback(map) {
+  let last = null;
+  setInterval(() => {
+    const d = STATE.walkback && STATE.walkback.data;
+    if (d && d !== last) { last = d; _buildWalkbackOverlay(map); }
+  }, 400);
+}
+
 /* Adds every real-site layer. Call once after loadGrids(). Order = drawing order (bottom to top). */
 async function initSiteLayers(map) {
   if (!map || !STATE.grids.loaded) return;
@@ -130,5 +172,6 @@ async function initSiteLayers(map) {
   addSiteImageLayer(map, 'themisDay',   'themis-day.png',   'themis-overlay');
   addSiteImageLayer(map, 'themisNight', 'themis-night.png', 'themis-overlay');
   addSiteImageLayer(map, 'relief',      'relief-overlay.png');
+  _watchWalkback(map);
   await addCuriosityTraverse(map);
 }
