@@ -99,7 +99,7 @@ function selectTarget(feature) {
   STATE.selectedTarget = feature;
 
   // Fly to target on the map
-  if (STATE.map) {
+  if (STATE.map && !STATE.ui.keepView) {   // keepView: the example route on page load leaves the map on the whole planet
     STATE.map.flyTo([lat, lon], Math.max(STATE.map.getZoom(), 14), { duration: 0.8 });
   }
 

@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v13';
+const CACHE_VERSION = 'marswalk-v14';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -21,7 +21,7 @@ const SHELL_FILES = [
   './js/site-layers.js', './js/graticule.js', './js/landing-sites.js', './js/route.js', './js/route-worker.js', './js/safety.js', './js/consumables.js', './js/hazards.js', './js/interact.js', './js/traverse.js',
   './js/targets.js', './js/pov.js', './js/profile.js', './js/ui.js', './js/hud.js', './js/marsclock.js',
   './js/brief.js', './js/tour.js', './js/terrain3d.js', './js/terrain3d-plan.js', './js/walk3d.js', './css/walk3d.css', './js/app.js', './js/charts.js', './js/routecard.js', './css/charts.css', './js/tidy.js', './css/tidy.css', './js/pages.js', './css/pages.css', './js/main.js', './css/terrain3d.css',
-  './data/hirise-texture.jpg',
+  './data/hirise-texture.jpg', './data/mars-global.jpg',
   './data/aoi.json', './data/elevation.bin', './data/slope.bin', './data/roughness.bin',
   './data/hillshade.png', './data/slope-overlay.png', './data/relief-overlay.png', './data/los-overlay.png',
   './data/themis-day.png', './data/themis-night.png',

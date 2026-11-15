@@ -1484,6 +1484,45 @@ button:focus-visible, .btn:focus-visible {
   outline-offset: 2px;
 }
 
+/* The bar now sits at the TOP of the map and its button is the way in from the whole-planet view */
+.outside-area-notice {
+  top: 14px; bottom: auto;
+  border-color: var(--border);
+  padding: 8px 8px 8px 18px;
+  color: var(--text);
+}
+.outside-area-text { color: var(--text); font-size: 13px; }
+.outside-area-btn {
+  padding: 7px 16px;
+  border-radius: 18px;
+  border-color: var(--route);
+  background: var(--route);
+  color: #0F1115;
+  font-size: 13px;
+  font-weight: 700;
+}
+.outside-area-btn:hover { background: #6fe0da; }
+
+/* Far-out view (map.js mapFarClass): the 4 km study area is only a few pixels wide, so its markers would
+   pile into one blob. Hide them and show one labelled pin for the area instead. */
+.map-far .target-icon, .map-far .habitat-icon, .map-far .ponr-icon,
+.map-far .rover-icon, .map-far .terrain-label, .map-far .haz-label { display: none !important; }
+.area-pin { display: none; width: auto !important; height: auto !important; white-space: nowrap; cursor: pointer; }
+.map-far .area-pin { display: block; }
+.area-pin::before {
+  content: ''; position: absolute; left: -7px; top: -7px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--route); border: 2px solid #0F1115; box-shadow: 0 0 0 2px var(--route);
+}
+/* On the far-out view the route card would sit on top of Gale Crater (it is near the right edge of the
+   planet map), and nobody reads route details from orbit: hide it until the user goes to the study area. */
+body:not([data-page="summary"]) .map-far #summary-card,
+body:not([data-page="summary"]) .map-far #pov-panel { display: none !important; }
+.area-pin span {
+  position: absolute; right: 12px; top: -12px; padding: 3px 8px; border-radius: 4px;   /* label to the LEFT: Gale is near the map's right edge */
+  background: rgba(16, 14, 13, 0.9); border: 1px solid var(--route); color: var(--route);
+  font: 600 12px var(--font, system-ui, sans-serif);
+}
+
 /* Small badge — required disclosure that terrain is synthetic, without blocking the map */
 .synthetic-notice {
   position: absolute;

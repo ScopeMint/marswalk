@@ -100,7 +100,13 @@ async function initApp() {
   // Auto-route the first science target so the example mission is immediately visible on load.
   if (!STATE.selectedTarget && typeof selectTarget === 'function') {
     // selectTarget needs the target itself, not its position in the list (a bare 0 was silently ignored)
-    setTimeout(() => { if (!STATE.selectedTarget && STATE.targets && STATE.targets[0]) selectTarget(STATE.targets[0]); }, 900);
+    // keepView: plan the example route but leave the map on the whole planet (the user presses "Go to Gale Crater")
+    setTimeout(() => {
+      if (STATE.selectedTarget || !STATE.targets || !STATE.targets[0]) return;
+      STATE.ui.keepView = true;
+      selectTarget(STATE.targets[0]);
+      setTimeout(() => { STATE.ui.keepView = false; }, 6000);   // safety: never leave the flag on if no route comes back
+    }, 900);
   }
 
   console.log('[main] MarsWalk ready');

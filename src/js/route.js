@@ -180,6 +180,8 @@ function drawRouteLine(cells) {
    Skipped while the visor HUD is open (it follows the walker itself). */
 function fitRouteInView(latlngs) {
   if (!STATE.map || !latlngs || latlngs.length < 2 || document.body.classList.contains('hud-active')) return;
+  // The example route drawn when the page opens must not move the map: the page starts on the whole planet
+  if (STATE.ui.keepView) { STATE.ui.keepView = false; return; }
   const card = document.getElementById('summary-card');
   const cardW = Math.max(card ? card.offsetWidth : 0, 280) + 24;   // card may not be drawn yet on the first route
   STATE.map.flyToBounds(latlngs, { paddingTopLeft: [40, 40], paddingBottomRight: [cardW, 40], maxZoom: 16, duration: 0.8 });
