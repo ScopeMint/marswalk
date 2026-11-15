@@ -18,12 +18,12 @@ const STATE = {
 
   /* Layer visibility and opacity for each layer */
   layers: {
-    opm:        { visible: true,  opacity: 1.0 },
+    opm:        { visible: true,  opacity: 0.5 },   // global basemap — semi-transparent so HiRISE dominates
     hirise:     { visible: true,  opacity: 1.0 },   // HiRISE 25 cm orthoimage tiles (study area)
     relief:     { visible: false, opacity: 0.85 },  // rock & ridge relief from 1 m HiRISE DTM
-    traverse:   { visible: true,  opacity: 0.9 },   // Curiosity's real path + waypoints
+    traverse:   { visible: false, opacity: 0.9 },   // Curiosity's real path + waypoints
     hillshade:  { visible: false, opacity: 0.70 },  // terrain shading (off: HiRISE imagery now shows the ground)
-    slope:      { visible: true,  opacity: 0.35 },  // slope classification over the imagery
+    slope:      { visible: false, opacity: 0.35 },  // slope classification over the imagery
     los:        { visible: false, opacity: 0.75 },  // communication shadow zones
     rad:        { visible: false, opacity: 0.65 },  // relative radiation zones
     walkback:   { visible: false, opacity: 0.70 },

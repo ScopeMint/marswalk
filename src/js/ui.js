@@ -204,9 +204,9 @@ function buildLayerPanel() {
 
   const layerDefs = [
     { id: 'hirise',    label: 'HiRISE imagery (25 cm)',  defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'traverse',  label: "Curiosity's real path",   defaultOn: true,  defaultOpacity: 0.90 },
-    { id: 'slope',     label: 'Slope classes',           defaultOn: true,  defaultOpacity: 0.35 },
+    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 0.50 },
+    { id: 'traverse',  label: "Curiosity's real path",   defaultOn: false, defaultOpacity: 0.90 },
+    { id: 'slope',     label: 'Slope classes',           defaultOn: false, defaultOpacity: 0.35 },
     { id: 'relief',    label: 'Rocks & ridges (1 m)',    defaultOn: false, defaultOpacity: 0.85 },
     { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
     { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
