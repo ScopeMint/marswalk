@@ -118,8 +118,8 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    center:  [-5, 137],  // near Gale Crater longitude — wide starting view
-    zoom:    1,          // fully zoomed out — user sees all of Mars before flying in
+    center:  [0, 85],    // centered on Mars — equatorial, ~90°E shows most of the planet
+    zoom:    3,          // shows most of Mars with landing sites readable
     minZoom: 1,
     maxZoom: 18,
     worldCopyJump:       false,

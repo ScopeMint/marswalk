@@ -251,19 +251,17 @@ button:focus-visible, .btn:focus-visible {
 /* ── Intro fly-in: hide all colored overlays until the animation lands ──
    Only the base tile layer (.leaflet-tile-pane) stays visible during the zoom.
    Class is removed by map.js once the flyTo moveend fires. */
+/* Only hide colored image overlays + route lines — keep markers visible so landing
+   sites are readable from the global view before the user clicks the button. */
 body.intro-flying .leaflet-overlay-pane,
 body.intro-flying .leaflet-routePane-pane,
-body.intro-flying .leaflet-hazardPane-pane,
-body.intro-flying .leaflet-marker-pane,
-body.intro-flying .leaflet-shadow-pane {
+body.intro-flying .leaflet-hazardPane-pane {
   opacity: 0 !important;
 }
 /* Smooth fade-in when class is removed */
 .leaflet-overlay-pane,
 .leaflet-routePane-pane,
-.leaflet-hazardPane-pane,
-.leaflet-marker-pane,
-.leaflet-shadow-pane {
+.leaflet-hazardPane-pane {
   transition: opacity 1s ease;
 }
 
