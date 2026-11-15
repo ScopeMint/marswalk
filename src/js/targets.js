@@ -100,7 +100,11 @@ function selectTarget(feature) {
 
   // Lock zoom at the current level while this route is active.
   // The user must stop the route before zooming into the terrain.
-  if (STATE.map) STATE.map.setMaxZoom(STATE.map.getZoom());
+  if (STATE.map) {
+    const z = STATE.map.getZoom();
+    STATE.map.setMinZoom(z);
+    STATE.map.setMaxZoom(z);
+  }
 
   // Highlight the active target card
   document.querySelectorAll('.target-card').forEach(card => {

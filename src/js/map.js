@@ -144,24 +144,21 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
-  // While a route is active the zoom is locked (setMaxZoom = current zoom).
-  // Show a message if the user tries to scroll in or hits the + button.
-  const _msg = () => {
+  // While a route is active zoom is fully locked (min = max = current zoom).
+  // Show a message on any scroll or +/- button press so the user knows why.
+  const _zoomMsg = () => {
     if (STATE.selectedTarget && typeof showMapMessage === 'function') {
-      showMapMessage('Stop the current route first to zoom into the terrain.');
+      showMapMessage('Stop the current route first to change the zoom level.');
     }
   };
-  map.getContainer().addEventListener('wheel', e => {
-    if (STATE.selectedTarget && e.deltaY < 0) _msg();
+  map.getContainer().addEventListener('wheel', () => {
+    if (STATE.selectedTarget) _zoomMsg();
   }, { passive: true });
-  map.on('zoomend', () => {
-    // If zoom was capped and user tried to go higher, the zoom won't have changed —
-    // the wheel event already fired the message above.
-  });
-  // Also catch the Leaflet + button
   setTimeout(() => {
-    const zoomIn = document.querySelector('.leaflet-control-zoom-in');
-    if (zoomIn) zoomIn.addEventListener('click', () => { if (STATE.selectedTarget) _msg(); });
+    const zIn  = document.querySelector('.leaflet-control-zoom-in');
+    const zOut = document.querySelector('.leaflet-control-zoom-out');
+    if (zIn)  zIn.addEventListener('click',  () => { if (STATE.selectedTarget) _zoomMsg(); });
+    if (zOut) zOut.addEventListener('click', () => { if (STATE.selectedTarget) _zoomMsg(); });
   }, 500);
 
   // Wire the "Return to study area" button
