@@ -279,3 +279,18 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
     read from the HiRISE elevation grid.
 [TO VERIFY] Rover size 3.0 x 2.7 x 2.2 m = Curiosity's published size (about 10 ft long, 9 ft wide, 7 ft tall; NASA Curiosity
   fact sheet). Team to confirm on nasa.gov before submission. The rover's loop around the camp and its speed are ILLUSTRATIVE.
+
+[CONFIRMED] Temperature data corrected (src/data/rems-temps.json, rebuilt by scripts/11_rems_from_nasa_record.py)
+  Source: Curiosity REMS daily air temperature record, NASA Mars / Centro de Astrobiologia (CSIC-INTA)
+    https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json   (4,745 sols, sol 1 to 4995)
+    The feed states it is for outreach use; the science archive is the NASA PDS REMS dataset.
+  MEASURED: mean daily high / low air temperature per half of the Mars year:
+    Ls 0-180   (2,524 sols): high -19.1 C, low -77.9 C   (cooler half-year at Gale: southern autumn and winter)
+    Ls 180-360 (2,193 sols): high  -4.4 C, low -70.7 C   (warmer half-year at Gale: southern spring and summer)
+  APPROXIMATE: the hour-by-hour shape between the low and the high (the record has no hourly values).
+    The shape kept from the first version peaks at 11:00 and bottoms at 03:00; real air temperature usually peaks in the
+    early afternoon and bottoms near sunrise. [TO VERIFY against hourly PDS REMS data if time allows.]
+  WHAT WAS WRONG BEFORE: the hand-typed first version had the seasons the wrong way round (Ls 0-180 "milder", high -2 C).
+    The spacewalk temperature on the route card was about 17 C too warm at midday. The data keys in the file
+    (northern_spring_summer = Ls 0-180, northern_autumn_winter = Ls 180-360) are unchanged so no code had to move.
+  NOTE: the planner always reads the Ls 0-180 curve. Today is Ls 22, so that is the right one now.

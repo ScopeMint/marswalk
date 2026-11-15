@@ -41,7 +41,7 @@ const CONFIG = {
       name:        'OPM Mars Basemap (optical + MOLA)',
       urlTemplate: 'https://cartocdn-gusc.global.ssl.fastly.net/opmbuilder/api/v1/map/named/opm-mars-basemap-v0-1/all/{z}/{x}/{y}.png',
       attribution: 'Tiles: <a href="https://www.openplanetary.org/opm">OpenPlanetaryMap</a> | Data: NASA Viking MDIM 2.1, MOLA (NASA/USGS/CARTO)',
-      minZoom: 1, maxZoom: 18, tms: false,
+      minZoom: 1, maxZoom: 19, maxNativeZoom: 8, tms: false,   // deeper zooms stretch the zoom-8 tiles (no empty black tiles)
       mission: 'Viking + MGS', instrument: 'MDIM + MOLA', resolution: '~232 m/px global'
     },
     themisDay: {

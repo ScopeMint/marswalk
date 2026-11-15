@@ -360,6 +360,7 @@ function initTidy() {
   tidyTopBar();
   tidyLeftPanel();
   tidyLayerPanel();
+  tidyMapEdge();
 
   // Landing sites load from their own file a moment later: fill that group when they arrive
   let tries = 0;
@@ -369,4 +370,24 @@ function initTidy() {
   tidyRefreshTargetLine();
   setInterval(tidyRefreshTargetLine, 500);
   console.log('[tidy] layout organised');
+}
+
+/* ── Map edge ───────────────────────────────────────────────────────────── */
+
+/* Trims the sharp HiRISE image layer to the study-area box. Its edge tiles are JPEGs, which cannot be
+   see-through, so they showed a black frame beyond the real image. Past the box you now see the global basemap. */
+function tidyMapEdge() {
+  const map = STATE.map;
+  if (!map || map._tidyEdge) return;
+  map._tidyEdge = true;
+  const clip = () => {
+    const layer = STATE.tileLayers.hirise, aoi = STATE.grids && STATE.grids.aoi;
+    const box = layer && typeof layer.getContainer === 'function' ? layer.getContainer() : null;
+    if (!box || !aoi) return;
+    const nw = map.latLngToLayerPoint([aoi.north, aoi.west]), se = map.latLngToLayerPoint([aoi.south, aoi.east]);
+    box.style.clipPath = 'polygon(' + nw.x + 'px ' + nw.y + 'px, ' + se.x + 'px ' + nw.y + 'px, ' + se.x + 'px ' + se.y + 'px, ' + nw.x + 'px ' + se.y + 'px)';
+  };
+  map.on('move zoom zoomend moveend viewreset layeradd', clip);
+  let tries = 0;                                        // the HiRISE layer is added a moment after start-up
+  const timer = setInterval(() => { clip(); if (++tries > 20) clearInterval(timer); }, 300);
 }

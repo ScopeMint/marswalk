@@ -433,7 +433,7 @@ function _buildAssumptionsModal() {
     { name: 'Science work time',   value: '60 min',       why: 'Time at the target for sampling', type: 'OUR ASSUMPTION' },
     { name: 'EVA reserve',         value: '25%',          why: 'Must keep 25% of EVA unused for safety', type: 'OUR ASSUMPTION' },
     { name: 'Radiation baseline',  value: '233 μGy/day',  why: 'Measured by Curiosity RAD at Gale Crater', type: 'SOURCE: Hassler et al. 2014, Science 343(6169)' },
-    { name: 'Temperature data',    value: 'REMS hourly',  why: 'Curiosity REMS air temp at 1.6 m height', type: 'SOURCE: Martínez et al. 2017, JGR Planets' },
+    { name: 'Temperature data',    value: 'REMS daily low/high',  why: 'Curiosity REMS air temp at 1.6 m height; hours in between are approximate', type: 'SOURCE: Curiosity REMS daily record (NASA Mars / CAB)' },
   ];
 
   const table = document.createElement('table');
@@ -508,7 +508,7 @@ function _buildAboutModal() {
       : 'Terrain check against Curiosity waypoints runs after the data loads.')],
     ['Curiosity path + photos', 'Rover traverse and waypoints: NASA/JPL-Caltech MMGIS. Photos: Curiosity Navcam/Mastcam raw images from the sol the rover stood at each target (NASA/JPL-Caltech/MSSS).'],
     ['Radiation baseline', 'Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797'],
-    ['Temperature data', 'Martínez et al. (2017), JGR Planets + REMS team (cab.inta-csic.es/rems/en/)'],
+    ['Temperature data', 'Curiosity REMS daily air temperature record, NASA Mars / Centro de Astrobiologia (mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json); background: Martínez et al. (2017), JGR Planets'],
     ['Science targets', 'Targets 1-4 sit at Curiosity’s real positions: Altadena drill (sol 4571), Monte Grande hollow / Nevado Sajama ridge drills (sols ~4695-4718), boxwork entry (sol 4548), latest position (sol 5073). Sources: NASA/JPL news (June 2025); Curiosity blog sols 4709-4722 (Nov 2025); Siebach & Grotzinger 2014, JGR Planets 119 (boxwork). Target 5 is our own pick from HiRISE.'],
     ['Route model', 'Dijkstra (walk-back map) + gradient descent (route). Speed model is a linear approximation [OUR ASSUMPTION].'],
     ['AI use', 'Claude Code (Anthropic) wrote most application code and data scripts; OpenAI Codex wrote the visor HUD module (hud.js, hud.css). Humans chose the concept, verified data sources, and tested. No AI-generated images or video.'],
@@ -692,7 +692,7 @@ function _buildHowToUseModal() {
       heading: '📈 Charts (bottom bar)',
       items: [
         'Elevation Profile (left chart) — shows the height of the terrain along your route from start to finish. Steep sections are highlighted.',
-        'Temperature Chart (right chart) — shows the estimated air temperature at Gale Crater over a full Mars day (24 hours). The shaded amber region is your EVA window. Orange line = spring/summer season; teal line = autumn/winter season.',
+        'Temperature Chart (right chart) — shows the estimated air temperature at Gale Crater over a full Mars day (24 hours). The shaded amber region is your EVA window. Blue line = cooler half of the Mars year (Ls 0–180); orange line = warmer half (Ls 180–360). Daily low and high are measured by Curiosity; the hours in between are approximate.',
         'The charts update whenever you pick a new route or change the EVA start time.',
         'Both charts use real data from Curiosity instruments, sourced from published papers.',
       ]

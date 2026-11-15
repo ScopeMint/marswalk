@@ -30,6 +30,7 @@ function makeTileLayer(layerConfig, opacity) {
     attribution: layerConfig.attribution,
     minZoom:     layerConfig.minZoom,
     maxZoom:     layerConfig.maxZoom,
+    maxNativeZoom: layerConfig.maxNativeZoom,   // undefined = tiles exist at every zoom
     tms:         layerConfig.tms,
     opacity:     opacity,
     noWrap:      true,  // prevent tiles repeating east/west beyond [-180, 180]

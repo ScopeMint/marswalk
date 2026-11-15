@@ -91,6 +91,10 @@ async function initApp() {
     if (el) el.addEventListener('wheel', e => e.stopPropagation(), { passive: false });
   });
 
+  // Clear, explorable charts and the plain-language route card. Both wrap functions the scripts above set up.
+  if (typeof initCharts === 'function') initCharts();
+  if (typeof initRouteCard === 'function') initRouteCard();
+
   // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
   if (typeof initTidy === 'function') initTidy();
 

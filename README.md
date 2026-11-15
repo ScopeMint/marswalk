@@ -52,7 +52,7 @@ Today's Mars maps (JPL Mars Trek, USGS geologic maps) are built for global and r
 | Rover path, positions | Curiosity MMGIS traverse + waypoints (NASA/JPL) | per drive |
 | Surface photos | Curiosity Navcam / Mastcam raw images | — |
 | Radiation | Curiosity RAD surface dose (Hassler et al. 2014, *Science*) | site |
-| Temperature | Curiosity REMS (Martínez et al. 2017) | site |
+| Temperature | Curiosity REMS daily record (NASA Mars / CAB) | site |
 | Context basemap | Viking MDIM 2.1 + MOLA (OpenPlanetaryMap) | 232 m |
 
 Every source, link and licence is listed in [`docs/SOURCES.md`](docs/SOURCES.md) and in the app's **About & Sources** panel. Every number that is our own planning guess is labelled **OUR ASSUMPTION** on screen and in `src/js/config.js`.

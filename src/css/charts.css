@@ -1,0 +1,61 @@
+/* charts.css — Bottom charts (js/charts.js) and the simplified route card (js/routecard.js). */
+
+/* ── Charts: header above the plot, so no text ever sits on the data ── */
+body.charts2 #bottom-bar { gap: 12px; }
+body.charts2 { --bottom-h: 232px; }   /* a little taller: room for the two-line header above each plot */
+body.charts2 #bottom-bar .chart-slot.chart-framed { height: 208px; min-width: 0; }
+body.charts2 #bottom-bar .chart-slot.chart-framed canvas { top: 50px; height: calc(100% - 50px); cursor: crosshair; outline: none; }
+body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-shadow: inset 0 0 0 2px #3FD0C9; }
+/* Line 1: title + what the colours mean. Line 2: the live readout, full width so it is never cut off. */
+.chart-head { position: absolute; top: 0; left: 0; right: 0; height: 50px; display: flex; flex-wrap: wrap; align-items: center;
+  column-gap: 10px; align-content: center; padding: 0 10px; border-bottom: 1px solid var(--border); background: var(--panel);
+  overflow: hidden; white-space: nowrap; }
+.chart-title { flex: 0 0 auto; font-size: 12.5px; font-weight: 600; color: var(--text); cursor: help; }
+.chart-legend { flex: 1 1 0; display: flex; gap: 10px; min-width: 0; overflow: hidden; font-size: 11px; color: var(--muted); }
+.chart-key { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+.chart-swatch { display: inline-block; width: 14px; height: 3px; border-radius: 2px; }
+.chart-swatch.dot { width: 8px; height: 8px; border-radius: 50%; }
+.chart-swatch.box { width: 10px; height: 10px; border-radius: 2px; }
+.chart-readout { flex: 0 0 100%; min-width: 0; height: 18px; text-align: left; overflow: hidden; text-overflow: ellipsis;
+  font: 600 11.5px ui-monospace, Consolas, monospace; color: #3FD0C9; }
+@media (max-width: 1150px) { .chart-legend .chart-key:nth-child(n+3) { display: none; } }
+
+/* ── Route card ── */
+#summary-card .rc-head { display: flex; align-items: center; gap: 6px; margin: -2px 0 8px; order: -1; }
+#summary-card { display: flex; flex-direction: column; width: 268px; }
+#summary-card[style*="display: none"] { display: none !important; }
+#summary-card .rc-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; line-height: 1.25; color: var(--text); }
+#summary-card .rc-btn { flex: 0 0 auto; padding: 3px 8px; border: 1px solid #3a4150; border-radius: 5px; background: #1d2129; color: var(--text);
+  font-size: 11.5px; cursor: pointer; }
+#summary-card .rc-btn:hover { border-color: #3FD0C9; color: #3FD0C9; }
+#summary-card .rc-btn.rc-stop { border-color: rgba(229, 72, 77, 0.6); color: #ff8589; }
+#summary-card .rc-btn.rc-stop:hover { background: rgba(229, 72, 77, 0.15); border-color: #E5484D; color: #ffb3b5; }
+#summary-card.rc-min .rc-body { display: none; }
+#summary-card.rc-min .rc-head { margin-bottom: -2px; }
+#summary-card .rc-line { margin: 0 0 8px; font-size: 14px; line-height: 1.4; color: var(--text); }
+#summary-card .rc-verdict { padding: 8px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+#summary-card .rc-verdict small { display: block; margin: 2px 0 6px; font-size: 11.5px; font-weight: 400; color: var(--text); opacity: 0.85; }
+#summary-card .rc-verdict.pass { background: rgba(70, 195, 123, 0.14); color: #6fdc9c; }
+#summary-card .rc-verdict.caution { background: rgba(242, 177, 52, 0.14); color: #F2B134; }
+#summary-card .rc-verdict.fail { background: rgba(229, 72, 77, 0.16); color: #ff8589; }
+#summary-card .rc-verdict .eva-bar-wrap { margin: 0; }
+#summary-card .rc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+#summary-card .rc-tile { padding: 7px 8px; border: 1px solid var(--border); border-radius: 6px; background: #1d2129; }
+#summary-card .rc-tile b { display: block; font: 600 16px ui-monospace, Consolas, monospace; color: var(--text); }
+#summary-card .rc-tile span { display: block; margin-top: 1px; font-size: 10.5px; color: var(--muted); }
+#summary-card .rc-section { border-top: 1px solid var(--border); }
+#summary-card .rc-section > summary { display: flex; align-items: center; gap: 6px; padding: 8px 0; cursor: pointer; list-style: none;
+  font-size: 12px; color: var(--text); }
+#summary-card .rc-section > summary::-webkit-details-marker { display: none; }
+#summary-card .rc-section > summary::before { content: '▸'; color: var(--muted); font-size: 10px; transition: transform 0.15s; }
+#summary-card .rc-section[open] > summary::before { transform: rotate(90deg); }
+#summary-card .rc-section > summary span:first-of-type { flex: 1; }
+#summary-card .rc-badge { padding: 1px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 600; }
+#summary-card .rc-badge.pass { background: rgba(70, 195, 123, 0.16); color: #6fdc9c; }
+#summary-card .rc-badge.caution { background: rgba(242, 177, 52, 0.16); color: #F2B134; }
+#summary-card .rc-badge.fail { background: rgba(229, 72, 77, 0.18); color: #ff8589; }
+#summary-card .rc-section > :not(summary) { margin-bottom: 6px; }
+#summary-card .rc-section .cons-block, #summary-card .rc-section .haz-block { border-top: 0; padding-top: 0; margin-top: 0; }
+#summary-card .sum-pov-btn { margin-top: 8px; }
+.rc-stop-mini { border-color: rgba(229, 72, 77, 0.6) !important; color: #ff8589 !important; }
+.rc-stop-mini[hidden] { display: none; }

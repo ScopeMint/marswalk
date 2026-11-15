@@ -135,7 +135,7 @@ or real screenshots.
 - Curiosity raw images: https://mars.nasa.gov/msl/multimedia/raw-images/
 - THEMIS mosaics via Mars Trek: https://trek.nasa.gov/mars/ ; Edwards et al. (2011), JGR 116, E10008
 - Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797 (RAD)
-- Martinez et al. (2017), JGR Planets (REMS); https://cab.inta-csic.es/rems/en/
+- Curiosity REMS daily weather record: https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json ; Martinez et al. (2017), JGR Planets (REMS); https://cab.inta-csic.es/rems/en/
 - Allison & McEwen (2000), Planet. Space Sci. 48, 215-235; https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
 - Pandolf, Givoni & Goldman (1977), J. Appl. Physiol. 43(4), 577-581
 - Weir (1949), J. Physiol. 109, 1-9
