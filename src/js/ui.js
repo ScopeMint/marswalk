@@ -46,7 +46,8 @@ function updateSummaryCard() {
     if (isFinite(wb) && wb > 0) walkbackMin = wb / 60;
   }
 
-  const totalMin    = outMin + workMin + walkbackMin;
+  const airlockMin  = CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes;  // same as the EVA cue card
+  const totalMin    = airlockMin + outMin + workMin + walkbackMin;
   const budgetFrac  = totalMin / (evaHours * 60);
   const budgetPct   = Math.min(100, Math.round(budgetFrac * 100));
 
@@ -105,7 +106,9 @@ function updateSummaryCard() {
       const ponrCell = route.cells[ponrIdx];
       // ponrIdx indexes the thinned display path (route.cells), not route.profile — use the fraction
       const wholeRouteSafe = ponrIdx >= route.cells.length - 1;
-      const ponrDistKm = ((ponrIdx / Math.max(1, route.cells.length - 1)) * (route.distanceMeters / 1000)).toFixed(2);
+      const ponrDistKm = (route.cellDistanceMeters && route.cellDistanceMeters[ponrIdx] !== undefined
+        ? route.cellDistanceMeters[ponrIdx] / 1000
+        : (ponrIdx / Math.max(1, route.cells.length - 1)) * (route.distanceMeters / 1000)).toFixed(2);
       const ponrRow = document.createElement('div');
       ponrRow.className = 'sum-row';
       const ponrLabel = document.createElement('span');
@@ -113,8 +116,10 @@ function updateSummaryCard() {
       ponrLabel.textContent = '↩ Turn-back point';
       const ponrVal = document.createElement('span');
       ponrVal.className = wholeRouteSafe ? 'sum-val sum-pass' : 'sum-val sum-caution';
-      ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK' : ponrDistKm + ' km from base';
-      ponrVal.title = 'Past this point you cannot complete the EVA within your time budget (including work time and 25% reserve). The amber flag on the map marks this position.';
+      ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK'
+        : ponrIdx === 0 ? 'at base: EVA too short for this target'
+        : ponrDistKm + ' km from base';
+      ponrVal.title = 'Furthest point on the route where the crew can still do the planned science work and walk home inside the EVA time (airlock time included) while keeping the 25% reserve. If the target is beyond it, turn back here. The flag on the map marks this position.';
       ponrRow.appendChild(ponrLabel);
       ponrRow.appendChild(ponrVal);
       card.appendChild(ponrRow);
@@ -141,7 +146,7 @@ function updateSummaryCard() {
   }
 
   // Temperature range
-  const temp = computeTemperatureRange(STATE.evaStartHour || 8, evaHours, 'northern_spring_summer');
+  const temp = computeTemperatureRange(STATE.evaStartHour || 8, evaHours);  // today's season at Gale
   if (temp) {
     const tempRow = document.createElement('div');
     tempRow.className = 'sum-row';
@@ -168,7 +173,7 @@ function updateSummaryCard() {
     evaHours:         STATE.evaHours,
     speedKmh:         STATE.speedKmh,
     evaStartHour:     STATE.evaStartHour || 8,
-    season:           'northern_spring_summer',
+    season:           null,   // null = today's season at Gale (safety.js currentSeason)
     walkbackMinutes:  walkbackMin  // real Dijkstra walkback, not outbound × 2
   };
   const checklist = runSafetyChecklist(route, evaParams);
@@ -283,7 +288,6 @@ function buildLayerPanel() {
       heading: 'Safety', hint: HINT,
       layers: [
         { id: 'los',      label: 'Communication zones', defaultOn: false, defaultOpacity: 0.75 },
-        { id: 'rad',      label: 'Radiation zones',     defaultOn: false, defaultOpacity: 0.65 },
         { id: 'walkback', label: 'Walk-back time',      defaultOn: false, defaultOpacity: 0.70 },
       ]
     },
@@ -499,19 +503,51 @@ function _buildAssumptionsModal() {
   disclaimer.textContent = 'This is a planning concept, not flight software. All [OUR ASSUMPTION] values are estimates chosen for this tool.';
   box.appendChild(disclaimer);
 
+  // Every number the app uses that is not measured data. Values are read live from the code where
+  // possible so this table can never drift from what the model actually does.
+  const A = 'OUR ASSUMPTION';
+  const S = CONFIG.suit, rb = STATE.radBaseline, rt = STATE.remsTemps;
+  const C = (typeof HAZ_MAST_HEIGHT_M !== 'undefined');
   const assumptions = [
-    { name: 'Study area size',    value: '4 km × 4 km',  why: 'Walkable range for a single Marswalk; limited by the HiRISE 1 m terrain strip', type: 'OUR ASSUMPTION' },
-    { name: 'Grid cell size',      value: '10 m',         why: 'Fast real-time route (160,000 cells); elevation averaged from 1 m HiRISE', type: 'OUR ASSUMPTION' },
-    { name: 'Slope limit (default)', value: '15°',        why: 'Conservative estimate for suited EVA traverse', type: 'OUR ASSUMPTION' },
-    { name: 'Walking speed (normal)', value: '3 km/h',    why: 'Suited astronaut estimated pace on flat terrain', type: 'OUR ASSUMPTION' },
-    { name: 'Uphill speed at limit', value: '40% of flat', why: 'Linear model — becomes very slow near the slope limit', type: 'OUR ASSUMPTION' },
-    { name: 'Downhill penalty',    value: '50% of uphill', why: 'Less slowdown going down than going up', type: 'OUR ASSUMPTION' },
-    { name: 'Rough ground slowdown', value: '+25% time',  why: 'Roughness above 0.5 m spread adds time', type: 'OUR ASSUMPTION' },
-    { name: 'EVA length (default)', value: '6 hours',     why: 'Typical ISS EVA duration used as baseline', type: 'OUR ASSUMPTION' },
-    { name: 'Science work time',   value: '60 min',       why: 'Time at the target for sampling', type: 'OUR ASSUMPTION' },
-    { name: 'EVA reserve',         value: '25%',          why: 'Must keep 25% of EVA unused for safety', type: 'OUR ASSUMPTION' },
-    { name: 'Radiation baseline',  value: '233 μGy/day',  why: 'Measured by Curiosity RAD at Gale Crater', type: 'SOURCE: Hassler et al. 2014, Science 343(6169)' },
-    { name: 'Temperature data',    value: 'REMS daily low/high',  why: 'Curiosity REMS air temp at 1.6 m height; hours in between are approximate', type: 'SOURCE: Curiosity REMS daily record (NASA Mars / CAB)' },
+    { group: 'Site and terrain' },
+    { name: 'Study area size',    value: '4 km × 4 km',  why: 'Walkable range for a single Marswalk; limited by the HiRISE 1 m terrain strip', type: A },
+    { name: 'Route grid cell',     value: (STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : CONFIG.grid.cellSizeMeters) + ' m', why: '160,000 cells: routes in under a second; elevation averaged from the 1 m HiRISE DTM', type: A },
+    { name: 'Rough-ground threshold', value: CONFIG.roughness.thresholdMeters + ' m', why: 'Spread of 1 m relief inside a 10 m cell above which ground counts as rough', type: A },
+    { group: 'Walking' },
+    { name: 'Slope limit (default)', value: CONFIG.slope.defaultLimitDeg + '°', why: 'Steeper cells are blocked. Check: almost all of Curiosity’s real drive path in our area is under 15° (exact figure in About → Validation)', type: A },
+    { name: 'Walking speed (flat)', value: `${CONFIG.walk.slowKmh} / ${CONFIG.walk.normalKmh} / ${CONFIG.walk.fastKmh} km/h`, why: 'Careful / normal / brisk suited pace on flat ground. No Mars-suit data exists yet', type: A },
+    { name: 'Uphill slowdown',     value: `${Math.round(CONFIG.speedModel.uphillMinFraction * 100)}% of flat speed at ${CONFIG.speedModel.referenceSlopeDeg}°`, why: 'Linear from 100% on flat ground. Fixed reference: the slope-limit slider never changes the speed on a given hill', type: A },
+    { name: 'Downhill slowdown',   value: Math.round(CONFIG.speedModel.downhillPenaltyFactor * 100) + '% of the uphill slowdown', why: 'Walking down a slope is slower than flat but faster than up', type: A },
+    { name: 'Rough ground',        value: '+' + Math.round(CONFIG.roughness.timePenaltyFraction * 100) + '% time', why: 'Extra care on rocky, ridged ground', type: A },
+    { group: 'EVA timeline' },
+    { name: 'EVA length (default)', value: CONFIG.eva.defaultHours + ' h', why: 'Close to a typical ISS spacewalk; slider 2-8 h', type: A },
+    { name: 'Science work at target', value: CONFIG.eva.workMinutes + ' min', why: 'Sampling, imaging and notes at one target', type: A },
+    { name: 'Work per stop (multi-stop traverse)', value: (typeof TRAVERSE_WORK_PER_STOP_MIN !== 'undefined' ? TRAVERSE_WORK_PER_STOP_MIN : 30) + ' min', why: 'Shorter stops when visiting several targets', type: A },
+    { name: 'EVA time reserve',    value: Math.round(CONFIG.eva.reserveFraction * 100) + '%', why: 'Part of the EVA always kept unused for problems. Also sets the turn-back point', type: A },
+    { name: 'Airlock out / in',    value: CONFIG.eva.egressMinutes + ' / ' + CONFIG.eva.ingressMinutes + ' min', why: 'Suit checks and airlock time. Counted in EVA used, the turn-back point and the cue card', type: A },
+    { group: 'Radio' },
+    { name: 'Habitat radio mast',  value: (C ? HAZ_MAST_HEIGHT_M : 10) + ' m', why: 'Height used for line-of-sight radio checks', type: A },
+    { name: 'Suit antenna height', value: (C ? HAZ_SUIT_ANTENNA_M : 2) + ' m', why: 'Antenna on the backpack, above the helmet', type: A },
+    { group: 'Suit and crew (per astronaut)' },
+    { name: 'Crew size',           value: S.crewSize + '', why: 'Buddy rule: nobody walks alone', type: A },
+    { name: 'Body mass',           value: S.bodyMassKg + ' kg', why: 'Average adult astronaut', type: A },
+    { name: 'Life-support backpack', value: S.backpackMassKg + ' kg', why: 'Carried mass on the back', type: A },
+    { name: 'Tools and samples',   value: S.toolMassKg + ' kg', why: 'Hammer, sample bags, camera', type: A },
+    { name: 'Terrain factor',      value: S.terrainFactor + '', why: 'Pandolf coefficient for unpaved, uneven ground (1.0 = treadmill)', type: A },
+    { name: 'Suit stiffness factor', value: '×' + S.suitMobilityFactor, why: 'Extra effort to bend a pressurised suit', type: A },
+    { name: 'Work rate at target', value: S.scienceWorkWatts + ' W', why: 'Metabolic rate while sampling', type: A },
+    { name: 'Body efficiency',     value: Math.round(S.mechanicalEfficiency * 100) + '%', why: 'Share of energy that becomes work; the rest is heat the suit must remove', type: A },
+    { name: 'Heat removed by water', value: Math.round(S.sublimatorShare * 100) + '%', why: 'Share of heat rejected by boiling off water (sublimator)', type: A },
+    { name: 'Oxygen supply',       value: S.o2CapacityKg + ' kg', why: 'Similar to today’s ISS suit (EMU) primary tank', type: A },
+    { name: 'Suit leak',           value: S.o2LeakKgPerHour + ' kg/h', why: 'Small allowance for gas leakage', type: A },
+    { name: 'CO2 scrubber',        value: S.co2CapacityKg + ' kg', why: 'Capacity of the CO2 removal cartridge', type: A },
+    { name: 'Cooling water',       value: S.feedwaterCapacityKg + ' kg', why: 'Similar to today’s ISS suit feedwater', type: A },
+    { name: 'Amber warning level', value: Math.round(S.cautionFraction * 100) + '% of capacity', why: 'Same 25% margin as the EVA time rule', type: A },
+    { name: 'Walking energy model', value: 'Pandolf equation', why: 'Load-carriage walking cost (an Earth equation). We scale its load and walking terms by Mars gravity 3.721 / 9.807 m/s²: that scaling is OUR ASSUMPTION', type: 'SOURCE: Pandolf, Givoni & Goldman 1977, J Appl Physiol 43' },
+    { name: 'Oxygen per energy',   value: '4.825 kcal per L O₂', why: 'Converts energy used into oxygen breathed', type: 'SOURCE: Weir 1949, J Physiol 109' },
+    { group: 'Measured environment' },
+    { name: 'Radiation baseline',  value: rb ? `${rb.doseRateMuGyPerDay} ± ${rb.uncertaintyMuGyPerDay} μGy/day` : '210 ± 40 μGy/day', why: 'Galactic cosmic rays measured by Curiosity RAD at Gale, 2012-2013 (daily 180-225). On the rover, not inside a suit', type: 'SOURCE: Hassler et al. 2014, Science 343, 1244797' },
+    { name: 'Air temperature',     value: rt && rt.seasons ? 'REMS hourly medians' : 'REMS', why: 'Curiosity REMS air temperature (~1.6 m), median for each hour of the sol, two halves of the Mars year', type: 'SOURCE: NASA PDS, REMS MODRDR (Gómez-Elvira et al. 2012)' },
   ];
 
   const table = document.createElement('table');
@@ -529,6 +565,17 @@ function _buildAssumptionsModal() {
   const tbody = document.createElement('tbody');
   assumptions.forEach(a => {
     const tr = document.createElement('tr');
+    if (a.group) {
+      tr.className = 'modal-table-group';
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.textContent = a.group;
+      td.style.fontWeight = '600';
+      td.style.paddingTop = '12px';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
     [a.name, a.value, a.why, a.type].forEach(text => {
       const td = document.createElement('td');
       td.textContent = text;
@@ -576,20 +623,23 @@ function _buildAboutModal() {
   box.appendChild(header);
 
   const content = [
-    ['What is MarsWalk?', "A layered EVA planning tool for the real site where NASA's Curiosity rover studied boxwork ridges in 2025-2026 (Mount Sharp, Gale Crater). It layers NASA data from 4 missions at walking scale to help plan a safe Marswalk."],
-    ['This is a planning concept', 'Not flight software. All assumptions are stated on screen. Data sources are listed below.'],
-    ['Cannot model', 'Single rocks smaller than ~2 m (they only show as extra relief), soil softness, suit or gear details, radiation forecasts, or real-time conditions.'],
-    ['Imagery layers', 'HiRISE orthoimage ESP_019988_1750 (0.25 m/px; NASA/JPL/University of Arizona, via USGS Astrogeology, CC0). Outside the study area: OpenPlanetaryMap (NASA Viking MDIM 2.1 + MOLA). THEMIS day/night IR mosaics (NASA/JPL/ASU via NASA Mars Trek; Edwards et al. 2011).'],
-    ['Elevation data', 'HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (1 m/px; HiRISE team, University of Arizona; McEwen et al. 2007, JGR 112). Slope = 10 m cells; rock & ridge relief = 1 m. Check: matches the elevations Curiosity reported along its real path (see Validation).'],
+    ['What is MarsWalk?', "A planning tool for a Marswalk (a surface EVA: extravehicular activity) at the real site where NASA's Curiosity rover studied boxwork ridges in 2025-2026 (Mount Sharp, Gale Crater). It layers data from four NASA missions (MRO HiRISE, Mars Odyssey THEMIS, Curiosity RAD and REMS, plus Curiosity's own path and photos) at walking scale: pick a target, get a slope-aware route, the time budget, turn-back point, suit consumables, radiation and temperature."],
+    ['This is a planning concept', 'Not flight software. Every number is either measured data with a source, or labelled OUR ASSUMPTION in the Assumptions panel.'],
+    ['Cannot model', 'Single rocks smaller than ~2 m (they only show as extra relief), soil softness, dust, real suit hardware, solar storms or radiation forecasts, live weather.'],
+    ['Imagery layers', 'HiRISE orthoimage ESP_019988_1750 (0.25 m/px; NASA/JPL/University of Arizona, via USGS Astrogeology, CC0). Outside the study area: OpenPlanetaryMap (NASA Viking MDIM 2.1 + MOLA). THEMIS day/night infrared controlled mosaics, ~100 m/px (NASA/JPL/ASU via NASA Mars Trek; Edwards et al. 2011): relative brightness only, no temperatures.'],
+    ['Elevation data', 'HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (1 m/px; HiRISE team, University of Arizona; McEwen et al. 2007, JGR 112). Slope = 10 m cells; rock & ridge relief = 1 m.'],
     ['Validation', (STATE.validation
-      ? `We compared our terrain model with the elevation Curiosity itself reported at ${STATE.validation.n} real stops inside the study area. After removing a constant ${Math.abs(STATE.validation.meanOffsetM).toFixed(1)} m datum offset, they agree to within ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m (RMS). The rover's own path also stays on slopes our model rates as walkable.`
-      : 'Terrain check against Curiosity waypoints runs after the data loads.')],
+      ? `We compared our terrain model with the elevation Curiosity itself reported at ${STATE.validation.n} real stops inside the study area. After removing a constant ${Math.abs(STATE.validation.meanOffsetM).toFixed(1)} m datum offset, they agree to within ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m (RMS).`
+      : 'Terrain check against Curiosity waypoints runs after the data loads.') +
+      (STATE.roverSlopeCheck
+        ? ` Slope check: ${(STATE.roverSlopeCheck.fractionUnderLimit * 100).toFixed(1)}% of the distance Curiosity actually drove inside our study area is on 10 m cells under our ${STATE.roverSlopeCheck.limitDeg}° default limit (sampled every 5 m); the steepest cell it crossed is ${STATE.roverSlopeCheck.maxSlopeDeg.toFixed(1)}°. A rover is not an astronaut, but this shows the slope grid is realistic.`
+        : '')],
     ['Curiosity path + photos', 'Rover traverse and waypoints: NASA/JPL-Caltech MMGIS. Photos: Curiosity Navcam/Mastcam raw images from the sol the rover stood at each target (NASA/JPL-Caltech/MSSS).'],
-    ['Radiation baseline', 'Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797'],
-    ['Temperature data', 'Curiosity REMS daily air temperature record, NASA Mars / Centro de Astrobiologia (mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json); background: Martínez et al. (2017), JGR Planets'],
+    ['Radiation baseline', 'Curiosity RAD measured an average galactic cosmic ray dose of 0.210 ± 0.040 mGy/day (210 μGy/day; daily values 180-225) at Gale from Aug 2012 to Jun 2013 (Hassler et al. 2014, Science 343, 1244797). EVA estimate = that rate × EVA hours / 24. Measured on the rover, not inside a suit. Space weather: in the 20 May 2024 solar storm RAD measured 8,100 μGy for a person beside the rover (NASA, June 2024), about 39 days of normal background at once. Storms are not forecast here: a real crew would shelter in the habitat on a storm alert.'],
+    ['Temperature data', 'Real Curiosity REMS air temperature (~1.6 m above ground) from NASA’s Planetary Data System (MODRDR product). For each hour of the sol we take the median over many sols, separately for the two halves of the Mars year. At Gale (4.8° S) the Ls 180-360 half, around perihelion, is the warmer one. The app picks today’s half from the Mars clock.'],
     ['Science targets', 'Targets 1-4 sit at Curiosity’s real positions: Altadena drill (sol 4571), Monte Grande hollow / Nevado Sajama ridge drills (sols ~4695-4718), boxwork entry (sol 4548), latest position (sol 5073). Sources: NASA/JPL news (June 2025); Curiosity blog sols 4709-4722 (Nov 2025); Siebach & Grotzinger 2014, JGR Planets 119 (boxwork). Target 5 is our own pick from HiRISE.'],
-    ['Route model', 'Dijkstra (walk-back map) + gradient descent (route). Speed model is a linear approximation [OUR ASSUMPTION].'],
-    ['AI use', 'Claude Code (Anthropic) wrote most application code and data scripts; OpenAI Codex wrote the visor HUD module (hud.js, hud.css). Humans chose the concept, verified data sources, and tested. No AI-generated images or video.'],
+    ['Route model', 'Dijkstra shortest-time search over 10 m cells: first a walk-back-time map from the habitat to every cell, then the route follows it downhill in time. Cells steeper than the slope limit are blocked; uphill, downhill and rough ground slow the walker (OUR ASSUMPTION, see Assumptions).'],
+    ['AI use', 'Claude Code (Anthropic) and OpenAI Codex wrote the application code and data scripts. The team chose the idea and site, checked every data source against the original papers and archives, and tested the app. No AI-generated images or video.'],
     ['Challenge', 'NASA Space Apps 2026 — "The Next Frontier". Team: Dark Matter Devs.'],
   ];
 
@@ -613,8 +663,14 @@ function _buildAboutModal() {
     ['THEMIS Day/Night IR controlled mosaics via NASA Mars Trek', 'https://trek.nasa.gov/mars/'],
     ['Edwards et al. (2011), THEMIS mosaics, JGR 116, E10008', 'https://doi.org/10.1029/2010JE003755'],
     ['OpenPlanetaryMap Mars basemap (Viking MDIM 2.1 + MOLA)', 'https://www.openplanetary.org/opm'],
-    ['Hassler et al. (2014), RAD surface radiation, Science 343(6169)', 'https://doi.org/10.1126/science.1244797'],
-    ['REMS weather station (Curiosity), INTA-CSIC', 'https://cab.inta-csic.es/rems/en/'],
+    ['Hassler et al. (2014), RAD surface radiation, Science 343(6169), 1244797', 'https://doi.org/10.1126/science.1244797'],
+    ['NASA (June 2024): NASA Watches Mars Light Up During Epic Solar Storm (RAD 8,100 μGy)', 'https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/'],
+    ['Curiosity REMS MODRDR data, NASA PDS Atmospheres Node', 'https://atmos.nmsu.edu/PDS/data/mslrem_1001/'],
+    ['Gómez-Elvira et al. (2012), REMS instrument, Space Sci. Rev. 170', 'https://doi.org/10.1007/s11214-012-9921-1'],
+    ['REMS daily summaries (Centro de Astrobiología, CAB/INTA-CSIC)', 'https://cab.inta-csic.es/rems/en/'],
+    ['Pandolf, Givoni & Goldman (1977), load-carriage energy, J Appl Physiol 43', 'https://doi.org/10.1152/jappl.1977.43.4.577'],
+    ['Weir (1949), oxygen-energy equivalent, J Physiol 109', 'https://doi.org/10.1113/jphysiol.1949.sp004363'],
+    ['Allison & McEwen (2000) / Mars24 algorithm (NASA GISS), Mars clock', 'https://www.giss.nasa.gov/tools/mars24/help/algorithm.html'],
     ["NASA/JPL: Curiosity starts unpacking boxwork formations (June 2025)", 'https://www.jpl.nasa.gov/news/nasas-curiosity-mars-rover-starts-unpacking-boxwork-formations/'],
     ['Curiosity blog, sols 4641-4648: Thinking outside and inside the boxwork', 'https://science.nasa.gov/blog/curiosity-blog-sols-4641-4648-thinking-outside-and-inside-the-boxwork/'],
     ['Curiosity blog, sols 4695-4701: Searching for answers at Monte Grande', 'https://science.nasa.gov/blog/curiosity-blog-sols-4695-4701-searching-for-answers-at-monte-grande/'],
@@ -622,6 +678,8 @@ function _buildAboutModal() {
     ['Curiosity blog, sols 4716-4722: Drilling success at Nevado Sajama', 'https://science.nasa.gov/blog/curiosity-blog-sols-4716-4722-drilling-success-at-nevado-sajama/'],
     ['Siebach & Grotzinger (2014), boxwork water estimates, JGR Planets 119', 'https://doi.org/10.1002/2013JE004508'],
     ['Leaflet 1.9.4 (BSD-2-Clause)', 'https://leafletjs.com'],
+    ['three.js r160 (MIT)', 'https://threejs.org'],
+    ['Mars landing-site coordinates: List of artificial objects on Mars', 'https://en.wikipedia.org/wiki/List_of_artificial_objects_on_Mars'],
     ['NASA Space Apps 2026 challenge: Interplanetary Survival Guide: Martian Map', 'https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/'],
   ];
   const refHeading = document.createElement('h3');
@@ -680,7 +738,7 @@ function _buildHowToUseModal() {
     {
       heading: '🗺 What is MarsWalk?',
       items: [
-        'MarsWalk is an EVA (spacewalk) planning tool for astronauts on Mars.',
+        'MarsWalk is a planning tool for a Marswalk: an EVA (extravehicular activity) on foot on the Martian surface.',
         'It layers NASA data on a map to help you plan a safe walking route to a science target at Gale Crater.',
         'You pick a target, the tool draws a route that avoids steep slopes, and shows you a safety summary — distance, time, radiation, temperature — before you go.',
         'This is a planning concept, not flight software. All assumptions are clearly labeled.',
@@ -692,7 +750,7 @@ function _buildHowToUseModal() {
         'Inside the study area the map shows 25 cm HiRISE images; outside, a global NASA Viking + MOLA basemap.',
         "The orange dashed box is your 4 km × 4 km planning area on Curiosity's real boxwork route. The white dotted line is the rover's actual path.",
         'Pan by clicking and dragging. Zoom with the scroll wheel or +/− buttons.',
-        'You can explore anywhere on Mars using the location library in the left panel — but EVA planning only works inside the orange box.',
+        'You can fly to the Mars landing sites in the location library in the left panel, but EVA planning only works inside the study-area box.',
         'If you pan away from Gale Crater, a yellow banner appears. Click "Return to study area" to come back.',
         'The coordinate readout in the bottom-left corner shows the latitude and longitude of your cursor.',
       ]
@@ -700,32 +758,32 @@ function _buildHowToUseModal() {
     {
       heading: '📍 Science Targets (left panel, top section)',
       items: [
-        'The "Science Targets" section lists 5 real places that Curiosity has studied near Mount Sharp.',
+        'The "Science Targets" section lists 5 targets: 4 real places where Curiosity worked on Mount Sharp, and 1 we picked from HiRISE images.',
         'Click a target card to expand it and read about why that location matters scientifically.',
         'Each card shows the target\'s name, distance from the habitat, and a one-line science description.',
         'Click "Plan route to this target →" on any card to draw the safest walking route from the habitat.',
-        'The orange ① ② ③ ④ ⑤ circles on the map mark each target. Click them directly to select a target.',
-        'The green tent icon (⌂) on the map marks your habitat — the starting point for all routes.',
+        'The numbered circles on the map mark each target. Click them directly to select a target.',
+        'The EVA base marker on the map is your habitat — the starting point for all routes.',
       ]
     },
     {
       heading: '🗂 Location Library (left panel, bottom section)',
       items: [
-        'The location library lists 52 places on Mars you can explore.',
-        'Use the search box to find any location by name, type, or mission (try "volcanic", "rover", or "crater").',
-        'Click any card header to expand it and read full safety notes, elevation, and mission data.',
+        'The location library lists our study area and the ten successful Mars landing sites.',
+        'Use the search box to find a site by name or mission (try "Curiosity" or "Viking"), or type coordinates like "-4.81, 137.37".',
+        'Click any card header to expand it and read what happened there.',
         'Click "Fly to this location →" to zoom the map to that place.',
-        'Only Gale Crater and Mount Sharp are inside the EVA planning area. All other locations show an informational note.',
+        'Only the boxwork study area on Mount Sharp has EVA planning. The other sites are for context.',
       ]
     },
     {
       heading: '🛤 Planning a Route',
       items: [
-        '1. The habitat (green tent) is your starting point. It sits on the flattest wide pad in the southwest of the study area.',
+        '1. The habitat (EVA base) is your starting point. It sits on a flat, wide pad in the southwest of the study area.',
         '2. Click a science target card and press "Plan route" — or click directly on a numbered marker on the map.',
-        '3. The route (teal/cyan line) will appear in under a second, following the flattest path that respects your slope limit.',
+        '3. The route line appears in under a second: the fastest walking path that never crosses ground steeper than your slope limit.',
         '4. The Summary Card appears in the top-right corner of the map with all the numbers you need.',
-        '5. Adjust the slope limit slider to see how the route changes (steeper = shorter route; gentler = safer route).',
+        '5. Adjust the slope limit slider to see how the route changes (higher limit = shorter but steeper route; lower = gentler but longer).',
         '6. The elevation profile chart at the bottom shows the height changes along the route.',
       ]
     },
@@ -746,23 +804,23 @@ function _buildHowToUseModal() {
     {
       heading: '⚙ EVA Controls (left panel, middle section)',
       items: [
-        'Slope limit — the steepest angle (in degrees) the route is allowed to cross. Default 15°. Raise it to allow steeper paths; lower it for safer travel. 0° = flat only; 25° = very steep.',
-        'EVA length — how many hours the EVA lasts. Default 6 hours. The EVA used % bar in the summary card will update.',
+        'Slope limit — the steepest ground (in degrees) the route is allowed to cross. Default 15°, range 5° (nearly flat only) to 25° (very steep). It only decides which ground is blocked: the walking speed on a given hill stays the same.',
+        'EVA length — how many hours the Marswalk may last, airlock to airlock. Default 6 hours. The EVA used % bar in the summary card will update.',
         'Walking speed — how fast you walk on flat ground. Slow (2 km/h) = very careful; Normal (3 km/h) = default; Fast (4 km/h) = best case. Uphill and rough ground automatically slow you down.',
-        'EVA start time — the local Mars time when you leave the habitat. This sets the temperature window shown in the temperature chart and the temperature range in the summary card.',
-        'All controls are labeled [our assumption] because no official suited-EVA speed data exists for Mars yet.',
+        'EVA start time — local mean solar time (LMST) at the site when you leave the habitat. It sets the temperature window in the chart and the temperature range in the summary card.',
+        'All controls are labeled [our assumptions] because nobody has walked on Mars yet: there is no measured suited walking speed or slope limit.',
       ]
     },
     {
       heading: '🗂 Layers Panel (right panel)',
       items: [
-        'Each row is a data layer. The toggle switch (blue = on, grey = off) turns it on or off.',
+        'Each row is a data layer. The switch turns it on or off.',
         'The opacity slider below each layer name adjusts how transparent the layer is.',
         'The ⓘ button shows the data source, mission, and resolution for that layer.',
         'HiRISE imagery — 25 cm orbital photos of the study area. Global basemap (OPM) — NASA Viking + MOLA context outside it.',
         'Slope classes — a colour overlay showing terrain steepness: green = gentle, yellow = moderate, orange = steep, red = very steep. See the SLOPE LEGEND below.',
         'Walk-back time — colour bands showing how many minutes it takes to walk back to the habitat from any point (requires a route to be computed first).',
-        'THEMIS Day IR — thermal infrared from the Mars Odyssey spacecraft showing surface warmth during the day.',
+        'THEMIS Day / Night IR — thermal infrared from Mars Odyssey (~100 m/px). Day: brighter = warmer surface in the afternoon. Night: brighter = ground that holds heat (rock); darker = dust or sand. Relative brightness only, not temperatures.',
         'The SLOPE LEGEND at the bottom of the layers panel shows what each colour means in degrees.',
       ]
     },
@@ -770,9 +828,9 @@ function _buildHowToUseModal() {
       heading: '📈 Charts (bottom bar)',
       items: [
         'Elevation Profile (left chart) — shows the height of the terrain along your route from start to finish. Steep sections are highlighted.',
-        'Temperature Chart (right chart) — shows the estimated air temperature at Gale Crater over a full Mars day (24 hours). The shaded amber region is your EVA window. Blue line = cooler half of the Mars year (Ls 0–180); orange line = warmer half (Ls 180–360). Daily low and high are measured by Curiosity; the hours in between are approximate.',
+        'Temperature chart — median air temperature Curiosity REMS measured at Gale for each hour of the sol, for the cooler (Ls 0-180) and warmer (Ls 180-360) halves of the Mars year. The shaded region is your EVA window.',
         'The charts update whenever you pick a new route or change the EVA start time.',
-        'Both charts use real data from Curiosity instruments, sourced from published papers.',
+        'The elevation profile comes from the HiRISE terrain model; the temperatures are real Curiosity REMS measurements from NASA\'s Planetary Data System.',
       ]
     },
     {
@@ -783,7 +841,7 @@ function _buildHowToUseModal() {
         '✕ Fail (red) — a critical limit is exceeded. The route is not safe as planned.',
         'ℹ Info (grey) — informational note. Not a pass/fail — just context.',
         'Hover any checklist item to see the specific numbers and data source behind the check.',
-        'Common cautions: route is much longer than a straight line (big detour); target is near the edge of the study area; steepest slope is close to your limit.',
+        'Common cautions: route is much longer than a straight line (big detour); steepest slope is within 2° of your limit.',
       ]
     },
     {
@@ -801,9 +859,9 @@ function _buildHowToUseModal() {
       items: [
         'Single small rocks — the terrain model is 1 m; rocks under ~2 m only show up as extra relief in the Rocks & ridges layer.',
         'Soil softness or dust depth — cannot predict whether the ground will bear weight.',
-        'Suit or life support details — no suit pressure, oxygen, or cooling modeled.',
-        'Radiation forecasts — the radiation number is a baseline from calm solar conditions, not a forecast.',
-        'Real-time Mars weather — all atmospheric data is a statistical average, not a live feed.',
+        'Real suit hardware — oxygen, CO2 and cooling water come from a simple energy model with planning values, not a real Mars suit.',
+        'Radiation forecasts and solar storms — the radiation number is the average galactic cosmic-ray dose Curiosity measured in 2012-2013, not a forecast.',
+        'Real-time Mars weather — temperatures are medians of past REMS measurements, not a live feed.',
         'All limitations are listed on the About & Sources page.',
       ]
     },

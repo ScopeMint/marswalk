@@ -52,24 +52,30 @@ function onToolClick(e) {
     setToolMode(null);
     replan();
   } else if (_mode === 'target') {
-    const feature = {
-      type: 'Feature', id: 'custom',
-      geometry: { type: 'Point', coordinates: [lng, lat] },
-      properties: { index: '★', targetId: 'custom', name: `Custom point ${Math.abs(lat).toFixed(4)}°S ${lng.toFixed(4)}°E`,
-        findings: 'Survey the site; photo-document; collect samples if safe.' }
-    };
-    if (_customMarker) STATE.map.removeLayer(_customMarker);
-    _customMarker = L.marker([lat, lng], {
-      icon: L.divIcon({ className: 'target-icon', html: '<div class="target-pin custom-pin">★</div>', iconSize: [26, 26], iconAnchor: [13, 13] }),
-      zIndexOffset: 500
-    }).addTo(STATE.map);
     setToolMode(null);
-    selectTarget(feature);
+    planRouteToPoint(lat, lng);
   } else if (_mode === 'nogo') {
     if (!_nogoFirst) { _nogoFirst = [lat, lng]; showMapMessage('Now click the opposite corner. (Esc to cancel)'); return; }
     addNoGoZone([_nogoFirst, [lat, lng]]);
     setToolMode(null);
   }
+}
+
+/* Plans a route to any point inside the study area: puts a ★ marker on the 2D map and asks for the route.
+   Used by the "Any point" map tool above and by the 3D terrain view (terrain3d-plan.js). */
+function planRouteToPoint(lat, lng) {
+  const feature = {
+    type: 'Feature', id: 'custom',
+    geometry: { type: 'Point', coordinates: [lng, lat] },
+    properties: { index: '★', targetId: 'custom', name: `Custom point ${Math.abs(lat).toFixed(4)}°S ${lng.toFixed(4)}°E`,
+      findings: 'Survey the site; photo-document; collect samples if safe.' }
+  };
+  if (_customMarker) STATE.map.removeLayer(_customMarker);
+  _customMarker = L.marker([lat, lng], {
+    icon: L.divIcon({ className: 'target-icon', html: '<div class="target-pin custom-pin">★</div>', iconSize: [26, 26], iconAnchor: [13, 13] }),
+    zIndexOffset: 500
+  }).addTo(STATE.map);
+  selectTarget(feature);
 }
 
 /* Adds a rectangular no-go zone from two corner [lat, lon] points, then re-plans. */

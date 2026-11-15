@@ -59,7 +59,7 @@ Five data layers (need 3): (1) topography + computed slope, (2) optical HiRISE/C
 Plus: real Curiosity point-of-view photos near each target, walk-back-time map, EVA time budget with reserve.
 
 ## 4. JUDGING + AWARDS (design every feature to score on these)
-Five criteria: Influence (impact), Creativity (novel vs incremental), Validity (scientifically sound, cited,
+Five criteria: Impact, Creativity (novel vs incremental), Validity (scientifically sound, cited,
 honest assumptions), Relevance (answers the challenge, complete, usable), Presentation (story; weighted equally).
 Global awards to aim for: Best Use of Data, Best Mission Concept, Best Use of Technology (also: Best Use of Science,
 Galactic Impact, Most Inspirational, Best Storytelling, Art & Technology).

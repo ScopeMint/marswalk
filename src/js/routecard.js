@@ -68,7 +68,7 @@ function rcArrange() {
   verdict.className = 'rc-verdict ' + kind;
   verdict.textContent = (kind === 'pass' ? '✓ Fits your ' : kind === 'caution' ? '⚠ Tight for your ' : '✕ Too long for your ') + STATE.evaHours + ' h EVA';
   const sub = document.createElement('small');
-  sub.textContent = 'Walking plus ' + CONFIG.eva.workMinutes + ' min of work at the target uses ' + (Number.isFinite(usedPct) ? usedPct : '—') + '% of your time.';
+  sub.textContent = 'Airlock (' + (CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes) + ' min), walking and ' + CONFIG.eva.workMinutes + ' min of work at the target use ' + (Number.isFinite(usedPct) ? usedPct : '—') + '% of your time.';
   verdict.appendChild(sub);
   if (rows['EVA used']) { const bar = rows['EVA used'].row.querySelector('.eva-bar-wrap'); if (bar) verdict.appendChild(bar); }
   body.appendChild(verdict);

@@ -207,8 +207,8 @@ function drawSunChart(canvasId, evaStartLmstHours, evaHours) {
     (height - MC.padTop - MC.padBottom);
   // Palette: read CSS tokens at draw time so they stay in sync with the UI theme.
   const _t = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
-  const MC_BG = _t.bg || '#100E0D', MC_MUTED = _t.muted || '#9E9890', MC_TEXT = _t.text || '#EAE7E2';
-  const MC_ROUTE = _t.route || '#3FD0C9', MC_ACCENT = _t.accent || '#B07D4A', MC_BORDER = _t.border || '#2D2A28';
+  const MC_BG = _t.bg || '#0B0E12', MC_MUTED = _t.muted || '#919AA7', MC_TEXT = _t.text || '#E7EAEE';
+  const MC_ROUTE = _t.route || '#3FD0C9', MC_ACCENT = _t.accent || '#8FB3DE', MC_BORDER = _t.border || '#252C36';
   ctx.fillStyle = MC_BG; ctx.fillRect(0, 0, width, height);
   if (Number.isFinite(evaStartLmstHours) && Number.isFinite(evaHours) && evaHours > 0) {
     const start = mcMod(evaStartLmstHours, MC.hoursPerSol), duration = Math.min(evaHours, MC.hoursPerSol);

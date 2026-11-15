@@ -13,10 +13,11 @@ let _tour = null;
 
 /* Waits ms milliseconds unless the tour is stopped. Returns false if stopped. */
 function tourWait(ms) {
+  const me = _tour;   // the tour that is waiting: a newer tour must never wake an old, stopped one
   return new Promise(resolve => {
     const t0 = performance.now();
     const tick = () => {
-      if (!_tour || _tour.stopped) return resolve(false);
+      if (!me || me.stopped || _tour !== me) return resolve(false);
       if (performance.now() - t0 >= ms) return resolve(true);
       requestAnimationFrame(tick);
     };
@@ -48,6 +49,14 @@ async function tourWaitRoute() {
 /* Runs the scripted tour. */
 async function runTour() {
   if (_tour) return;
+  // Clear anything on screen that would cover the tour: welcome card, open modals, HUD, 3D, first-person walk.
+  document.querySelectorAll('#welcome, .modal-overlay').forEach(el => {
+    if (el.id === 'welcome') { try { localStorage.setItem('marswalk-welcome', '1'); } catch (e) { /* private mode */ } el.remove(); }
+    else el.style.display = 'none';
+  });
+  if (typeof hudClose === 'function' && document.body.classList.contains('hud-active')) hudClose();
+  if (typeof t3dClose === 'function') { try { t3dClose(); } catch (e) { /* not open */ } }
+  if (typeof walkClose === 'function') { try { walkClose(); } catch (e) { /* not open */ } }
   const el = document.createElement('div');
   el.className = 'tour-caption';
   el.innerHTML = '<div class="tour-main"></div><div class="tour-small"></div><button class="tour-stop" type="button">Stop tour · Esc</button>';
@@ -84,6 +93,11 @@ async function runTour() {
     selectTarget(t);
     tourCaption(`Pick a science target: ${t.properties.name}, where Curiosity drilled a ridge and a hollow.`, 'Real rover position on the drill sols');
     await tourWaitRoute();
+    // Show the whole route, clear of the caption (top) and the route card (right)
+    if (STATE.map && STATE.route && STATE.route.cells && typeof cellToLatLon === 'function') {
+      const pts = STATE.route.cells.map(c => { const p = cellToLatLon(c.row, c.col); return [p.lat, p.lon]; });
+      STATE.map.flyToBounds(pts, { paddingTopLeft: [40, 130], paddingBottomRight: [380, 40], duration: 1.2, maxZoom: 16 });
+    }
     if (!(await tourWait(TOUR_STEP_MS))) return;
 
     if (!TOUR_VIDEO) {
@@ -125,12 +139,13 @@ async function runTour() {
     const t3dBtn = [...document.querySelectorAll('#top-bar button')].find(b => /3D/.test(b.textContent));
     if (t3dBtn) {
       t3dBtn.click();
-      tourCaption('…and rehearses it on the real terrain in 3D, at eye level, before ever leaving the habitat.',
+      tourCaption('…and rehearses it on the real terrain in 3D before ever leaving the habitat.',
         'HiRISE 1 m terrain + 25 cm image · vertical exaggeration 1.5× (labelled)');
+      // Stay in the 3D terrain orbit view (HiRISE terrain + planned route). "Fly the route" now opens the
+      // first-person walk, which starts at the habitat and barely moves within a few seconds of tour time.
       for (let i = 0; i < 60; i++) {
         const fly = document.querySelector('[data-t3d="fly"]');
-        // wait past the 3D view's first overlay refresh (it resets the camera to orbit), then fly
-        if (fly && !fly.disabled) { await tourWait(700); fly.click(); break; }
+        if (fly && !fly.disabled) break;
         if (!(await tourWait(150))) return;
       }
       if (!(await tourWait(TOUR_VIDEO ? 5000 : TOUR_STEP_MS + 3000))) return;
@@ -151,6 +166,7 @@ function stopTour() {
   document.removeEventListener('keydown', tourEsc);
   if (typeof hudClose === 'function' && document.body.classList.contains('hud-active')) hudClose();
   if (typeof t3dClose === 'function') { try { t3dClose(); } catch (e) { /* not open */ } }
+  if (typeof walkClose === 'function') { try { walkClose(); } catch (e) { /* not open */ } }
   const bm = document.getElementById('brief-modal');
   if (bm) bm.remove();
   _tour.el.remove();

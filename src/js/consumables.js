@@ -33,12 +33,13 @@ function pandolfWatts(bodyKg, loadKg, speedMps, gradePct, eta, gravityRatio) {
   return standing + gravityRatio * (load + move);
 }
 
-/* Speed (m/s) on one step, same rules as the route worker: uphill slows linearly to 40% at the slope limit,
-   downhill slows half as much, rough ground +25% time. */
+/* Speed (m/s) on one step, same rules as the route worker: uphill slows linearly to 40% at a FIXED 25° reference
+   slope (not the slider limit, so the same hill always takes the same time), downhill slows half as much,
+   rough ground +25% time. */
 function stepSpeedMps(slopeDeg, uphill, rough) {
   const flat = STATE.speedKmh * 1000 / 3600;
-  const limit = STATE.slopeLimitDeg || CONFIG.slope.defaultLimitDeg;
-  let frac = 1 - (1 - CONFIG.speedModel.uphillMinFraction) * Math.min(slopeDeg / limit, 1);
+  const ref = CONFIG.speedModel.referenceSlopeDeg;
+  let frac = 1 - (1 - CONFIG.speedModel.uphillMinFraction) * Math.min(slopeDeg / ref, 1);
   if (!uphill) frac = 1 - (1 - frac) * CONFIG.speedModel.downhillPenaltyFactor;
   const roughFactor = rough ? (1 + CONFIG.roughness.timePenaltyFraction) : 1;
   return flat * frac / roughFactor;

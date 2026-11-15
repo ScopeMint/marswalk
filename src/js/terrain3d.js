@@ -4,7 +4,7 @@ const T3D_VERTICES = 200; // 2x2 mean of the 400x400 input; approximately 20 m s
 const T3D_POLL_MS = 500; // Check live mission changes only while open.
 const T3D_CLEARANCE_METERS = 2, T3D_FLIGHT_METERS = 25; // Display offsets, not terrain measurements.
 const T3D_RAD = Math.PI / 180; // Degrees to radians.
-const T3D_CYAN = '#3FD0C9', T3D_ORANGE = '#B07D4A'; // Mission overlay colors (--route, --accent).
+const T3D_CYAN = '#3FD0C9', T3D_ORANGE = '#8FB3DE'; // Mission overlay colors (--route, --accent).
 let _t3d = null;
 
 /* Creates the header entry and accessible, self-contained terrain dialog once. */
@@ -21,8 +21,9 @@ function initTerrain3D() {
     <h2>Gale Crater <span>in three dimensions</span></h2></div><button data-t3d="close">Close · Esc</button></header>
     <div class="t3d-stage" data-t3d="stage"><div class="t3d-labels" data-t3d="labels"></div></div>
     <div class="t3d-message" data-t3d="message" role="status"></div>
-    <aside class="t3d-controls"><div class="t3d-modes" aria-label="Camera modes">
-      <button data-t3d="orbit" aria-pressed="true">Orbit</button><button data-t3d="fly" disabled aria-pressed="false" title="First-person view along the planned route">Walk the route</button>
+    <div class="t3d-plan-banner" data-t3d="planBanner" role="status" hidden></div>
+    <aside class="t3d-controls"><div class="t3d-plan" data-t3d="plan"></div><div class="t3d-modes" aria-label="Camera modes">
+      <button data-t3d="orbit" aria-pressed="true">Orbit</button><button data-t3d="fly" class="t3d-locked" aria-disabled="true" aria-pressed="false" title="Choose a destination first">Walk the route</button>
       <button data-t3d="top" aria-pressed="false">Top-down</button></div>
       <div class="t3d-flight" data-t3d="flight" hidden><button data-t3d="pause">Pause</button>
       <progress data-t3d="progress" max="1" value="0" aria-label="Route flight progress"></progress><span>25 m preview · not walking speed</span></div>
@@ -43,8 +44,12 @@ function initTerrain3D() {
   _t3d = { root, button, el, open: false, token: 0, ex: 1.5, labels: [], pointers: new Map(), notices: {}, mode: 'orbit' };
   button.addEventListener('click', t3dOpen); el.close.addEventListener('click', t3dClose);
   // 'fly' opens the first-person walk (walk3d.js) when it is loaded; otherwise the old 25 m fly-over
-  ['orbit', 'fly', 'top'].forEach(mode => el[mode].addEventListener('click', () =>
-    (mode === 'fly' && typeof walkOpen === 'function') ? walkOpen() : t3dMode(mode)));
+  // With no route yet, 'fly' does not stay silent: it points the user at step 1 (terrain3d-plan.js).
+  ['orbit', 'fly', 'top'].forEach(mode => el[mode].addEventListener('click', () => {
+    if (mode === 'fly' && !_t3d.curve) { if (typeof t3dPlanNudge === 'function') t3dPlanNudge(); return; }
+    (mode === 'fly' && typeof walkOpen === 'function') ? walkOpen() : t3dMode(mode);
+  }));
+  if (typeof t3dPlanInit === 'function') t3dPlanInit();   // route planning inside this view
   el.pause.addEventListener('click', () => { _t3d.paused = !_t3d.paused; el.pause.textContent = _t3d.paused ? 'Resume' : 'Pause'; });
   el.ex.addEventListener('input', () => {
     _t3d.ex = Number(el.ex.value); el.exLabel.textContent = _t3d.ex.toFixed(1) + '×';
@@ -91,7 +96,16 @@ function t3dDisposeScene() {
   if (s.renderer) { s.renderer.dispose(); s.renderer.forceContextLoss(); s.renderer.domElement.remove(); }
   s.renderer = s.scene = s.mesh = s.texture = s.group = s.curve = null;
   s.labels = []; s.el.labels.textContent = ''; s.pointers.clear(); s.signature = ''; s.lastMs = null;
-  s.el.fly.disabled = true; s.el.flight.hidden = true;
+  t3dFlyReady(false); s.el.flight.hidden = true;
+  if (typeof t3dPlanCancelPick === 'function') t3dPlanCancelPick();
+}
+
+/* Locks or unlocks "Walk the route". Locked still accepts a click, so it can explain what is missing. */
+function t3dFlyReady(ready) {
+  const button = _t3d.el.fly;
+  button.setAttribute('aria-disabled', String(!ready));
+  button.classList.toggle('t3d-locked', !ready); button.classList.toggle('t3d-ready', ready);
+  button.title = ready ? 'First-person view along the planned route' : 'Choose a destination first';
 }
 
 /* Releases geometries and materials in an owned object hierarchy. */
@@ -111,8 +125,9 @@ function t3dPoll() {
       if (typeof STATE === 'undefined' || !STATE.grids.loaded || !STATE.grids.aoi) return;
       t3dBuild();
     }
-    const signature = JSON.stringify([STATE.route, STATE.habitat, STATE.targets]);
+    const signature = JSON.stringify([STATE.route, STATE.habitat, STATE.targets, STATE.selectedTarget && STATE.selectedTarget.geometry]);
     if (signature !== s.signature) { s.signature = signature; t3dOverlays(); }
+    if (typeof t3dPlanUpdate === 'function') t3dPlanUpdate(true);
     t3dSun();
   } catch (error) {
     ++s.token; if (s.abort) s.abort.abort();
@@ -238,6 +253,11 @@ function t3dOverlays() {
     const point = t3dGeo(...feature.geometry.coordinates), props = feature.properties || {};
     if (point) t3dPin(point, `${props.index == null ? index + 1 : props.index} · ${props.name || 'Science target'}`, T3D_CYAN, 55);
   });
+  const chosen = STATE.selectedTarget;                       // a point the user picked that is not one of the listed targets
+  if (chosen && chosen.id === 'custom' && chosen.geometry) {
+    const point = t3dGeo(...chosen.geometry.coordinates);
+    if (point) t3dPin(point, '★ Your chosen point', T3D_CYAN, 55);
+  }
   const route = STATE.route || {}, points = [];
   if (route.status === 'ok' && route.cells) route.cells.forEach(cell => {
     if (!Number.isFinite(cell.row) || !Number.isFinite(cell.col) || cell.row < 0 || cell.col < 0 || cell.row >= s.aoi.height || cell.col >= s.aoi.width) return;
@@ -257,10 +277,10 @@ function t3dOverlays() {
     curve.arcLengthDivisions = Math.min(12000, Math.max(1000, points.length * 4)); curve.updateArcLengths(); s.curve = curve;
     const lengthMeters = curve.getLength();
     s.durationSeconds = t3dClamp((route.distanceMeters || lengthMeters) / 100, 20, 30);
-    s.group.add(new T.Mesh(new T.TubeGeometry(curve, Math.min(16000, Math.max(200, Math.ceil(lengthMeters / 3))), 1.5, 5, false),
+    s.group.add(new T.Mesh(new T.TubeGeometry(curve, Math.min(16000, Math.max(200, Math.ceil(lengthMeters / 3))), 3, 5, false),   // 3 m wide line: drawn thick so it can be seen from far away, not a real width
       new T.MeshBasicMaterial({ color: T3D_CYAN })));
   }
-  t3dTraverse(); s.el.fly.disabled = !s.curve;
+  t3dTraverse(); t3dFlyReady(!!s.curve);
   if (s.mode === 'fly') t3dMode('orbit');
 }
 
@@ -344,6 +364,12 @@ function t3dControls(canvas) {
   canvas.addEventListener('contextmenu', event => event.preventDefault());
   canvas.addEventListener('pointerdown', event => {
     canvas.focus(); canvas.setPointerCapture(event.pointerId); s.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    s.downAt = { x: event.clientX, y: event.clientY };
+  });
+  // A press and release in the same spot is a click (not a drag): the planner may use it to pick a point.
+  canvas.addEventListener('pointerup', event => {
+    const down = s.downAt; s.downAt = null;
+    if (down && Math.hypot(event.clientX - down.x, event.clientY - down.y) < 6 && typeof t3dPlanClick === 'function') t3dPlanClick(event, canvas);
   });
   canvas.addEventListener('pointermove', event => {
     const rect = canvas.getBoundingClientRect();
@@ -375,7 +401,11 @@ function t3dControls(canvas) {
 /* Traps dialog focus, closes on Escape, and supplies keyboard camera controls. */
 function t3dKey(event) {
   const s = _t3d; if (!s || !s.open) return;
-  if (event.key === 'Escape') { event.preventDefault(); t3dClose(); return; }
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    if (typeof t3dPlanCancelPick === 'function' && t3dPlanCancelPick()) return;   // first Esc only leaves point-picking
+    t3dClose(); return;
+  }
   if (event.key === 'Tab') {
     const nodes = Array.from(s.root.querySelectorAll('button:not(:disabled), input, canvas')).filter(node => node.getClientRects().length);
     const index = nodes.indexOf(document.activeElement);

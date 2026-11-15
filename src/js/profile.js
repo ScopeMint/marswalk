@@ -27,9 +27,9 @@ function drawProfile(canvasId, profileData) {
 
   const T = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   const C = {
-    bg: T.bg || '#100E0D', muted: T.muted || '#9E9890', route: T.route || '#3FD0C9',
-    accent: T.accent || '#B07D4A', caution: T.caution || '#F2B134', danger: T.danger || '#E5484D',
-    border: T.border || '#2D2A28',
+    bg: T.bg || '#0B0E12', muted: T.muted || '#919AA7', route: T.route || '#3FD0C9',
+    accent: T.accent || '#8FB3DE', caution: T.caution || '#F2B134', danger: T.danger || '#E5484D',
+    border: T.border || '#252C36',
   };
 
   const ctx   = canvas.getContext('2d');
@@ -193,9 +193,9 @@ function clearProfile(canvasId) {
   const ctx = canvas.getContext('2d');
   const _Tc = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = _Tc.bg || '#100E0D';
+  ctx.fillStyle = _Tc.bg || '#0B0E12';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle    = _Tc.muted || '#9E9890';
+  ctx.fillStyle    = _Tc.muted || '#919AA7';
   ctx.font         = '12px system-ui';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
@@ -205,7 +205,7 @@ function clearProfile(canvasId) {
 /* ── Temperature chart ─────────────────────────────────────────────────────── */
 
 /* Draws the REMS temperature chart on the canvas with id `canvasId`.
-   Shows two seasonal curves (spring/summer and autumn/winter) with the EVA window shaded.
+   Shows the two halves of the Mars year (Ls 0-180 cooler, Ls 180-360 warmer at Gale) with the EVA window shaded.
    Reads from STATE.remsTemps, STATE.evaStartHour, STATE.evaHours. */
 function drawTempChart(canvasId) {
   const canvas = document.getElementById(canvasId);
@@ -214,8 +214,8 @@ function drawTempChart(canvasId) {
 
   const _T = (typeof getThemeTokens === 'function') ? getThemeTokens() : {};
   const TC = {
-    bg: _T.bg || '#100E0D', muted: _T.muted || '#9E9890',
-    route: _T.route || '#3FD0C9', accent: _T.accent || '#B07D4A', border: _T.border || '#2D2A28',
+    bg: _T.bg || '#0B0E12', muted: _T.muted || '#919AA7',
+    route: _T.route || '#3FD0C9', accent: _T.accent || '#8FB3DE', border: _T.border || '#252C36',
   };
 
   const ctx   = canvas.getContext('2d');
@@ -260,7 +260,10 @@ function drawTempChart(canvasId) {
   });
 
   // EVA window shading
-  const evaStart = STATE.evaStartHour || 8;
+  // EVA start is LMST (slider); REMS hours are LTST, so shift by today's equation of time.
+  const ltstShift = (typeof currentSeason === 'function' && (STATE.remsTemps.clock || '').startsWith('LTST'))
+    ? currentSeason().ltstMinusLmstHours : 0;
+  const evaStart = (STATE.evaStartHour || 8) + ltstShift;
   const evaEnd   = Math.min(23, evaStart + (STATE.evaHours || 6));
   if (evaEnd > evaStart) {
     ctx.fillStyle = TC.accent + '20';
@@ -282,8 +285,8 @@ function drawTempChart(canvasId) {
     ctx.stroke();
   };
 
-  drawCurve(ss, TC.accent + 'cc');  // spring/summer — Martian ochre
-  drawCurve(aw, TC.route + '80');   // autumn/winter — teal
+  drawCurve(ss, TC.accent + 'cc');  // Ls 0-180: cooler half at Gale — Martian ochre
+  drawCurve(aw, TC.route + '80');   // Ls 180-360: warmer half at Gale — teal
 
   // X-axis: hours with "LMST" on last label
   ctx.fillStyle    = TC.muted;
@@ -308,7 +311,7 @@ function drawTempChart(canvasId) {
   ctx.font         = '11px system-ui';
   ctx.textAlign    = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillText('Air temperature · REMS (Martínez et al. 2017)', pad.left, 4);
+  ctx.fillText('Air temperature °C · Curiosity REMS (NASA PDS)', pad.left, 4);
 
   // Season swatches in title area
   const swatchY = 5;
@@ -316,9 +319,9 @@ function drawTempChart(canvasId) {
   if (labelsX > pad.left + 150) {
     ctx.font = '9px system-ui';
     ctx.fillStyle = TC.accent + 'cc'; ctx.fillRect(labelsX, swatchY + 2, 14, 3);
-    ctx.fillStyle = TC.muted; ctx.textAlign = 'left'; ctx.fillText('N. spring/summer', labelsX + 18, swatchY);
+    ctx.fillStyle = TC.muted; ctx.textAlign = 'left'; ctx.fillText('Ls 0-180 (cooler)', labelsX + 18, swatchY);
     ctx.fillStyle = TC.route + '80'; ctx.fillRect(labelsX, swatchY + 12, 14, 3);
-    ctx.fillStyle = TC.muted; ctx.fillText('N. autumn/winter', labelsX + 18, swatchY + 10);
+    ctx.fillStyle = TC.muted; ctx.fillText('Ls 180-360 (warmer)', labelsX + 18, swatchY + 10);
   }
 
   if (evaEnd > evaStart) {

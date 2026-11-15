@@ -27,7 +27,6 @@ const STATE = {
     hillshade:  { visible: false, opacity: 0.70 },  // terrain shading (off: HiRISE imagery now shows the ground)
     slope:      { visible: false, opacity: 0.35 },  // slope classification over the imagery
     los:        { visible: false, opacity: 0.75 },  // communication shadow zones
-    rad:        { visible: false, opacity: 0.65 },  // relative radiation zones
     walkback:   { visible: false, opacity: 0.70 },
     themisDay:  { visible: false, opacity: 0.70 },
     themisNight:{ visible: false, opacity: 0.70 },

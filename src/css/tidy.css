@@ -171,7 +171,7 @@ body.tidy .tidy-section[open] > .tidy-hint { display: block; }
 
 /* Our own targets stand out from the reference groups */
 body.tidy .tidy-group-ours > summary .tidy-section-title { color: var(--accent); }
-body.tidy .tidy-group-ours > summary .tidy-count { background: rgba(176, 125, 74, 0.18); color: var(--accent); }
+body.tidy .tidy-group-ours > summary .tidy-count { background: rgba(143, 179, 222, 0.18); color: var(--accent); }
 
 /* Nested terrain groups inside the library */
 body.tidy .tidy-sub { border-top: 0; margin-left: 4px; }

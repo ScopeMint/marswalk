@@ -54,9 +54,6 @@ async function initApp() {
   if (typeof addLosOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addLosOverlay(STATE.map);
   }
-  if (typeof addRadOverlay === 'function' && STATE.map && STATE.grids.loaded) {
-    addRadOverlay(STATE.map);
-  }
 
   // 5. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();
@@ -97,10 +94,13 @@ async function initApp() {
 
   // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
   if (typeof initTidy === 'function') initTidy();
+  // Then split the screen into four pages (plan / layers / weather / summary). Only shows and hides what exists.
+  if (typeof initPages === 'function') initPages();
 
   // Auto-route the first science target so the example mission is immediately visible on load.
   if (!STATE.selectedTarget && typeof selectTarget === 'function') {
-    setTimeout(() => selectTarget(0), 900);
+    // selectTarget needs the target itself, not its position in the list (a bare 0 was silently ignored)
+    setTimeout(() => { if (!STATE.selectedTarget && STATE.targets && STATE.targets[0]) selectTarget(STATE.targets[0]); }, 900);
   }
 
   console.log('[main] MarsWalk ready');

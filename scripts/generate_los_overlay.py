@@ -4,11 +4,11 @@ Loads elevation.bin + aoi.json, traces a line of sight from the EVA Base habitat
 to every cell in the grid. Cells where terrain blocks the line of sight are
 colored amber/red; cells with clear signal are transparent.
 
-Output: src/data/los-overlay.png  (300 x 300 RGBA PNG)
+Output: src/data/los-overlay.png  (400 x 400 RGBA PNG, one pixel per 10 m cell)
 
 Science basis: radio line-of-sight is a real EVA risk — astronauts out of
 radio contact from the base are in a dangerous situation.
-NOTE: This uses SYNTHETIC terrain. Results must be verified with real DTM data.
+Terrain: the real HiRISE 1 m DTM, averaged to 10 m cells (src/data/elevation.bin from 08_build_real_site.py).
 """
 
 import json

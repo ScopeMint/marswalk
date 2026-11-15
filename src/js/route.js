@@ -121,6 +121,8 @@ function onWorkerMessage(e) {
     STATE.route = {
       status:         'ok',
       cells:          msg.cells,
+      cellTimeSeconds:    msg.cellTimeSeconds,     // outbound time to each display cell (slope-aware)
+      cellDistanceMeters: msg.cellDistanceMeters,  // outbound distance to each display cell
       distanceMeters: msg.distanceMeters,
       timeSeconds:    msg.timeSeconds,
       steepestDeg:    msg.steepestDeg,
@@ -163,6 +165,8 @@ function drawRouteLine(cells) {
     return [pt.lat, pt.lon];
   });
 
+  fitRouteInView(latlngs);
+
   _routeLine = L.polyline(latlngs, {
     color:       '#3FD0C9',  // var(--route)
     weight:      4,
@@ -170,6 +174,15 @@ function drawRouteLine(cells) {
     smoothFactor: 1.5,
     interactive: false
   }).addTo(STATE.map);
+}
+
+/* Zooms/pans so the whole route is visible beside the route card (right) and below any caption (top).
+   Skipped while the visor HUD is open (it follows the walker itself). */
+function fitRouteInView(latlngs) {
+  if (!STATE.map || !latlngs || latlngs.length < 2 || document.body.classList.contains('hud-active')) return;
+  const card = document.getElementById('summary-card');
+  const cardW = Math.max(card ? card.offsetWidth : 0, 280) + 24;   // card may not be drawn yet on the first route
+  STATE.map.flyToBounds(latlngs, { paddingTopLeft: [40, 40], paddingBottomRight: [cardW, 40], maxZoom: 16, duration: 0.8 });
 }
 
 function clearRouteLine() {
@@ -185,26 +198,27 @@ function clearRouteLine() {
 function computePointOfNoReturn() {
   if (!STATE.route || STATE.route.status !== 'ok') return null;
   if (!STATE.walkback || STATE.walkback.status !== 'ready' || !STATE.walkback.data) return null;
+  // Outbound time to each display cell comes from the route worker (cellTimeSeconds): the same
+  // slope-aware model as the route total. The display path keeps only every 3rd cell, so stepping
+  // cell-to-cell here at flat speed (the old method) under-counted time ~3x.
   const cells   = STATE.route.cells;
-  if (!cells || cells.length < 2) return null;
+  const times   = STATE.route.cellTimeSeconds;
+  if (!cells || cells.length < 2 || !times || times.length !== cells.length) return null;
   const W       = STATE.grids.aoi ? STATE.grids.aoi.width : STATE.grids.width;
-  const cell_m  = STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : 20;
-  const speedMs = STATE.speedKmh * 1000 / 3600;
   const evaLimit = STATE.evaHours * 3600 * (1 - CONFIG.eva.reserveFraction);
   const workSec  = CONFIG.eva.workMinutes * 60;
+  const airlockSec = (CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes) * 60;  // same as the EVA cue card
 
   let ponrIndex = 0;
-  let cumTimeSec = 0;
   for (let i = 1; i < cells.length; i++) {
-    const prev = cells[i - 1], cur = cells[i];
-    const isDiag = prev.row !== cur.row && prev.col !== cur.col;
-    cumTimeSec += (isDiag ? cell_m * Math.SQRT2 : cell_m) / speedMs;
+    const cur = cells[i];
+    const cumTimeSec = times[i];
 
     const idx = cur.row * W + cur.col;
     const walkbackSec = STATE.walkback.data[idx];
     if (!isFinite(walkbackSec) || walkbackSec <= 0) continue;
 
-    if (cumTimeSec + workSec + walkbackSec <= evaLimit) {
+    if (airlockSec + cumTimeSec + workSec + walkbackSec <= evaLimit) {
       ponrIndex = i;
     } else {
       break;

@@ -96,7 +96,7 @@ function initWalk3D() {
     <div class="walk-visor" data-w="visor" aria-hidden="true"><i></i></div>
     <header class="walk-top">
       <div><span class="walk-kicker">MARSWALK / FIRST-PERSON EVA</span><h2 data-w="title">Walking the route</h2></div>
-      <div class="walk-top-right"><button data-w="close">Close · Esc</button></div>
+      <div class="walk-top-right"><span class="walk-pill" data-w="lapse"></span><button data-w="close">Close · Esc</button></div>
     </header>
     <div class="walk-compass" aria-hidden="true"><div class="walk-compass-strip" data-w="compass"></div><b>▼</b></div>
     <div class="walk-readouts">
@@ -438,7 +438,7 @@ function walkMarkers() {
     w.stops.push({ x, z, props });
   };
   const hab = STATE.habitat || { lat: CONFIG.studyArea.defaultHabitatLat, lon: CONFIG.studyArea.defaultHabitatLon };
-  add(hab.lon, hab.lat, 'EVA BASE', '#B07D4A', null);
+  add(hab.lon, hab.lat, 'EVA BASE', '#8FB3DE', null);
   (STATE.targets || []).forEach((f, i) => {
     if (!f.geometry || f.geometry.type !== 'Point') return;
     const p = f.properties || {};

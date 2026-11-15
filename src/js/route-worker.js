@@ -16,7 +16,9 @@
 /* ── Speed model constants (passed in via aoi or hardcoded from CONFIG equivalents) ───── */
 /* These match CONFIG in config.js — keep in sync if config.js values change */
 const WALK_SPEED_KMH    = 3;      // normal speed, overridden by message.speedKmh
-const UPHILL_MIN_FRAC   = 0.40;   // at slope limit, speed = 40% of flat speed [OUR ASSUMPTION]
+const UPHILL_MIN_FRAC   = 0.40;   // at REF_SLOPE_DEG uphill, speed = 40% of flat speed [OUR ASSUMPTION]
+const REF_SLOPE_DEG     = 25;     // fixed reference slope for the slowdown (= slider maximum). Does NOT move with
+                                  // the slope-limit slider, so the same hill always takes the same time. [OUR ASSUMPTION]
 const DOWNHILL_PENALTY  = 0.5;    // downhill slowdown is half as much as uphill [OUR ASSUMPTION]
 const ROUGHNESS_THRESH  = 0.5;    // meters — above this = rough ground [OUR ASSUMPTION]
 const ROUGHNESS_PENALTY = 0.25;   // 25% slower on rough ground [OUR ASSUMPTION]
@@ -71,17 +73,18 @@ MinHeap.prototype._sinkDown = function(i) {
 /* Returns time in seconds to traverse one step.
    stepLengthM: meters. elevDeltaM: elevation change (positive = uphill).
    slopeDeg: slope of the destination cell. roughnessM: roughness of destination.
-   slopeLimit: max walkable slope (for speed scaling). speedKmh: flat speed. */
+   slopeLimit: unused for speed (kept so callers don't change; the limit only BLOCKS cells).
+   speedKmh: flat speed. */
 function stepTimeSeconds(stepLengthM, elevDeltaM, slopeDeg, roughnessM, slopeLimit, speedKmh) {
   let speedFraction = 1.0;
 
-  if (elevDeltaM > 0 && slopeLimit > 0) {
-    // Uphill: speed falls linearly from 100% at 0° to UPHILL_MIN_FRAC at the slope limit
-    speedFraction = 1.0 - (1.0 - UPHILL_MIN_FRAC) * Math.min(slopeDeg / slopeLimit, 1.0);
+  if (elevDeltaM > 0) {
+    // Uphill: speed falls linearly from 100% at 0° to UPHILL_MIN_FRAC at REF_SLOPE_DEG
+    speedFraction = 1.0 - (1.0 - UPHILL_MIN_FRAC) * Math.min(slopeDeg / REF_SLOPE_DEG, 1.0);
     speedFraction = Math.max(UPHILL_MIN_FRAC, speedFraction);
-  } else if (elevDeltaM < 0 && slopeLimit > 0) {
+  } else if (elevDeltaM < 0) {
     // Downhill: half as much slowdown as uphill
-    const uphillDrop = (1.0 - UPHILL_MIN_FRAC) * Math.min(slopeDeg / slopeLimit, 1.0);
+    const uphillDrop = (1.0 - UPHILL_MIN_FRAC) * Math.min(slopeDeg / REF_SLOPE_DEG, 1.0);
     speedFraction = 1.0 - uphillDrop * DOWNHILL_PENALTY;
     speedFraction = Math.max(UPHILL_MIN_FRAC, speedFraction);
   }
@@ -209,6 +212,8 @@ function computeRouteStats(path, elevArr, slopeArr, roughArr, aoi, slopeLimit, s
   let climbMeters    = 0;
   let descentMeters  = 0;
   const profile = [];
+  const cumTimeSeconds = [0];      // outbound walking time from the habitat to each raw path point
+  const cumDistanceMeters = [0];   // outbound distance from the habitat to each raw path point
 
   for (let i = 0; i < path.length; i++) {
     const { row, col } = path[i];
@@ -217,6 +222,7 @@ function computeRouteStats(path, elevArr, slopeArr, roughArr, aoi, slopeLimit, s
     profile.push({ distanceMeters, elevationM: isFinite(elev) ? elev : 0 });
 
     if (i === 0) continue;
+    // (cumulative arrays are pushed at the end of this iteration)
 
     const prev = path[i - 1];
     const isDiag = (prev.row !== row) && (prev.col !== col);
@@ -234,6 +240,8 @@ function computeRouteStats(path, elevArr, slopeArr, roughArr, aoi, slopeLimit, s
     if (isFinite(slope) && slope > steepestDeg) steepestDeg = slope;
     if (elevDelta > 0) climbMeters   += elevDelta;
     if (elevDelta < 0) descentMeters += Math.abs(elevDelta);
+    cumTimeSeconds.push(timeSeconds);
+    cumDistanceMeters.push(distanceMeters);
   }
 
   // Update profile distances
@@ -246,20 +254,20 @@ function computeRouteStats(path, elevArr, slopeArr, roughArr, aoi, slopeLimit, s
     }
   });
 
-  return { distanceMeters, timeSeconds, steepestDeg, climbMeters, descentMeters, profile };
+  return { distanceMeters, timeSeconds, steepestDeg, climbMeters, descentMeters, profile,
+           cumTimeSeconds, cumDistanceMeters };
 }
 
 /* ── Smooth path for display ──────────────────────────────────────────────── */
 /* Keeps every Nth cell (plus first and last) for a smoother polyline.
-   Numbers stay from the raw path — only the display cells are reduced. */
-function smoothPathForDisplay(path, keepEveryN) {
-  if (path.length <= 2) return path;
-  const smoothed = [path[0]];
-  for (let i = keepEveryN; i < path.length - 1; i += keepEveryN) {
-    smoothed.push(path[i]);
-  }
-  smoothed.push(path[path.length - 1]);
-  return smoothed;
+   Numbers stay from the raw path — only the display cells are reduced.
+   Returns the kept raw-path INDICES so per-point numbers (time, distance) can follow the display cells. */
+function displayIndices(pathLength, keepEveryN) {
+  if (pathLength <= 2) return Array.from({ length: pathLength }, (_, i) => i);
+  const kept = [0];
+  for (let i = keepEveryN; i < pathLength - 1; i += keepEveryN) kept.push(i);
+  kept.push(pathLength - 1);
+  return kept;
 }
 
 /* ── Message handler ──────────────────────────────────────────────────────── */
@@ -348,11 +356,15 @@ self.onmessage = function(e) {
     const stats = computeRouteStats(rawPath, elevArr, slopeArr, roughArr, aoi, slopeLimit, speedKmh);
 
     // Smooth path for display (every 3rd cell, cosmetic only)
-    const displayPath = smoothPathForDisplay(rawPath, 3);
+    const kept = displayIndices(rawPath.length, 3);
+    const displayPath = kept.map(i => rawPath[i]);
 
     self.postMessage({
       type: 'route_result',
       cells: displayPath,
+      // Real outbound time / distance at each DISPLAY cell (same slope-aware model as timeSeconds).
+      cellTimeSeconds:     kept.map(i => stats.cumTimeSeconds[i]),
+      cellDistanceMeters:  kept.map(i => stats.cumDistanceMeters[i]),
       distanceMeters: stats.distanceMeters,
       timeSeconds:    stats.timeSeconds,
       steepestDeg:    stats.steepestDeg,

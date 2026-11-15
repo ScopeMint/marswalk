@@ -12,7 +12,7 @@ KICKOFF BRIEF FOR CLAUDE CODE
 - 2026 NASA Space Apps Challenge, theme "The Next Frontier". Hackathon: Saturday Nov 14 and Sunday Nov 15, 2026.
 - Project submission opens Saturday 9:00 AM and closes Sunday 11:59 PM, local time. Our own target: submit by Sunday 6 PM.
 - GOAL: submit a strong project that can advance to GLOBAL judging (local judging first, then NASA/space-agency
-  experts). Judges score five things: Influence, Creativity, Validity, Relevance, Presentation.
+  experts). Judges score five things: Impact, Creativity, Validity, Relevance, Presentation.
   Presentation counts as much as the rest, so the demo and story matter.
 
 3. THE CHALLENGE WE CHOSE (Intermediate level; subjects: Human Exploration, Mars, Software)

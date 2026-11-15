@@ -34,7 +34,7 @@ const TIDY_LIBRARY_GROUPS = [
 /* Layer switches by group. Any layer id not listed lands in the last group. */
 const TIDY_LAYER_GROUPS = [
   { title: 'Imagery',          ids: ['hirise', 'opm', 'themisDay', 'themisNight'] },
-  { title: 'Terrain & safety', ids: ['slope', 'relief', 'walkback', 'los', 'rad'] },
+  { title: 'Terrain & safety', ids: ['slope', 'relief', 'walkback', 'los'] },
   { title: 'Reference',        ids: ['sites', 'traverse', 'grid'] }
 ];
 

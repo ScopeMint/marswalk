@@ -44,7 +44,7 @@ function makeTileLayer(layerConfig, opacity) {
 function addStudyAreaOutline(map) {
   const bounds = studyAreaBounds();
 
-  const _accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#B07D4A';
+  const _accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#8FB3DE';
   L.rectangle(bounds, {
     color:       _accent,
     weight:      2,

@@ -1,0 +1,108 @@
+/* pages.css — Four pages instead of one busy screen (pairs with js/pages.js). Loaded LAST.
+   Every rule is under body.paged, so removing pages.js + this file restores the single-screen layout exactly.
+   The page name is on <body data-page="plan | layers | weather | summary">. */
+
+body.paged { --pg-nav-h: 46px; --pg-side-w: 430px; }
+
+/* ── Page bar (under the top bar) ── */
+#pg-nav { display: none; }
+body.paged #pg-nav {
+  position: fixed; top: var(--top-h); left: 0; right: 0; height: var(--pg-nav-h); z-index: 1100;
+  display: flex; align-items: center; gap: 6px; padding: 0 14px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+}
+body.paged .pg-tab {
+  display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px 0 8px;
+  border: 1px solid transparent; border-radius: 999px; background: none; color: var(--muted);
+  font: 600 13px var(--font, system-ui, sans-serif); cursor: pointer; white-space: nowrap;
+}
+body.paged .pg-tab b {
+  display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%;
+  border: 1px solid var(--muted); font: 700 11px ui-monospace, Consolas, monospace;
+}
+body.paged .pg-tab:hover { color: var(--text); }
+body.paged .pg-tab[aria-current="page"] { color: var(--text); background: var(--panel); border-color: var(--accent); }
+body.paged .pg-tab[aria-current="page"] b { background: var(--accent); border-color: var(--accent); color: #14110f; }
+body.paged .pg-tab.pg-done:not([aria-current="page"]) b { border-color: var(--pass); color: var(--pass); }
+body.paged .pg-tab:focus-visible, body.paged .pg-step:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.paged .pg-hint { flex: 1; min-width: 0; margin-left: 12px; color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.paged .pg-step {
+  height: 30px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel);
+  color: var(--text); font: 500 12.5px var(--font, system-ui, sans-serif); cursor: pointer; white-space: nowrap;
+}
+body.paged .pg-step:hover { border-color: var(--route); color: var(--route); }
+body.paged .pg-step.pg-next { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+body.paged .pg-step[hidden] { display: none; }
+body.hud-active #pg-nav, body.hud-active #pg-summary-head, body.hud-active #pg-weather { visibility: hidden; }
+@media (max-width: 1150px) { body.paged .pg-hint { display: none; } body.paged #pg-nav { justify-content: space-between; } }
+
+/* Everything below the page bar */
+body.paged #main-area { top: calc(var(--top-h) + var(--pg-nav-h)); }
+
+/* Parts that only exist for one page start hidden */
+#pg-weather, #pg-summary-head { display: none; }
+
+/* ── 1. Plan route: mission panel + map + short route card ── */
+body.paged[data-page="plan"] { --bottom-h: 0px; }
+body.paged[data-page="plan"] #bottom-bar,
+body.paged[data-page="plan"] #right-panel { display: none; }
+
+/* ── 2. Map layers: map + layer switches, nothing else ── */
+body.paged[data-page="layers"] { --bottom-h: 0px; }
+body.paged[data-page="layers"] #bottom-bar,
+body.paged[data-page="layers"] #left-panel,
+body.paged[data-page="layers"] #summary-card,
+body.paged[data-page="layers"] #pov-panel { display: none !important; }
+body.paged[data-page="layers"] #right-panel { width: 320px; min-width: 320px; padding: 12px 14px 32px; }
+
+/* ── 3. Weather: no map. Numbers on the left, the two weather charts big on the right ── */
+body.paged[data-page="weather"] #main-area { display: none; }
+body.paged[data-page="weather"] #pg-weather {
+  display: block; position: fixed; top: calc(var(--top-h) + var(--pg-nav-h)); left: 0; bottom: 0; width: var(--pg-side-w);
+  padding: 18px 18px 28px; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border); z-index: 1001;
+}
+body.paged[data-page="weather"] #bottom-bar {
+  top: calc(var(--top-h) + var(--pg-nav-h)); left: var(--pg-side-w); height: auto;
+  flex-direction: column; align-items: stretch; padding: 16px; gap: 16px; border-top: 0; background: var(--bg);
+}
+body.paged[data-page="weather"] #elevation-profile-slot { display: none; }
+body.paged[data-page="weather"] #bottom-bar .chart-slot.chart-framed { flex: 1 1 0; height: auto; min-height: 0; }
+
+body.paged .pg-kicker { color: var(--accent); font: 600 11px ui-monospace, Consolas, monospace; letter-spacing: 0.16em; }
+body.paged .pg-lead { margin: 6px 0 14px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+body.paged .pg-slider { display: block; margin-bottom: 12px; color: var(--text); font-size: 13px; }
+body.paged .pg-slider input { display: block; width: 100%; margin: 6px 0 0; accent-color: var(--accent); cursor: pointer; }
+body.paged .pg-card { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+body.paged .pg-card-label { color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+body.paged .pg-card-value { margin: 6px 0 4px; color: var(--text); font: 600 21px ui-monospace, Consolas, monospace; }
+body.paged .pg-card-note { color: var(--muted); font-size: 12px; line-height: 1.45; }
+body.paged .pg-foot { margin: 14px 2px 0; color: var(--muted); font-size: 11.5px; line-height: 1.45; }
+
+/* ── 4. Summary: map + hills chart on the left, the whole route card down the right ── */
+body.paged[data-page="summary"] #left-panel,
+body.paged[data-page="summary"] #right-panel,
+body.paged[data-page="summary"] #temperature-chart-slot,
+body.paged[data-page="summary"] #sun-chart-slot { display: none; }
+body.paged[data-page="summary"] #main-area,
+body.paged[data-page="summary"] #bottom-bar { right: var(--pg-side-w); }
+body.paged[data-page="summary"] #pg-summary-head {
+  display: block; position: fixed; top: calc(var(--top-h) + var(--pg-nav-h)); right: 0; width: var(--pg-side-w); height: 84px;
+  padding: 14px 16px 0; background: var(--panel); border-left: 1px solid var(--border); z-index: 1002;
+}
+body.paged .pg-actions { display: flex; gap: 8px; margin-top: 10px; }
+body.paged .pg-actions button, body.paged .pg-empty button {
+  height: 30px; padding: 0 12px; border: 1px solid var(--route); border-radius: 6px; background: none;
+  color: var(--route); font: 600 12.5px var(--font, system-ui, sans-serif); cursor: pointer;
+}
+body.paged .pg-actions button:hover, body.paged .pg-empty button:hover { background: rgba(63, 208, 201, 0.12); }
+body.paged .pg-empty { display: none; margin-top: 26px; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+body.paged.pg-noroute[data-page="summary"] .pg-empty { display: block; }
+body.paged.pg-noroute[data-page="summary"] .pg-actions { display: none; }
+body.paged.pg-noroute[data-page="summary"] #pg-summary-head { height: auto; bottom: 0; }
+body.paged[data-page="summary"]:not(.hud-active) #summary-card {
+  position: fixed; top: calc(var(--top-h) + var(--pg-nav-h) + 84px); right: 0; bottom: 0; left: auto;
+  width: var(--pg-side-w); max-height: none; margin: 0; padding: 12px 16px 28px; overflow-y: auto;
+  border: 0; border-left: 1px solid var(--border); border-radius: 0; background: var(--panel); z-index: 1001;
+}
+body.paged[data-page="summary"] #summary-card .rc-btn:not(.rc-stop) { display: none; }      /* "Hide" has no job on this page */
+body.paged[data-page="summary"] #pov-panel { right: 12px; }
