@@ -426,6 +426,43 @@ function updateHoverTooltip(lat, lon) {
   el.style.display = 'block';
 }
 
+/* ── Shared modal accessibility helper ─────────────────────────────────────── */
+
+/* Opens a modal overlay, sets ARIA attributes, traps focus inside, and closes on Esc.
+   Call once per open (not once per build) so the event listener is fresh each time. */
+function _openModal(modal) {
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.style.display = 'flex';
+
+  const focusable = 'button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';
+  const getFocusable = () => [...modal.querySelectorAll(focusable)].filter(el => !el.disabled);
+
+  // Focus the close button (first focusable element) on open
+  const first = getFocusable()[0];
+  if (first) setTimeout(() => first.focus(), 50);
+
+  // Esc to close
+  function onKeyDown(e) {
+    if (e.key === 'Escape') { modal.style.display = 'none'; document.removeEventListener('keydown', onKeyDown); return; }
+    if (e.key !== 'Tab') return;
+    const els = getFocusable();
+    if (!els.length) return;
+    const last = els[els.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === els[0]) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); els[0].focus(); }
+    }
+  }
+  document.addEventListener('keydown', onKeyDown);
+  // Clean up listener when modal is hidden again
+  const obs = new MutationObserver(() => {
+    if (modal.style.display === 'none') { document.removeEventListener('keydown', onKeyDown); obs.disconnect(); }
+  });
+  obs.observe(modal, { attributes: true, attributeFilter: ['style'] });
+}
+
 /* ── Assumptions modal ──────────────────────────────────────────────────────── */
 
 function showAssumptionsModal() {
@@ -434,7 +471,7 @@ function showAssumptionsModal() {
     modal = _buildAssumptionsModal();
     document.body.appendChild(modal);
   }
-  modal.style.display = 'flex';
+  _openModal(modal);
 }
 
 function _buildAssumptionsModal() {
@@ -515,7 +552,7 @@ function showAboutModal() {
     modal = _buildAboutModal();
     document.body.appendChild(modal);
   }
-  modal.style.display = 'flex';
+  _openModal(modal);
 }
 
 function _buildAboutModal() {
@@ -616,7 +653,7 @@ function showHowToUseModal() {
     modal = _buildHowToUseModal();
     document.body.appendChild(modal);
   }
-  modal.style.display = 'flex';
+  _openModal(modal);
 }
 
 function _buildHowToUseModal() {

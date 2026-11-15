@@ -44,8 +44,9 @@ function makeTileLayer(layerConfig, opacity) {
 function addStudyAreaOutline(map) {
   const bounds = studyAreaBounds();
 
+  const _accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#B07D4A';
   L.rectangle(bounds, {
-    color:       '#D9622B',  // var(--accent)
+    color:       _accent,
     weight:      2,
     opacity:     0.9,
     dashArray:   '6 4',      // dashed so it reads as "planning boundary" not solid territory
