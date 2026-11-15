@@ -88,7 +88,7 @@ function drawHazardSegments(hz) {
     hz[kind].forEach(r => {
       const pts = cells.slice(r.i0, r.i1 + 1).map(c => { const p = cellToLatLon(c.row, c.col); return [p.lat, p.lon]; });
       if (pts.length < 2) return;
-      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: kind === 'radio' ? 0.75 : 0.9, dashArray: dash, interactive: true })
+      L.polyline(pts, { color: HAZ_STYLE[kind].color, weight, opacity: kind === 'radio' ? 0.75 : 0.9, dashArray: dash, interactive: true, renderer: STATE.routeRenderer })
         .bindTooltip(`${HAZ_STYLE[kind].label}<br>${(r.fromM / 1000).toFixed(2)}–${(r.toM / 1000).toFixed(2)} km`, { className: 'target-tooltip', sticky: true })
         .addTo(_hazLayer);
     });

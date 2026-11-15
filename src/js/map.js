@@ -158,6 +158,12 @@ function initMap() {
     map.flyTo([centerLat, centerLon], defaultZoom, { duration: 12 });
   }, 1800);
 
+  // Custom pane for the route line + hazard segments so they always render above tile layers,
+  // even during Leaflet's CSS zoom animation (tiles animate inside their own stacking context).
+  map.createPane('routePane');
+  map.getPane('routePane').style.zIndex = 450;
+  STATE.routeRenderer = L.svg({ pane: 'routePane' });
+
   STATE.map = map;
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
