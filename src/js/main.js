@@ -19,6 +19,7 @@ async function initApp() {
   if (typeof initBrief === 'function') initBrief();             // EVA cue card button
   if (typeof initTour === 'function') initTour();               // guided tour with captions
   if (typeof initTerrain3D === 'function') initTerrain3D();     // 3D HiRISE terrain view
+  if (typeof initRoverCheck === 'function') initRoverCheck();   // planner vs Curiosity's real drive (button goes in the Menu)
 
   // Place habitat marker immediately using CONFIG fallback — grids may not be loaded yet.
   // This ensures the EVA Base is always visible on first load, even on slow connections.
@@ -91,6 +92,7 @@ async function initApp() {
   // Clear, explorable charts and the plain-language route card. Both wrap functions the scripts above set up.
   if (typeof initCharts === 'function') initCharts();
   if (typeof initRouteCard === 'function') initRouteCard();
+  if (typeof initStraightLine === 'function') initStraightLine();   // straight line vs safe route (adds a route-card section; must run after initRouteCard)
 
   // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
   if (typeof initTidy === 'function') initTidy();

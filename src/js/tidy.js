@@ -15,7 +15,7 @@
    It only MOVES existing elements, so every button keeps the click behaviour its own script gave it. */
 
 /* Top-bar buttons that go inside the Menu (by id). Buttons with class .app-btn (Install, Offline pack) go too. */
-const TIDY_MENU_BUTTON_IDS = ['btn-how-to-use', 'btn-about', 'btn-assumptions', 'btn-reload'];
+const TIDY_MENU_BUTTON_IDS = ['btn-rover-check', 'btn-how-to-use', 'btn-about', 'btn-assumptions', 'btn-reload'];
 
 /* Left-panel section titles that start folded shut (everything else starts open). */
 const TIDY_CLOSED_SECTIONS = [/mission tools/i, /multi-stop/i];

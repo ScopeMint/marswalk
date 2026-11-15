@@ -147,7 +147,7 @@ function buildBrief() {
     ['Walk out / back', `${Math.round(outMin)} / ${Math.round(backMin)} min`],
     ['Energy per astronaut', cons ? `${Math.round(cons.kcal)} kcal (avg ${Math.round(cons.avgW)} W)` : '—'],
     ['O2 / water used', cons ? `${cons.o2Kg.toFixed(2)} kg / ${cons.waterKg.toFixed(2)} kg` : '—'],
-    ['Radiation, this EVA (rover baseline)', rad ? `${rad.doseEstimateMuGy} μGy` : '—']
+    ['Radiation, this EVA (rover baseline)', rad ? `${rad.doseEstimateMuGy} μGy${doseRangeText(rad)}` : '—']
   ];
   nums.forEach(([k, v]) => { const d = document.createElement('div'); d.className = 'brief-num'; d.innerHTML = '<span></span><b></b>'; d.firstChild.textContent = k; d.lastChild.textContent = v; numBox.appendChild(d); });
   grid.append(goBox, numBox);

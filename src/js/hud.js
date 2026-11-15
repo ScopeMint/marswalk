@@ -235,7 +235,7 @@ function hudRender() {
   el.eta.textContent = `${hudNumber(Math.max(0, route.timeSeconds - elapsedSeconds) / HUD_SECONDS_PER_MINUTE)} min`;
   el.terrain.textContent = `${hudNumber(hudGridValue(grids.elevation, currentCell))} m / ${hudNumber(hudGridValue(grids.slope, currentCell))}°`;
   el.walkback.textContent = `${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`;
-  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN, 0)} μGy`;
+  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN, 0)} μGy${typeof doseRangeText === 'function' ? doseRangeText(dose) : ''}`;
   hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength);
   const done = elapsedSeconds >= hudEndSeconds();
   el.phase.textContent = done ? `Return leg: walk-back ${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`
