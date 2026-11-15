@@ -38,98 +38,142 @@ function stormMinutes(min) {
   return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0') + ' min';
 }
 
-/* Builds the empty page once and loads the facts file. Called by initPages. */
+/* Builds the empty page once and loads the facts file. Called by initPages.
+   Layout, top to bottom: headline + three key numbers | the storm drill for the planned walk |
+   the three measured storms side by side | what to do (left) and what it does to a person (right). */
 function stormsBuild() {
   if (_storm) return;
   const root = stormEl('section'); root.id = 'pg-storm'; root.setAttribute('aria-label', 'Solar storms');
-  const intro = stormEl('header', 'storm-intro');
-  intro.appendChild(stormEl('div', 'pg-kicker', 'SPACE WEATHER'));
-  intro.appendChild(stormEl('h2', '', 'A solar storm hits the whole planet at once'));
-  intro.appendChild(stormEl('p', '', 'Mars has no magnetic field and only thin air to stop it, so there is no route around a storm. ' +
-    'The only thing a crew controls is how quickly they get under shielding. This page uses what NASA\'s Curiosity rover has really measured on the ground at Gale Crater with its radiation detector, RAD.'));
-  root.appendChild(intro);
-  const cols = stormEl('div', 'storm-cols');
-  const events = stormEl('div', 'storm-col'), drill = stormEl('div', 'storm-col'), person = stormEl('div', 'storm-col');
-  cols.appendChild(events); cols.appendChild(drill); cols.appendChild(person); root.appendChild(cols);
+  const wrap = stormEl('div', 'st-wrap'); root.appendChild(wrap);
+
+  const hero = stormEl('header', 'st-hero'), heroText = stormEl('div', 'st-hero-text'), stats = stormEl('div', 'st-stats');
+  heroText.appendChild(stormEl('div', 'st-kicker', 'Space weather · measured by Curiosity'));
+  heroText.appendChild(stormEl('h2', '', 'A solar storm hits the whole planet at once'));
+  heroText.appendChild(stormEl('p', '', 'Mars has no magnetic field and only thin air, so there is no route around a storm. ' +
+    'The one thing a crew controls is how fast they get under shielding.'));
+  hero.appendChild(heroText); hero.appendChild(stats); wrap.appendChild(hero);
+
+  const drill = stormEl('section', 'st-drill'), events = stormEl('section', 'st-events');
+  const bottom = stormEl('div', 'st-bottom'), steps = stormEl('section', 'st-col'), person = stormEl('section', 'st-col');
+  bottom.appendChild(steps); bottom.appendChild(person);
+  wrap.appendChild(drill); wrap.appendChild(events); wrap.appendChild(bottom);
   document.body.appendChild(root);
-  _storm = { root, events, drill, person, data: null, drawn: '', warnMin: null };
+  _storm = { root, stats, events, drill, steps, person, data: null, drawn: '', warnMin: null };
   stormsCardHook();
 
   fetch('./data/space-weather.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(data => { _storm.data = data; stormsStatic(); stormsRefresh(); })
-    .catch(err => { console.warn('[storms]', err); events.appendChild(stormEl('p', 'storm-note', 'Could not load the storm data file. Refresh the page.')); });
+    .catch(err => { console.warn('[storms]', err); drill.appendChild(stormEl('p', 'st-note', 'Could not load the storm data file. Refresh the page.')); });
 }
 
-/* Draws the parts that never change: the measured storms (left) and the person + precautions column (right). */
+/* A fold-out "more" block: a short label you click to read the longer text. */
+function stormFold(label) {
+  const box = stormEl('details', 'st-fold'); box.appendChild(stormEl('summary', '', label));
+  return box;
+}
+
+/* A section heading with an optional short line beside it. */
+function stormHead(title, aside) {
+  const head = stormEl('div', 'st-head'); head.appendChild(stormEl('h3', '', title));
+  if (aside) head.appendChild(stormEl('span', '', aside));
+  return head;
+}
+
+/* Draws the parts that never change. Every text and number comes from space-weather.json. */
 function stormsStatic() {
   const s = _storm, d = s.data;
-  s.events.appendChild(stormEl('h3', 'storm-h', 'Storms Curiosity measured on the ground'));
+  const e2017 = d.events.find(e => e.id === '2017-09'), e2024 = d.events.find(e => e.id === '2024-05');
+
+  // Headline numbers
+  [[e2017.stat, e2017.statLabel, e2017.date], [e2024.stat, e2024.statLabel, e2024.date],
+   [d.health.evaTerminateHours + ' h', 'to end an EVA and reach shielding', 'NASA planning figure']].forEach(([big, label, foot]) => {
+    const tile = stormEl('div', 'st-stat');
+    tile.appendChild(stormEl('b', '', big)); tile.appendChild(stormEl('span', '', label)); tile.appendChild(stormEl('small', '', foot));
+    s.stats.appendChild(tile);
+  });
+
+  // The drill: frame only; stormsRefresh fills in the numbers
+  s.drill.appendChild(stormHead('Storm drill for your planned walk', 'Drag the slider: when does the alert come?'));
+  s.empty = stormEl('p', 'st-note');
+  const go = stormEl('button', 'st-go', '← Go to 1 · Plan route'); go.type = 'button';
+  go.addEventListener('click', () => { if (typeof pagesShow === 'function') pagesShow('plan'); });
+  s.emptyBox = stormEl('div', 'st-empty'); s.emptyBox.appendChild(s.empty); s.emptyBox.appendChild(go);
+  s.live = stormEl('div', 'st-live');
+  const main = stormEl('div', 'st-main'), side = stormEl('div', 'st-side');
+
+  s.track = stormEl('div', 'st-track'); s.marker = stormEl('i', 'st-marker');
+  s.slider = stormEl('input'); s.slider.type = 'range'; s.slider.min = '0'; s.slider.step = '1';
+  s.slider.setAttribute('aria-label', 'Minutes into the EVA when the storm alert comes');
+  s.slider.addEventListener('input', () => { s.warnMin = Number(s.slider.value); stormsRefresh(true); });
+  const rail = stormEl('div', 'st-rail'); rail.appendChild(s.track); rail.appendChild(s.marker); rail.appendChild(s.slider);
+  s.where = stormEl('p', 'st-where');
+  const answer = stormEl('div', 'st-answer'); s.big = stormEl('b'); s.bigNote = stormEl('span');
+  answer.appendChild(s.big); answer.appendChild(s.bigNote);
+  s.sum = stormEl('p', 'st-sum');
+  const gauge = stormEl('div', 'st-gauge');
+  s.gaugeText = stormEl('div', 'st-gauge-text');
+  const bar = stormEl('div', 'st-gauge-bar'); s.gaugeFill = stormEl('i'); s.gaugeTick = stormEl('em');
+  bar.appendChild(s.gaugeFill); bar.appendChild(s.gaugeTick);
+  s.far = stormEl('p', 'st-fine');
+  gauge.appendChild(s.gaugeText); gauge.appendChild(bar); gauge.appendChild(s.far);
+  main.appendChild(rail); main.appendChild(s.where); main.appendChild(answer); main.appendChild(s.sum); main.appendChild(gauge);
+
+  const tripBox = stormEl('div', 'st-block'); tripBox.appendChild(stormEl('h4', '', 'What it does to the trip'));
+  s.trip = stormEl('div'); tripBox.appendChild(s.trip);
+  const doseBox = stormEl('div', 'st-block'); doseBox.appendChild(stormEl('h4', '', 'Radiation on the walk home'));
+  s.dose = stormEl('div'); doseBox.appendChild(s.dose);
+  side.appendChild(tripBox); side.appendChild(doseBox);
+  s.live.appendChild(main); s.live.appendChild(side);
+  s.drill.appendChild(s.emptyBox); s.drill.appendChild(s.live);
+
+  // The three storms, side by side, oldest first
+  s.events.appendChild(stormHead('Storms Curiosity measured on the ground', d.context.stormCount));
+  const row = stormEl('div', 'st-event-row');
   d.events.forEach(ev => {
-    const card = stormEl('div', 'pg-card storm-event');
-    card.appendChild(stormEl('div', 'pg-card-label', ev.date));
-    card.appendChild(stormEl('div', 'storm-title', ev.title));
-    card.appendChild(stormEl('p', '', ev.measured));
-    card.appendChild(stormEl('p', 'storm-meaning', ev.meaning));
-    card.appendChild(stormSource(ev.source, ev.url));
-    s.events.appendChild(card);
+    const card = stormEl('article', 'st-event');
+    card.appendChild(stormEl('time', '', ev.date));
+    card.appendChild(stormEl('b', '', ev.stat)); card.appendChild(stormEl('span', '', ev.statLabel));
+    card.appendChild(stormEl('h4', '', ev.title));
+    card.appendChild(stormEl('p', 'st-quote', ev.meaning));
+    const more = stormFold('What RAD measured');
+    more.appendChild(stormEl('p', '', ev.measured)); more.appendChild(stormSource(ev.source, ev.url));
+    card.appendChild(more); row.appendChild(card);
   });
-  const ctx = stormEl('div', 'pg-card');
-  ctx.appendChild(stormEl('div', 'pg-card-label', 'How often'));
-  ctx.appendChild(stormEl('p', '', d.context.stormCount));
-  ctx.appendChild(stormSource(d.context.stormCountSource, d.context.stormCountUrl));
-  s.events.appendChild(ctx);
+  s.events.appendChild(row);
+  s.events.appendChild(stormSource(d.context.stormCountSource, d.context.stormCountUrl));
 
-  s.person.appendChild(stormEl('h3', 'storm-h', 'What a storm can do to a person'));
-  const health = stormEl('div', 'pg-card');
-  [['During the mission', d.health.duringMission], ['Years later', d.health.afterMission], ['How likely', d.health.howLikely],
-   ['NASA\'s limits', d.health.limits], ['About the units', d.health.unitNote]].forEach(([label, text]) => {
-    health.appendChild(stormEl('div', 'pg-card-label', label)); health.appendChild(stormEl('p', '', text));
-  });
-  health.appendChild(stormSource(d.health.source, d.health.url));
-  s.person.appendChild(health);
-
-  s.person.appendChild(stormEl('h3', 'storm-h', 'When the storm alert sounds'));
-  const steps = stormEl('ol', 'storm-steps');
+  // What to do
+  s.steps.appendChild(stormHead('When the storm alert sounds'));
+  const list = stormEl('ol', 'st-steps');
   d.precautions.forEach(p => {
     const li = stormEl('li');
     li.appendChild(stormEl('strong', '', p.step)); li.appendChild(stormEl('p', '', p.why)); li.appendChild(stormEl('small', '', p.source));
-    steps.appendChild(li);
+    list.appendChild(li);
   });
-  s.person.appendChild(steps);
-  const cliff = stormEl('div', 'pg-card');
-  cliff.appendChild(stormEl('div', 'pg-card-label', 'How much does a cliff help? (measured)'));
-  cliff.appendChild(stormEl('p', '', d.context.cliffShielding));
-  cliff.appendChild(stormSource(d.context.cliffSource, d.context.cliffUrl));
-  s.person.appendChild(cliff);
+  s.steps.appendChild(list);
 
-  // Middle column: the drill. The frame is built once; stormsRefresh fills in the numbers.
-  s.drill.appendChild(stormEl('h3', 'storm-h', 'Storm drill for your planned walk'));
-  const box = stormEl('div', 'pg-card storm-drill');
-  s.empty = stormEl('p', 'storm-note');
-  const go = stormEl('button', 'storm-go', '← Go to 1 · Plan route'); go.type = 'button';
-  go.addEventListener('click', () => { if (typeof pagesShow === 'function') pagesShow('plan'); });
-  s.emptyBox = stormEl('div'); s.emptyBox.appendChild(s.empty); s.emptyBox.appendChild(go);
-  s.live = stormEl('div');
-  const label = stormEl('label', 'pg-slider'); s.sliderText = stormEl('span'); s.slider = stormEl('input');
-  s.slider.type = 'range'; s.slider.min = '0'; s.slider.step = '1';
-  s.slider.addEventListener('input', () => { s.warnMin = Number(s.slider.value); stormsRefresh(true); });
-  label.appendChild(s.sliderText); label.appendChild(s.slider); s.live.appendChild(label);
-  s.where = stormEl('div', 'storm-where'); s.big = stormEl('div', 'pg-card-value'); s.sum = stormEl('p', 'storm-sum');
-  s.live.appendChild(s.where); s.live.appendChild(s.big); s.live.appendChild(s.sum);
-  s.rule = stormEl('div', 'storm-rule'); s.live.appendChild(s.rule);
-  s.far = stormEl('p', 'storm-sum'); s.live.appendChild(s.far);
-  box.appendChild(s.emptyBox); box.appendChild(s.live); s.drill.appendChild(box);
-
-  const after = stormEl('div', 'pg-card');
-  after.appendChild(stormEl('div', 'pg-card-label', 'What it does to the trip'));
-  s.trip = stormEl('div'); after.appendChild(s.trip); s.drill.appendChild(after);
-  const dose = stormEl('div', 'pg-card');
-  dose.appendChild(stormEl('div', 'pg-card-label', 'Radiation on the walk home'));
-  s.dose = stormEl('div'); dose.appendChild(s.dose); s.drill.appendChild(dose);
+  // What it does to a person
+  s.person.appendChild(stormHead('What a storm can do to a person'));
+  const rows = stormEl('dl', 'st-facts');
+  [['During the mission', d.health.duringMission], ['Years later', d.health.afterMission]].forEach(([label, text]) => {
+    rows.appendChild(stormEl('dt', '', label)); rows.appendChild(stormEl('dd', '', text));
+  });
+  s.person.appendChild(rows);
+  const limits = stormEl('div', 'st-limits');
+  [[d.health.sepLimitMsv + ' mSv', 'NASA limit for any one solar storm'], [d.health.careerLimitMsv + ' mSv', 'NASA limit over a whole career'],
+   [d.context.cliffPercent + '%', 'less radiation measured at the foot of a cliff']].forEach(([big, label]) => {
+    const chip = stormEl('div', 'st-limit'); chip.appendChild(stormEl('b', '', big)); chip.appendChild(stormEl('span', '', label)); limits.appendChild(chip);
+  });
+  s.person.appendChild(limits);
+  const likely = stormFold('How likely is a dangerous dose?'); likely.appendChild(stormEl('p', '', d.health.howLikely)); likely.appendChild(stormEl('p', '', d.health.limits));
+  const units = stormFold('Why this page does not convert gray to sievert'); units.appendChild(stormEl('p', '', d.health.unitNote));
+  const cliff = stormFold('How much does a cliff help?'); cliff.appendChild(stormEl('p', '', d.context.cliffShielding)); cliff.appendChild(stormSource(d.context.cliffSource, d.context.cliffUrl));
+  s.person.appendChild(likely); s.person.appendChild(units); s.person.appendChild(cliff);
+  s.person.appendChild(stormSource(d.health.source, d.health.url));
 }
 
 /* Works out where the crew is, minute by minute, for the planned EVA.
-   Returns null without a route. Otherwise { totalMin, peak: {min, km}, at(minute) }.
+   Returns null without a route. Otherwise { totalMin, arriveMin, phases, peak: {min, km}, at(minute) }.
    at() gives { phase, km (walked from base, or null), shelterMin (walk to the habitat from there) }. */
 function stormTimeline() {
   const route = STATE.route, wb = STATE.walkback && STATE.walkback.data, aoi = STATE.grids && STATE.grids.aoi;
@@ -145,6 +189,8 @@ function stormTimeline() {
   return {
     totalMin: total / 60,
     arriveMin: arrive / 60,
+    phases: [['Airlock', egress], ['Walk out', out], ['Work at target', work], ['Walk back', home], ['Airlock', ingress]]
+      .map(([name, seconds]) => ({ name, min: seconds / 60 })),
     peak: { min: back[peak] / 60, km: dists[peak] / 1000 },
     at(minute) {
       const t = minute * 60;
@@ -163,6 +209,17 @@ function stormTimeline() {
 /* Called when the page opens. */
 function stormsOpen() { if (_storm) { _storm.drawn = ''; stormsRefresh(); } }
 
+/* One row of the dose comparison: a label, a bar and the number. from/to are shares (0 to 1) of the bar. */
+function stormDoseRow(label, value, from, to, kind) {
+  const row = stormEl('div', 'st-dose-row');
+  row.appendChild(stormEl('span', '', label));
+  const bar = stormEl('div', 'st-dose-bar'), solid = stormEl('i', kind);
+  solid.style.width = (from * 100).toFixed(1) + '%'; bar.appendChild(solid);
+  if (to > from) { const range = stormEl('i', kind + ' range'); range.style.width = ((to - from) * 100).toFixed(1) + '%'; bar.appendChild(range); }
+  row.appendChild(bar); row.appendChild(stormEl('b', '', value));
+  return row;
+}
+
 /* Fills the drill with the planner's numbers. Runs once a second while the page is open, and on slider moves. */
 function stormsRefresh(force) {
   const s = _storm;
@@ -180,8 +237,6 @@ function stormsRefresh(force) {
     s.empty.textContent = route.status === 'ok'
       ? 'This kind of route (several stops) has no minute-by-minute timeline yet. Plan a walk to one target to run the drill.'
       : 'Plan a walk first. The drill then shows how far you are from shelter at every minute of it.';
-    s.trip.appendChild(stormEl('p', '', 'The EVA ends at once and the crew stays inside. In September 2017 the high readings lasted more than two days, so the next walks wait too.'));
-    s.trip.appendChild(stormSource(e2017.source, e2017.url));
     return;
   }
 
@@ -189,27 +244,39 @@ function stormsRefresh(force) {
   if (s.warnMin == null || s.warnMin > total) s.warnMin = Math.round(line.arriveMin);     // start the drill at arrival: usually the far point
   s.slider.max = String(total); s.slider.value = String(s.warnMin);
   const now = line.at(s.warnMin);
-  s.sliderText.textContent = 'The alert comes ' + stormMinutes(s.warnMin) + ' into the EVA';
-  s.where.textContent = 'You are ' + now.phase + (now.km != null ? ', ' + now.km.toFixed(2) + ' km along the route' : '') + '.';
+
+  // The EVA as one bar: each phase as wide as the time it takes
+  s.track.textContent = '';
+  line.phases.forEach((phase, i) => {
+    const part = stormEl('div', 'st-phase p' + i); part.style.flexGrow = String(Math.max(phase.min, 0.01));
+    part.appendChild(stormEl('span', '', phase.name)); part.appendChild(stormEl('small', '', stormMinutes(phase.min)));
+    s.track.appendChild(part);
+  });
+  s.marker.style.left = (100 * s.warnMin / total).toFixed(2) + '%';
+
+  s.where.textContent = 'Alert ' + stormMinutes(s.warnMin) + ' into the EVA. You are ' + now.phase + (now.km != null ? ', ' + now.km.toFixed(2) + ' km along the route' : '') + '.';
   if (now.inside) {
-    s.big.textContent = 'Already at the habitat';
+    s.big.textContent = 'Already at the habitat'; s.bigNote.textContent = '';
     s.sum.textContent = 'Stay in and go to the storm shelter.';
   } else {
-    s.big.textContent = stormMinutes(now.shelterMin + airlock) + ' to be inside';
+    s.big.textContent = stormMinutes(now.shelterMin + airlock); s.bigNote.textContent = 'to be inside';
     s.sum.textContent = stormMinutes(now.shelterMin) + ' walk to the habitat + ' + airlock + ' min airlock (our assumption). The habitat is the storm shelter (our assumption).';
   }
 
   // NASA's 2-hour figure against the worst moment of this route
   const worst = line.peak.min + airlock, limitMin = d.health.evaTerminateHours * 60, ok = worst <= limitMin;
-  s.rule.className = 'storm-rule ' + (ok ? 'pass' : 'fail');
-  s.rule.textContent = (ok ? '✓ ' : '✕ ') + 'Worst moment of this walk: ' + stormMinutes(worst) + ' to be inside. NASA: ' + d.health.evaRule;
-  s.far.textContent = 'That worst moment is ' + line.peak.km.toFixed(2) + ' km along the route (' + stormMinutes(line.peak.min) + ' walk back). ' +
-    'We compare it with NASA\'s 2 hours as a planning check; reading "ended" as "back inside" is our interpretation.';
+  const scale = Math.max(limitMin * 1.25, worst * 1.05);
+  s.gaugeText.className = 'st-gauge-text ' + (ok ? 'pass' : 'fail');
+  s.gaugeText.textContent = (ok ? '✓ ' : '✕ ') + 'Worst moment of this walk: ' + stormMinutes(worst) + ' to be inside';
+  s.gaugeFill.className = ok ? 'pass' : 'fail'; s.gaugeFill.style.width = (100 * worst / scale).toFixed(1) + '%';
+  s.gaugeTick.style.left = (100 * limitMin / scale).toFixed(1) + '%'; s.gaugeTick.textContent = 'NASA ' + d.health.evaTerminateHours + ' h';
+  s.far.textContent = 'That moment is ' + line.peak.km.toFixed(2) + ' km along the route (' + stormMinutes(line.peak.min) + ' walk back). NASA: ' + d.health.evaRule +
+    ' Reading "ended" as "back inside" is our interpretation.';
 
   // What it does to the trip
   const used = Math.min(s.warnMin, total), lost = Math.max(0, line.arriveMin + CONFIG.eva.workMinutes - used);
   s.trip.appendChild(stormEl('p', '', now.inside ? 'The walk does not start, or is already over.'
-    : 'The walk ends here. ' + (lost >= CONFIG.eva.workMinutes ? 'All ' + CONFIG.eva.workMinutes + ' min of science at the target are lost.'
+    : 'The walk ends here. ' + (Math.round(lost) >= CONFIG.eva.workMinutes ? 'All ' + CONFIG.eva.workMinutes + ' min of science at the target are lost.'
       : lost > 0 ? 'About ' + stormMinutes(lost) + ' of the ' + CONFIG.eva.workMinutes + ' min of science at the target are lost.' : 'The science at the target was already done.')));
   s.trip.appendChild(stormEl('p', '', 'Then the crew stays inside. In September 2017 the radiation stayed at its peak for about ' + e2017.peakHours +
     ' hours and took ' + e2017.declineHours + ' more to fall back: about two days with no EVAs.'));
@@ -218,17 +285,17 @@ function stormsRefresh(force) {
   // Dose on the walk home: normal, and at the measured 2017 peak (our calculation from two sourced numbers)
   const base = STATE.radBaseline && STATE.radBaseline.doseRateMuGyPerDay;
   if (base && !now.inside) {
-    const days = (now.shelterMin + airlock) / 1440, normal = base * days;
+    const days = (now.shelterMin + airlock) / 1440, normal = base * days, low = normal * e2017.peakFactorLow, high = normal * e2017.peakFactorHigh;
     const fmt = v => v < 10 ? v.toFixed(1) : String(Math.round(v));
-    s.dose.appendChild(stormEl('p', '', 'On a quiet day those ' + stormMinutes(now.shelterMin + airlock) + ' add about ' + fmt(normal) + ' μGy. ' +
-      'At the peak of a storm like September 2017 (' + e2017.peakFactorLow + ' to ' + e2017.peakFactorHigh + ' times normal) they add about ' +
-      fmt(normal * e2017.peakFactorLow) + ' to ' + fmt(normal * e2017.peakFactorHigh) + ' μGy.'));
-    s.dose.appendChild(stormEl('p', 'storm-calc', 'Our calculation: ' + base + ' μGy per day (Curiosity RAD average, 2012-13) × storm factor × time outside. Not inside a suit; suit shielding is not modelled.'));
+    s.dose.appendChild(stormDoseRow('Quiet day', fmt(normal) + ' μGy', normal / high, 0, 'quiet'));
+    s.dose.appendChild(stormDoseRow('Storm like Sept 2017', fmt(low) + ' to ' + fmt(high) + ' μGy', low / high, 1, 'storm'));
+    s.dose.appendChild(stormEl('p', 'st-fine', 'Our calculation for those ' + stormMinutes(now.shelterMin + airlock) + ' outside: ' + base + ' μGy per day (Curiosity RAD average, 2012-13) × storm factor (' +
+      e2017.peakFactorLow + ' to ' + e2017.peakFactorHigh + ' times normal) × time. Suit shielding is not modelled.'));
   } else if (now.inside) {
     s.dose.appendChild(stormEl('p', '', 'You are already under shielding when the alert comes.'));
   }
-  s.dose.appendChild(stormEl('p', '', 'Staying outside for the whole of the biggest storm RAD has measured (May 2024) would have meant ' +
-    e2024.doseMuGy.toLocaleString('en-US') + ' μGy, which NASA compares to 30 chest X-rays. The sooner you are under shielding, the less of a storm you receive.'));
+  s.dose.appendChild(stormEl('p', 'st-fine', 'Staying outside for the whole of the biggest storm RAD has measured (May 2024) would have meant ' +
+    e2024.doseMuGy.toLocaleString('en-US') + ' μGy, which NASA compares to 30 chest X-rays.'));
   s.dose.appendChild(stormSource(e2024.source, e2024.url));
 }
 

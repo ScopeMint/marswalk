@@ -1,5 +1,5 @@
 {
-  "note": "Solar-storm facts for the Solar storms page (src/js/storms.js). Every number below was read from the linked NASA page or paper on 2026-11-15. Nothing here is estimated by us. Where the app combines two of these numbers, the page labels the result 'our calculation'.",
+  "note": "Solar-storm facts for the Solar storms page (src/js/storms.js). Every number below was read from the linked NASA page or paper on 2026-11-15. Nothing here is estimated by us. Where the app combines two of these numbers, the page labels the result 'our calculation'. The 'stat', 'statLabel' and 'cliffPercent' fields repeat a number from the sourced sentence in the same entry, for the big display numbers.",
   "events": [
     {
       "id": "2013-04",
@@ -8,7 +8,9 @@
       "measured": "Dose rate rose about 30% above the normal cosmic-ray level. The whole event added 0.025 mGy (25 μGy).",
       "meaning": "A small storm: Mars' thin air stopped most of it.",
       "source": "Hassler et al. (2014), Science 343(6169), 1244797",
-      "url": "https://doi.org/10.1126/science.1244797"
+      "url": "https://doi.org/10.1126/science.1244797",
+      "stat": "+30%",
+      "statLabel": "above the normal radiation level"
     },
     {
       "id": "2017-09",
@@ -22,7 +24,9 @@
       "peakFactorLow": 2,
       "peakFactorHigh": 3,
       "peakHours": 12,
-      "declineHours": 36
+      "declineHours": 36,
+      "stat": "2 to 3×",
+      "statLabel": "the normal radiation level, for about 12 hours"
     },
     {
       "id": "2024-05",
@@ -32,7 +36,9 @@
       "meaning": "Hassler: \"Cliffsides or lava tubes would provide additional shielding for an astronaut from such an event.\"",
       "source": "NASA/JPL, \"NASA Watches Mars Light Up During Epic Solar Storm\", 10 June 2024",
       "url": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/",
-      "doseMuGy": 8100
+      "doseMuGy": 8100,
+      "stat": "8,100 μGy",
+      "statLabel": "in one storm, the biggest RAD has measured"
     }
   ],
   "context": {
@@ -41,7 +47,8 @@
     "stormCountUrl": "https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/",
     "cliffShielding": "Parked at the foot of a cliff at Murray Buttes (9-21 Sept 2016), RAD measured 4% less radiation overall and 7.5% less neutral-particle radiation.",
     "cliffSource": "NASA/JPL, 15 Nov 2021; Ehresmann et al. (2021), JGR Planets, doi:10.1029/2021JE006851",
-    "cliffUrl": "https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/"
+    "cliffUrl": "https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/",
+    "cliffPercent": 4
   },
   "health": {
     "source": "NASA-STD-3001 Technical Brief OCHMO-TB-020 Rev E, \"Design for Ionizing Radiation Protection\" (27 Dec 2022)",
@@ -57,11 +64,35 @@
     "evaRule": "Real-time alert dosimetry gives a very high level of protection for EVAs if the EVA is ended within 2 hours and there is access to shielding."
   },
   "precautions": [
-    { "step": "Stop work and start back at once.", "why": "NASA: ending the EVA within 2 hours, with shielding to go to, gives a very high level of protection.", "source": "OCHMO-TB-020 Rev E" },
-    { "step": "Do not wait to see anything.", "why": "In May 2024 the charged particles reached Mars tens of minutes after the flare's light. A storm cannot be seen or felt.", "source": "NASA/JPL, 10 June 2024" },
-    { "step": "Go straight to the habitat's storm shelter.", "why": "NASA plans a shelter with about 10 cm of water (or similar material) added around crew quarters for a once-in-100-years storm.", "source": "OCHMO-TB-020 Rev E" },
-    { "step": "Too far from the habitat? Put rock between you and the sky.", "why": "Cliffsides or lava tubes give extra shielding (Hassler, 2024). The measured gain at the foot of one cliff was small: 4% (Curiosity, 2016). It is a stop-gap, not a shelter.", "source": "NASA/JPL, 10 June 2024 and 15 Nov 2021" },
-    { "step": "Read and report your dosimeter.", "why": "NASA requires personal dose monitoring, so the crew and Earth know what each person received.", "source": "NASA-STD-3001 Vol. 2 [V2 6101]" },
-    { "step": "Stay inside until monitoring gives the all-clear.", "why": "In September 2017 the high readings lasted more than two days. NASA requires real-time space-weather monitoring and crew alerts.", "source": "NASA/JPL, 29 Sept 2017; NASA-STD-3001 Vol. 2 [V2 6099, V2 6100]" }
+    {
+      "step": "Stop work and start back at once.",
+      "why": "NASA: ending the EVA within 2 hours, with shielding to go to, gives a very high level of protection.",
+      "source": "OCHMO-TB-020 Rev E"
+    },
+    {
+      "step": "Do not wait to see anything.",
+      "why": "In May 2024 the charged particles reached Mars tens of minutes after the flare's light. A storm cannot be seen or felt.",
+      "source": "NASA/JPL, 10 June 2024"
+    },
+    {
+      "step": "Go straight to the habitat's storm shelter.",
+      "why": "NASA plans a shelter with about 10 cm of water (or similar material) added around crew quarters for a once-in-100-years storm.",
+      "source": "OCHMO-TB-020 Rev E"
+    },
+    {
+      "step": "Too far from the habitat? Put rock between you and the sky.",
+      "why": "Cliffsides or lava tubes give extra shielding (Hassler, 2024). The measured gain at the foot of one cliff was small: 4% (Curiosity, 2016). It is a stop-gap, not a shelter.",
+      "source": "NASA/JPL, 10 June 2024 and 15 Nov 2021"
+    },
+    {
+      "step": "Read and report your dosimeter.",
+      "why": "NASA requires personal dose monitoring, so the crew and Earth know what each person received.",
+      "source": "NASA-STD-3001 Vol. 2 [V2 6101]"
+    },
+    {
+      "step": "Stay inside until monitoring gives the all-clear.",
+      "why": "In September 2017 the high readings lasted more than two days. NASA requires real-time space-weather monitoring and crew alerts.",
+      "source": "NASA/JPL, 29 Sept 2017; NASA-STD-3001 Vol. 2 [V2 6099, V2 6100]"
+    }
   ]
 }
