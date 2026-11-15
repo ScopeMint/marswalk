@@ -171,11 +171,13 @@ function initMarsClock() {
     const now = window.MARS_CLOCK.now();
     clock.querySelector('.mc-sol').textContent = 'SOL ' + now.mslSol;
     clock.querySelector('.mc-time').textContent = 'LMST ' + mcFormatHours(now.lmstHours);
-    clock.querySelector('.mc-season').textContent = 'Ls ' + Math.floor(now.lsDeg) + '° · N. ' + now.seasonName;
+    const _nIdx = MC_SEASONS.indexOf(now.seasonName);
+    const _sName = MC_SEASONS[(_nIdx + 2) % 4];
+    clock.querySelector('.mc-season').textContent = 'Ls ' + Math.floor(now.lsDeg) + '° · N. ' + now.seasonName + ' / S. ' + _sName;
     clock.querySelector('.mc-sun').textContent = now.sunElevationDeg > 0 ? '☀' : '☼';
     clock.classList.toggle('mc-day', now.sunElevationDeg > 0);
     clock.title = 'SOL: Curiosity mission sol, counted at landing-site mean midnight. ' +
-      'LMST: local mean solar time at the study site. Ls: areocentric solar longitude; N.: northern season. ' +
+      'LMST: local mean solar time at the study site. Ls: areocentric solar longitude; N.: northern season; S.: southern season (Gale Crater ~4.6°S). ' +
       'Sun: ' + (now.sunElevationDeg > 0 ? 'above' : 'below') + ' the geometric horizon. ' +
       'Mars24 (Allison & McEwen 2000); fixed TT−UTC 69.184 s. ' +
       'https://www.giss.nasa.gov/tools/mars24/help/algorithm.html';

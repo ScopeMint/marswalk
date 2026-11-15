@@ -131,7 +131,8 @@ function updateSummaryCard() {
     radLabel.textContent = 'Radiation est.';
     const radVal = document.createElement('span');
     radVal.className = 'sum-val sum-sourced';
-    radVal.textContent = rad.doseEstimateMuGy + ' μGy';
+    const _dose = rad.doseEstimateMuGy;
+    radVal.textContent = '~' + (_dose >= 100 ? Math.round(_dose / 10) * 10 : Math.round(_dose)) + ' μGy';
     radVal.title = rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
@@ -709,7 +710,7 @@ function _buildHowToUseModal() {
       heading: '⚙ EVA Controls (left panel, middle section)',
       items: [
         'Slope limit — the steepest angle (in degrees) the route is allowed to cross. Default 15°. Raise it to allow steeper paths; lower it for safer travel. 0° = flat only; 25° = very steep.',
-        'EVA length — how many hours your spacewalk lasts. Default 6 hours. The EVA used % bar in the summary card will update.',
+        'EVA length — how many hours the EVA lasts. Default 6 hours. The EVA used % bar in the summary card will update.',
         'Walking speed — how fast you walk on flat ground. Slow (2 km/h) = very careful; Normal (3 km/h) = default; Fast (4 km/h) = best case. Uphill and rough ground automatically slow you down.',
         'EVA start time — the local Mars time when you leave the habitat. This sets the temperature window shown in the temperature chart and the temperature range in the summary card.',
         'All controls are labeled [our assumption] because no official suited-EVA speed data exists for Mars yet.',

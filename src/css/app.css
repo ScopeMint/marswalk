@@ -146,8 +146,8 @@ body.hud-active .tour-caption { top: 120px; z-index: 2600; }
 /* ── First-visit welcome card (app.js) ── */
 .welcome {
   position: fixed; z-index: 4800; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  width: min(560px, 92vw); background: var(--bg); border: 1px solid var(--border); border-top: 3px solid var(--accent);
-  border-radius: 12px; padding: 22px 24px; color: var(--text); box-shadow: 0 30px 80px rgba(0,0,0,.65);
+  width: min(440px, 92vw); background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 4px; padding: 22px 24px; color: var(--text); box-shadow: 0 30px 80px rgba(0,0,0,.65);
 }
 .welcome-kicker { font: 700 11px system-ui; letter-spacing: .2em; color: var(--accent); }
 .welcome-title { font: 700 22px/1.25 system-ui; margin: 6px 0 12px; }
