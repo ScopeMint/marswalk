@@ -273,6 +273,8 @@ function buildLayerPanel() {
     { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisNight', label: 'THEMIS Night IR',       defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'sites',     label: 'Explored sites (9 NASA landings)', defaultOn: true, defaultOpacity: 1.00 },
+    { id: 'grid',      label: 'Coordinate grid (lat/lon)', defaultOn: false, defaultOpacity: 0.60 },
   ];
 
   panel.innerHTML = '';

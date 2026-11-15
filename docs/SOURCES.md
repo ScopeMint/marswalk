@@ -229,3 +229,26 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
 [CONFIRMED] Mars surface gravity 3.721 m/s^2: NASA Mars Fact Sheet https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
 [CONFIRMED] three.js r160 (MIT) — 3D terrain view, loaded from https://cdn.jsdelivr.net/npm/three@0.160.0/
 [CONFIRMED] Electron 33 (MIT) — desktop app shell; electron-builder (MIT) — Windows installer
+[CONFIRMED] Explored-sites layer: HiRISE photo patches for the 9 NASA landing sites (added Nov 14 evening)
+  Files: src/data/sites/*.jpg, src/data/landing-sites.json (made by scripts/10_build_landing_sites.py)
+  Imagery: NASA Mars Trek WMTS tiles, https://trek.nasa.gov/mars/ (HiRISE mosaics, Mars Reconnaissance Orbiter)
+  Tile URL: https://trek.nasa.gov/tiles/Mars/EQ/<product>/1.0.0//default/default028mm/{z}/{row}/{col}.png
+  Trek products used: PSP_001521_2025_RED (Viking 1), PSP_001501_2280_RED (Viking 2), sojourner_hirise_mosaic
+    (Mars Pathfinder), spirit_hirise_mosaic, opportunity_hirise_mosaic, phoenix_hirise_mosaic,
+    curiosity_hirise_mosaic, ESP_058005_1845_RED_spline_rect (InSight),
+    JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd (Perseverance / Jezero)
+  Credit: NASA/JPL-Caltech/University of Arizona (HiRISE); NASA/JPL-Caltech (Mars Trek). NASA media, no copyright claimed.
+  Shown at about 2 m/px (zoom 15 tiles resampled to 2048 px); source mosaics are 0.25 m/px.
+  Note: the working Trek URL needs "/1.0.0//" and the catalog product name; Trek was not down (earlier 404s were wrong layer names).
+[CONFIRMED] Landing coordinates: Viking 1, Viking 2, Mars Pathfinder
+  NASA/JPL Horizons observing-site list for Mars, https://ssd.jpl.nasa.gov/api/horizons.api (CENTER='*@499'), fetched Nov 14 2026
+  Values from Kuchynka et al. (2014), Icarus 229, 340-347, doi:10.1016/j.icarus.2013.11.015. Latitude = atan2(z, rho).
+[CONFIRMED, APPROXIMATE] Landing coordinates: Spirit, Opportunity, Phoenix, InSight; landing dates for all 9 sites
+  NASA GISS Mars24 lander list, https://www.giss.nasa.gov/tools/mars24/help/landers.html
+  Published to 0.01 degree (about 600 m on Mars): pins are labelled "approximate" in the app.
+[CONFIRMED] Landing coordinates: Curiosity, Perseverance
+  NASA/JPL-Caltech MMGIS waypoints (first waypoint): MSL_waypoints.json and
+  https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json
+  Check: every landing point falls inside the bounds of the NASA mosaic it is drawn on (script stops a site if not).
+[TO VERIFY] "Thomas Mutch / Gerald Soffen / Carl Sagan / Columbia / Challenger Memorial Station", "Bradbury Landing",
+  "Octavia E. Butler Landing" place names: taken from the NASA GISS Mars24 page above; team to re-read before submission.

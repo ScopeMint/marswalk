@@ -8,6 +8,8 @@ async function initApp() {
   initSearch();        // wires search bar to MARS_LOCATIONS
   initRouteWorker();   // creates the Web Worker (route-worker.js)
   initLayers();        // defines LAYER_CATALOG + SLOPE_LEGEND; adds imagery tiles to map
+  if (typeof initCoordinateGrid === 'function') initCoordinateGrid(STATE.map);  // lat/lon grid, off by default
+  if (typeof initLandingSites === 'function') initLandingSites(STATE.map);      // NASA landing sites (loads its own file)
   initUI();            // builds layer panel + EVA controls; wires top-bar buttons
   if (typeof initAppShell === 'function') initAppShell();       // install / offline / link status
   if (typeof initMarsClock === 'function') initMarsClock();     // live sol + LMST at the site
@@ -88,6 +90,9 @@ async function initApp() {
     const el = document.getElementById(id);
     if (el) el.addEventListener('wheel', e => e.stopPropagation(), { passive: false });
   });
+
+  // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
+  if (typeof initTidy === 'function') initTidy();
 
   console.log('[main] MarsWalk ready');
 }

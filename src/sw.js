@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v7';
+const CACHE_VERSION = 'marswalk-v8';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -18,15 +18,16 @@ const SHELL_FILES = [
   './', './index.html', './manifest.webmanifest',
   './css/styles.css', './css/hud.css', './css/marsclock.css', './css/app.css',
   './js/config.js', './js/state.js', './js/map.js', './js/search.js', './js/grid.js', './js/layers.js',
-  './js/site-layers.js', './js/route.js', './js/route-worker.js', './js/safety.js', './js/consumables.js', './js/hazards.js', './js/interact.js', './js/traverse.js',
+  './js/site-layers.js', './js/graticule.js', './js/landing-sites.js', './js/route.js', './js/route-worker.js', './js/safety.js', './js/consumables.js', './js/hazards.js', './js/interact.js', './js/traverse.js',
   './js/targets.js', './js/pov.js', './js/profile.js', './js/ui.js', './js/hud.js', './js/marsclock.js',
-  './js/brief.js', './js/tour.js', './js/terrain3d.js', './js/app.js', './js/main.js', './css/terrain3d.css',
+  './js/brief.js', './js/tour.js', './js/terrain3d.js', './js/app.js', './js/tidy.js', './css/tidy.css', './js/main.js', './css/terrain3d.css',
   './data/hirise-texture.jpg',
   './data/aoi.json', './data/elevation.bin', './data/slope.bin', './data/roughness.bin',
   './data/hillshade.png', './data/slope-overlay.png', './data/relief-overlay.png', './data/los-overlay.png',
   './data/rad-overlay.png', './data/themis-day.png', './data/themis-night.png',
   './data/targets.geojson', './data/curiosity-traverse.geojson', './data/pov-images.json',
   './data/rad-baseline.json', './data/rems-temps.json',
+  './data/landing-sites.json',   // site photos (./data/sites/*.jpg) are cached when first viewed, not up front
   './icons/icon-192.png', './icons/icon-512.png',
   './vendor/leaflet.css', './vendor/leaflet.js', './vendor/three.module.js'
 ];

@@ -1443,3 +1443,79 @@ body {
 .sum-val.sum-pass { color: var(--pass, #46C37B); }
 .modal-ref-list { padding-left: 20px; line-height: 1.6; }
 .modal-ref-list a { color: #3FD0C9; text-decoration: underline; word-break: break-word; }
+
+/* ── Coordinate grid (graticule.js) ── */
+.grid-label {
+  width: auto !important;
+  height: auto !important;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 14px;
+  color: #FFFFFF;
+  text-shadow: 0 0 3px #000, 0 0 3px #000, 0 1px 2px #000;
+  pointer-events: none;
+}
+.grid-label-lat { margin-left: 6px; margin-top: -15px; }  /* sits just above its line, at the left edge */
+.grid-label-lon { margin-left: 4px; margin-top: 3px; }    /* sits just right of its line, at the top edge */
+.grid-note {
+  background: rgba(15, 17, 21, 0.85);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+/* ── Explored NASA landing sites (landing-sites.js) ── */
+.site-pin, .site-box-label {
+  width: auto !important;
+  height: auto !important;
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 14px;
+}
+.site-pin::before {                 /* the dot that marks the landing point */
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7FB4FF;
+  border: 2px solid #0F1115;
+  box-shadow: 0 0 0 1px #7FB4FF;
+  cursor: pointer;
+}
+.site-pin span, .site-box-label span {
+  display: none;                    /* names appear only when zoomed in enough (classes set by landing-sites.js) */
+  background: rgba(15, 17, 21, 0.88);
+  color: #7FB4FF;
+  border: 1px solid #7FB4FF;
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+.site-pin span { margin-left: 10px; position: relative; top: -8px; cursor: pointer; }
+.sites-pin-labels .site-pin span { display: inline-block; }
+.sites-box-labels .site-box-label span { display: inline-block; font-weight: 700; letter-spacing: 0.04em; }
+.site-box-label { pointer-events: none; }
+.site-popup-wrap .leaflet-popup-content-wrapper,
+.site-popup-wrap .leaflet-popup-tip { background: #181B22; color: #E8E6E3; border: 1px solid #2A2F3A; }
+.site-popup { font-size: 12px; line-height: 1.45; }
+.site-popup-title { font-size: 15px; font-weight: 700; color: #7FB4FF; margin-bottom: 4px; }
+.site-popup-row { margin-bottom: 3px; }
+.site-popup-label { color: #A3A8B3; }
+.site-popup-btn {
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: transparent;
+  color: #7FB4FF;
+  border: 1px solid #7FB4FF;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.site-popup-btn:hover { background: rgba(127, 180, 255, 0.15); }

@@ -99,7 +99,7 @@
         "shortName": "Curiosity today",
         "kind": "Rover's latest reported position (sol 5073)",
         "why": "Meet the rover: inspect wheel wear, clean dust from instruments, or hand-pick the next drill target together. Humans and robots working as one team.",
-        "detail": "This is the most recent end-of-drive position NASA/JPL has published for Curiosity (sol 5073, about 38.6 km driven since landing). Its weather (REMS) and radiation (RAD) sensors measure the conditions used in this planner. The marker updates whenever the data script is re-run.",
+        "detail": "This is the most recent end-of-drive position NASA/JPL has published for Curiosity (sol 5073, about 38.3 km driven since landing). Its weather (REMS) and radiation (RAD) sensors measure the conditions used in this planner. The marker updates whenever the data script is re-run.",
         "findings": "Look for: bright bedrock plates and dark sand ripples (see photo); the rover's wheel tracks; buttes of upper Mount Sharp on the horizon.",
         "source": "NASA/JPL MMGIS waypoints (sol 5073, fetched Nov 14 2026)",
         "sol": 5073,

@@ -13,7 +13,9 @@ const STATE = {
     los:         null,   // line-of-sight communication shadow overlay
     rad:         null,   // relative radiation level overlay
     themisDay:   null,
-    themisNight: null
+    themisNight: null,
+    grid:        null,   // coordinate grid (lat/lon lines), built by graticule.js
+    sites:       null    // NASA landing sites: pins, borders, HiRISE photo patches (landing-sites.js)
   },
 
   /* Layer visibility and opacity for each layer */
@@ -29,7 +31,9 @@ const STATE = {
     walkback:   { visible: false, opacity: 0.70 },
     themisDay:  { visible: false, opacity: 0.70 },
     themisNight:{ visible: false, opacity: 0.70 },
-    minerals:   { visible: false, opacity: 0.70 }
+    minerals:   { visible: false, opacity: 0.70 },
+    grid:       { visible: false, opacity: 0.60 },  // coordinate grid (lat/lon lines + labels)
+    sites:      { visible: true,  opacity: 1.0 }    // explored NASA landing sites (bordered HiRISE patches)
   },
 
   /* Mission settings (driven by sliders/controls in left panel) */

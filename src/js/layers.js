@@ -17,6 +17,24 @@ const SLOPE_LEGEND = [
 /* Layer catalog — used by the right panel "i" info buttons */
 const LAYER_CATALOG = [
   {
+    id: 'sites',
+    name: 'Explored Sites (NASA landers and rovers)',
+    description: 'The 9 places where a NASA lander or rover has worked on the surface. Each has a blue border around a 4 km patch of sharp orbital imagery, so it is clear which parts of the map are explored and charted in detail. Zoom out to see all pins; click a pin for facts and sources.',
+    mission: 'Mars Reconnaissance Orbiter (imagery); Viking 1 and 2, Mars Pathfinder, Spirit, Opportunity, Phoenix, Curiosity, InSight, Perseverance (sites)',
+    instrument: 'HiRISE camera mosaics',
+    resolution: 'About 2 m/px as shown (0.25 m/px source)',
+    source: 'Imagery: NASA Mars Trek. Positions: NASA/JPL Horizons, NASA GISS Mars24, NASA/JPL MMGIS (see docs/SOURCES.md)'
+  },
+  {
+    id: 'grid',
+    name: 'Coordinate Grid (lat/lon)',
+    description: 'Latitude and longitude lines with labels, in the same coordinates as the map readout. Use it to check where targets and the study box really are. Spacing changes with zoom; the note at the bottom-left gives it in degrees and meters.',
+    mission: 'Not mission data (a map reference)',
+    instrument: 'Planetocentric latitude, east longitude, as used by NASA/JPL rover localization',
+    resolution: 'Adapts to zoom (0.0001 to 30 degrees)',
+    source: 'Our drawing. Meters per degree = pi x Mars radius / 180'
+  },
+  {
     id: 'hirise',
     name: 'HiRISE Imagery (25 cm)',
     description: 'Walking-scale orbital photo of the study area. Individual ridges, sand ripples and large rocks are visible.',
