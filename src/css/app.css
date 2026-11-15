@@ -1,0 +1,103 @@
+/* app.css — App shell (boot screen, install/offline controls), suit & crew bars, EVA cue card, print layout.
+   Colors follow the palette at the top of styles.css. */
+
+/* ── Boot sequence ─────────────────────────────────────────────────────── */
+.boot {
+  position: fixed; inset: 0; z-index: 5000; display: grid; place-items: center;
+  background: radial-gradient(ellipse at 50% 40%, #1a1214 0%, #0F1115 60%);
+  color: #E8E6E3; transition: opacity .45s ease;
+}
+.boot-out { opacity: 0; pointer-events: none; }
+.boot-inner { width: min(560px, 92vw); }
+.boot-logo { width: 72px; height: 72px; border-radius: 16px; display: block; margin-bottom: 14px; }
+.boot-title { font: 800 30px/1.1 system-ui, sans-serif; letter-spacing: .14em; }
+.boot-title span { color: #D9622B; font-weight: 600; font-size: 15px; letter-spacing: .3em; margin-left: 8px; }
+.boot-sub { color: #A3A8B3; font-size: 13px; margin: 6px 0 22px; letter-spacing: .04em; }
+.boot-steps { list-style: none; padding: 0; margin: 0 0 18px; font: 13px/1.9 ui-monospace, Consolas, monospace; }
+.boot-steps li { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; color: #6b7280; transition: color .25s; }
+.boot-steps li.ok { color: #E8E6E3; }
+.boot-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #4b5563; }
+.boot-steps li.ok .boot-dot { background: #46C37B; border-color: #46C37B; box-shadow: 0 0 8px #46C37B; }
+.boot-detail { color: #3FD0C9; font-size: 12px; }
+.boot-bar { height: 3px; background: #2A2F3A; border-radius: 2px; overflow: hidden; }
+.boot-fill { height: 100%; width: 0; background: linear-gradient(90deg, #D9622B, #3FD0C9); transition: width .3s ease; }
+.boot-skip { margin-top: 16px; background: transparent; color: #A3A8B3; border: 1px solid #2A2F3A; border-radius: 6px; padding: 6px 14px; cursor: pointer; }
+.boot-skip:hover { color: #E8E6E3; border-color: #3FD0C9; }
+@media (prefers-reduced-motion: reduce) { .boot, .boot-fill, .boot-steps li { transition: none; } }
+
+/* ── App actions in the top bar ────────────────────────────────────────── */
+.app-actions { display: flex; align-items: center; gap: 8px; margin-right: 8px; }
+.link-pill {
+  font: 600 10.5px/1 ui-monospace, Consolas, monospace; letter-spacing: .08em; color: #46C37B;
+  border: 1px solid rgba(70, 195, 123, .45); border-radius: 999px; padding: 6px 10px; white-space: nowrap;
+}
+.link-pill.link-off { color: #F2B134; border-color: rgba(242, 177, 52, .5); }
+.app-btn {
+  background: #1d2129; color: #E8E6E3; border: 1px solid #3a4150; border-radius: 6px;
+  padding: 6px 10px; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+}
+.app-btn:hover:not(:disabled) { border-color: #3FD0C9; color: #3FD0C9; }
+.app-btn:disabled { opacity: .7; cursor: default; }
+
+/* ── Suit & crew block in the route card ───────────────────────────────── */
+.cons-block { margin: 10px 0 8px; padding-top: 10px; border-top: 1px solid #2A2F3A; }
+.cons-heading { font: 700 10.5px/1.2 system-ui, sans-serif; letter-spacing: .12em; color: #A3A8B3; margin-bottom: 6px; cursor: help; }
+.cons-stats { display: grid; grid-template-columns: 1fr; gap: 2px; margin-bottom: 6px; }
+.cons-stat { display: flex; justify-content: space-between; font-size: 12px; color: #A3A8B3; }
+.cons-stat b { font: 600 12.5px ui-monospace, Consolas, monospace; color: #E8E6E3; }
+.cons-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; margin: 5px 0; cursor: help; }
+.cons-label { font-size: 12px; color: #A3A8B3; }
+.cons-val { font: 600 12px ui-monospace, Consolas, monospace; text-align: right; }
+.cons-pass { color: #46C37B; } .cons-caution { color: #F2B134; } .cons-danger { color: #E5484D; }
+.cons-bar { grid-column: 1 / -1; height: 5px; background: #2A2F3A; border-radius: 3px; overflow: hidden; }
+.cons-fill { height: 100%; border-radius: 3px; }
+.cons-fill-pass { background: #46C37B; } .cons-fill-caution { background: #F2B134; } .cons-fill-danger { background: #E5484D; }
+.cons-note { font-size: 10.5px; color: #8b919c; margin-top: 6px; line-height: 1.4; }
+
+/* ── EVA cue card ──────────────────────────────────────────────────────── */
+.brief-modal { position: fixed; inset: 0; z-index: 4000; background: rgba(5, 7, 10, .78); display: grid; place-items: center; padding: 16px; }
+.brief-box { background: #12151b; border: 1px solid #2A2F3A; border-radius: 12px; width: min(1040px, 100%); max-height: 92vh; overflow: auto; padding: 18px 22px; box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+.brief-tools { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 6px; }
+.brief-tools button { background: #1d2129; color: #E8E6E3; border: 1px solid #3a4150; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+.brief-tools button:hover { border-color: #3FD0C9; }
+.brief { color: #E8E6E3; }
+.brief-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 2px solid #D9622B; padding-bottom: 10px; margin-bottom: 12px; }
+.brief-kicker { font: 700 11px system-ui; letter-spacing: .2em; color: #D9622B; }
+.brief-title { font: 700 22px/1.2 system-ui; margin: 4px 0; }
+.brief-sub { font-size: 12.5px; color: #A3A8B3; }
+.brief-badge { font: 800 22px ui-monospace, Consolas, monospace; letter-spacing: .1em; padding: 8px 16px; border-radius: 8px; border: 2px solid; }
+.brief-go { color: #46C37B; border-color: #46C37B; } .brief-nogo { color: #E5484D; border-color: #E5484D; }
+.brief-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.brief-table th { text-align: left; font: 700 10.5px system-ui; letter-spacing: .12em; color: #A3A8B3; border-bottom: 1px solid #2A2F3A; padding: 6px; }
+.brief-table td { padding: 7px 6px; border-bottom: 1px solid #20242c; vertical-align: top; }
+.brief-table td:nth-child(1), .brief-table td:nth-child(2), .brief-table td:nth-child(5) { font-family: ui-monospace, Consolas, monospace; white-space: nowrap; color: #3FD0C9; }
+.brief-ev { font-weight: 700; white-space: nowrap; }
+.brief-turn { margin: 12px 0; padding: 10px 12px; border-left: 4px solid #F2B134; background: rgba(242,177,52,.08); font-size: 13px; }
+.brief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.brief-h { font: 700 11px system-ui; letter-spacing: .16em; color: #A3A8B3; margin-bottom: 6px; }
+.brief-ok { color: #46C37B; font-size: 13px; margin: 3px 0; } .brief-bad { color: #E5484D; font-size: 13px; margin: 3px 0; }
+.brief-num { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; border-bottom: 1px dotted #2A2F3A; }
+.brief-num b { font-family: ui-monospace, Consolas, monospace; }
+.brief-foot { margin-top: 14px; font-size: 10.5px; color: #8b919c; }
+.brief-empty { color: #A3A8B3; }
+@media (max-width: 720px) { .brief-grid { grid-template-columns: 1fr; } }
+
+/* ── Print: only the cue card, black on white ──────────────────────────── */
+@media print {
+  body > *:not(#brief-modal) { display: none !important; }
+  .brief-modal { position: static; background: none; padding: 0; }
+  .brief-box { box-shadow: none; border: none; max-height: none; background: #fff; }
+  .brief-tools { display: none; }
+  .brief, .brief-table td, .brief-num b { color: #000 !important; }
+  .brief-sub, .brief-h, .brief-table th, .brief-foot { color: #444 !important; }
+  .brief-turn { background: #fff4d6; }
+}
+
+/* ── Header layout as an app bar (overrides styles.css; keeps one row at 1280px+) ── */
+#top-bar { gap: 10px; }
+#top-bar .tagline { display: none; }
+#top-bar .mission-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #A3A8B3; font-weight: 500; }
+#top-bar button { white-space: nowrap; padding: 6px 10px; }
+#top-bar #btn-brief, #top-bar #hud-toggle, #top-bar button.hud-toggle { color: #3FD0C9; border-color: rgba(63,208,201,.55); font-weight: 600; }
+@media (max-width: 1360px) { #top-bar .link-pill { display: none; } }
+@media (max-width: 1220px) { #top-bar .app-btn { display: none; } #top-bar .mission-title { display: none; } }

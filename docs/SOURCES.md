@@ -222,3 +222,8 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
   Other 2026 team repos looked at for scope comparison only:
     https://github.com/AhsanulHoque22/Nasa-Space-Apps-Challenge-2026-Team-Protikriti
     https://github.com/pollob-kumar/nasa-space-apps-martian-map
+
+[CONFIRMED] Mars clock: Allison, M. & McEwen, M. (2000), Planet. Space Sci. 48, 215-235; NASA GISS Mars24 algorithm https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
+[CONFIRMED] Walking energy: Pandolf, K. B., Givoni, B. & Goldman, R. F. (1977), Predicting energy expenditure with loads while standing or walking very slowly, J. Appl. Physiol. 43(4), 577-581
+[CONFIRMED] Oxygen energy equivalent: Weir, J. B. de V. (1949), New methods for calculating metabolic rate with special reference to protein metabolism, J. Physiol. 109, 1-9
+[CONFIRMED] Mars surface gravity 3.721 m/s^2: NASA Mars Fact Sheet https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html

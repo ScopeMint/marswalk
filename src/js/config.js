@@ -107,6 +107,25 @@ const CONFIG = {
     sourceLabel: 'Hassler et al. (2014), Science 343(6169)'
   },
 
+  /* Suit & crew model (consumables.js). Walking energy: Pandolf et al. (1977). O2 equivalent: Weir (1949).
+     Suit capacities are EMU-class PLANNING values — OUR ASSUMPTION, not a specific flight suit spec. */
+  suit: {
+    crewSize:            2,     // buddy rule: astronauts never walk alone [OUR ASSUMPTION]
+    bodyMassKg:          75,    // astronaut body mass [OUR ASSUMPTION]
+    backpackMassKg:      45,    // life-support backpack carried on the back (pressure garment cost is in suitMobilityFactor) [OUR ASSUMPTION]
+    toolMassKg:          15,    // sample bags, hammer, drill, camera [OUR ASSUMPTION]
+    terrainFactor:       1.2,   // Pandolf terrain coefficient for rough unpaved ground (1.0 = treadmill) [OUR ASSUMPTION]
+    suitMobilityFactor:  1.3,   // extra effort to bend a pressurized suit at the joints [OUR ASSUMPTION]
+    scienceWorkWatts:    300,   // metabolic rate while sampling at the target [OUR ASSUMPTION]
+    mechanicalEfficiency:0.15,  // share of metabolic energy that becomes work, not heat [OUR ASSUMPTION]
+    sublimatorShare:     0.8,   // share of heat rejected by water sublimation [OUR ASSUMPTION]
+    o2CapacityKg:        0.54,  // primary O2 supply (~1.2 lb, EMU-class) [OUR ASSUMPTION]
+    o2LeakKgPerHour:     0.005, // suit leakage allowance [OUR ASSUMPTION]
+    co2CapacityKg:       1.2,   // CO2 scrubber capacity [OUR ASSUMPTION]
+    feedwaterCapacityKg: 4.5,   // cooling feedwater (~10 lb, EMU-class) [OUR ASSUMPTION]
+    cautionFraction:     0.75   // amber above 75% of capacity (keeps a 25% reserve, same as EVA time rule)
+  },
+
   /* UI behavior */
   ui: {
     debounceMs:       250,  // slider debounce before recalculating

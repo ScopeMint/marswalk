@@ -9,6 +9,10 @@ async function initApp() {
   initRouteWorker();   // creates the Web Worker (route-worker.js)
   initLayers();        // defines LAYER_CATALOG + SLOPE_LEGEND; adds imagery tiles to map
   initUI();            // builds layer panel + EVA controls; wires top-bar buttons
+  if (typeof initAppShell === 'function') initAppShell();       // install / offline / link status
+  if (typeof initMarsClock === 'function') initMarsClock();     // live sol + LMST at the site
+  if (typeof initConsumables === 'function') initConsumables(); // suit & crew section in route card
+  if (typeof initBrief === 'function') initBrief();             // EVA cue card button
 
   // Place habitat marker immediately using CONFIG fallback — grids may not be loaded yet.
   // This ensures the EVA Base is always visible on first load, even on slow connections.
