@@ -173,17 +173,15 @@ function drawRouteLine(cells) {
     opacity:     0.9,
     smoothFactor: 1.5,
     interactive: false,
-    renderer:    STATE.routeRenderer  // keeps route above tiles during zoom animation
+    pane:        'routePane',
+    renderer:    STATE.routeRenderer  // SVG renderer in routePane (z-index 580, above all imagery)
   }).addTo(STATE.map);
 }
 
 /* Zooms/pans so the whole route is visible beside the route card (right) and below any caption (top).
    Skipped while the visor HUD is open (it follows the walker itself). */
-function fitRouteInView(latlngs) {
-  if (!STATE.map || !latlngs || latlngs.length < 2 || document.body.classList.contains('hud-active')) return;
-  const card = document.getElementById('summary-card');
-  const cardW = Math.max(card ? card.offsetWidth : 0, 280) + 24;   // card may not be drawn yet on the first route
-  STATE.map.flyToBounds(latlngs, { paddingTopLeft: [40, 40], paddingBottomRight: [cardW, 40], maxZoom: 16, duration: 0.8 });
+function fitRouteInView(_latlngs) {
+  // Zoom is locked while a route is active — no auto-pan so the global view is preserved.
 }
 
 function clearRouteLine() {

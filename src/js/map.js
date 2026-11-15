@@ -144,6 +144,26 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
+  // While a route is active the zoom is locked (setMaxZoom = current zoom).
+  // Show a message if the user tries to scroll in or hits the + button.
+  const _msg = () => {
+    if (STATE.selectedTarget && typeof showMapMessage === 'function') {
+      showMapMessage('Stop the current route first to zoom into the terrain.');
+    }
+  };
+  map.getContainer().addEventListener('wheel', e => {
+    if (STATE.selectedTarget && e.deltaY < 0) _msg();
+  }, { passive: true });
+  map.on('zoomend', () => {
+    // If zoom was capped and user tried to go higher, the zoom won't have changed —
+    // the wheel event already fired the message above.
+  });
+  // Also catch the Leaflet + button
+  setTimeout(() => {
+    const zoomIn = document.querySelector('.leaflet-control-zoom-in');
+    if (zoomIn) zoomIn.addEventListener('click', () => { if (STATE.selectedTarget) _msg(); });
+  }, 500);
+
   // Wire the "Return to study area" button
   const galeBtn = document.getElementById('btn-goto-gale');
   if (galeBtn) {

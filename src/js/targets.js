@@ -98,10 +98,9 @@ function selectTarget(feature) {
   const [lon, lat] = feature.geometry.coordinates;
   STATE.selectedTarget = feature;
 
-  // Fly to target on the map
-  if (STATE.map) {
-    STATE.map.flyTo([lat, lon], Math.max(STATE.map.getZoom(), 14), { duration: 0.8 });
-  }
+  // Lock zoom at the current level while this route is active.
+  // The user must stop the route before zooming into the terrain.
+  if (STATE.map) STATE.map.setMaxZoom(STATE.map.getZoom());
 
   // Highlight the active target card
   document.querySelectorAll('.target-card').forEach(card => {
