@@ -97,7 +97,8 @@ three.js r160 (MIT) — 3D terrain view. Self-hosted copy in src/vendor/. https:
 Electron 33 (MIT) + electron-builder (MIT) — Windows desktop app shell (desktop/).
 Python: numpy, scipy, rasterio, Pillow — data pipeline (scripts/).
 USGS Astrogeology STAC API — data discovery. https://stac.astrogeology.usgs.gov/api/
-(ui-polish branch: add any font, icon set or 3D model here with its license.)
+IBM Plex Sans (SIL Open Font License 1.1) — UI font, self-hosted in src/vendor/fonts/ (static Latin-1 woff2,
+  weights 400/500/600/700 + italic), from the official IBM Plex GitHub release https://github.com/IBM/plex
 
 ===========================================================================
 4. RESEARCH / INSPIRATION (read during planning, nothing copied)

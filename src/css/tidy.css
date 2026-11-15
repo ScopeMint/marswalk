@@ -25,8 +25,8 @@ body.tidy #top-bar #btn-brief,
 body.tidy #top-bar .t3d-toggle,
 body.tidy #top-bar .hud-toggle {
   color: var(--text);
-  border-color: #3a4150;
-  background: #1d2129;
+  border-color: var(--border);
+  background: var(--panel);
   font-weight: 500;
 }
 body.tidy #top-bar #btn-brief:hover,
@@ -34,7 +34,7 @@ body.tidy #top-bar .t3d-toggle:hover,
 body.tidy #top-bar .hud-toggle:hover { color: var(--route); border-color: var(--route); }
 
 body.tidy .tidy-menu { position: relative; }
-body.tidy #top-bar #btn-menu { color: var(--text); border-color: #3a4150; background: #1d2129; }
+body.tidy #top-bar #btn-menu { color: var(--text); border-color: var(--border); background: var(--panel); }
 body.tidy .tidy-menu-list {
   position: absolute;
   right: 0;
@@ -64,7 +64,7 @@ body.tidy #top-bar .tidy-menu-list button {
   font-size: 13px;
   font-weight: 400;
 }
-body.tidy #top-bar .tidy-menu-list button:hover:not(:disabled) { background: #232834; color: var(--route); }
+body.tidy #top-bar .tidy-menu-list button:hover:not(:disabled) { background: #201d1b; color: var(--route); }
 
 /* ── Left panel: tabs ── */
 body.tidy #left-panel { padding: 0; display: flex; flex-direction: column; }
@@ -104,7 +104,7 @@ body.tidy .tidy-target-line {
   gap: 8px;
   margin: 8px 0 10px;
   padding: 8px 10px;
-  background: #1d2129;
+  background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 6px;
 }
@@ -158,7 +158,7 @@ body.tidy .tidy-count {
   min-width: 20px;
   padding: 1px 6px;
   border-radius: 999px;
-  background: #232834;
+  background: #201d1b;
   color: var(--muted);
   font: 600 10.5px var(--mono, monospace);
   text-align: center;
@@ -171,7 +171,7 @@ body.tidy .tidy-section[open] > .tidy-hint { display: block; }
 
 /* Our own targets stand out from the reference groups */
 body.tidy .tidy-group-ours > summary .tidy-section-title { color: var(--accent); }
-body.tidy .tidy-group-ours > summary .tidy-count { background: rgba(217, 98, 43, 0.18); color: var(--accent); }
+body.tidy .tidy-group-ours > summary .tidy-count { background: rgba(176, 125, 74, 0.18); color: var(--accent); }
 
 /* Nested terrain groups inside the library */
 body.tidy .tidy-sub { border-top: 0; margin-left: 4px; }
@@ -197,7 +197,7 @@ body.tidy .tidy-site-row {
   margin-bottom: 4px;
   padding: 8px 10px;
   text-align: left;
-  background: #1d2129;
+  background: var(--panel);
   border: 1px solid var(--border);
   border-left: 3px solid #7FB4FF;
   border-radius: 5px;
@@ -225,5 +225,5 @@ body.tidy .tidy-layer-title:first-of-type { margin-top: 4px; }
 body.tidy #layer-panel-content .layer-row:not(:has(input:checked)) + .layer-opacity-row { display: none; }
 
 /* 3D button: terrain3d.css forces teal with !important; match the other view buttons unless it is switched on */
-body.tidy #top-bar .t3d-toggle:not(.active):not([aria-pressed="true"]) { color: var(--text) !important; border-color: #3a4150 !important; }
+body.tidy #top-bar .t3d-toggle:not(.active):not([aria-pressed="true"]) { color: var(--text) !important; border-color: var(--border) !important; }
 body.tidy #top-bar .t3d-toggle:not(.active):not([aria-pressed="true"]):hover { color: var(--route) !important; border-color: var(--route) !important; }

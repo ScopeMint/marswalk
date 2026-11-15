@@ -95,6 +95,11 @@ async function initApp() {
   // LAST: tidy the layout (tabs, grouped locations, top-bar menu). Must run after every other init.
   if (typeof initTidy === 'function') initTidy();
 
+  // Auto-route the first science target so the example mission is immediately visible on load.
+  if (!STATE.selectedTarget && typeof selectTarget === 'function') {
+    setTimeout(() => selectTarget(0), 900);
+  }
+
   console.log('[main] MarsWalk ready');
 }
 

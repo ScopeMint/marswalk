@@ -66,7 +66,7 @@ function rcArrange() {
   const verdict = document.createElement('div');
   const kind = usedPct > 90 ? 'fail' : usedPct > 75 ? 'caution' : 'pass';
   verdict.className = 'rc-verdict ' + kind;
-  verdict.textContent = (kind === 'pass' ? '✓ Fits your ' : kind === 'caution' ? '⚠ Tight for your ' : '✕ Too long for your ') + STATE.evaHours + ' h spacewalk';
+  verdict.textContent = (kind === 'pass' ? '✓ Fits your ' : kind === 'caution' ? '⚠ Tight for your ' : '✕ Too long for your ') + STATE.evaHours + ' h EVA';
   const sub = document.createElement('small');
   sub.textContent = 'Airlock (' + (CONFIG.eva.egressMinutes + CONFIG.eva.ingressMinutes) + ' min), walking and ' + CONFIG.eva.workMinutes + ' min of work at the target use ' + (Number.isFinite(usedPct) ? usedPct : '—') + '% of your time.';
   verdict.appendChild(sub);

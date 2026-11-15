@@ -153,5 +153,17 @@ function initAppShell() {
   });
 }
 
+/* Small-screen notice: dismiss button hides the overlay for this session. */
+(function () {
+  const dismiss = () => {
+    const el = document.getElementById('small-screen-notice');
+    if (el) el.style.display = 'none';
+  };
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-small-screen-dismiss');
+    if (btn) btn.addEventListener('click', dismiss);
+  });
+}());
+
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootStart);
 else bootStart();

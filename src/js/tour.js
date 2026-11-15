@@ -5,7 +5,7 @@
    Depends on: STATE, CONFIG, selectTarget, toggleLayer, showBrief (brief.js), hud.js (hud-toggle button). */
 
 const TOUR_VIDEO = /[?&]video=1/.test(location.search);   // 30-second demo-video cut (open index.html?video=1)
-const TOUR_STEP_MS = TOUR_VIDEO ? 3600 : 5200;   // time each caption stays up
+const TOUR_STEP_MS = TOUR_VIDEO ? 3600 : 4800;   // time each caption stays up (~45 s total)
 const TOUR_LOG = [];                 // {tMs, main, small} for building video subtitles
 const TOUR_TARGET_INDEX = 1;         // Monte Grande hollow / Nevado Sajama ridge (Curiosity's drill pair)
 
