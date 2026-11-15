@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v6';
+const CACHE_VERSION = 'marswalk-v7';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -28,8 +28,7 @@ const SHELL_FILES = [
   './data/targets.geojson', './data/curiosity-traverse.geojson', './data/pov-images.json',
   './data/rad-baseline.json', './data/rems-temps.json',
   './icons/icon-192.png', './icons/icon-512.png',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  './vendor/leaflet.css', './vendor/leaflet.js', './vendor/three.module.js'
 ];
 
 /* Install: store the app shell. Missing optional files do not break the install. */

@@ -1,5 +1,5 @@
 /* Standalone classic script: only initTerrain3D is public; Three loads on first open. */
-const T3D_MODULE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'; // Pinned, no imports.
+const T3D_MODULE_URL = new URL('./vendor/three.module.js', document.baseURI).href; // three.js r160 (MIT), bundled locally for offline use
 const T3D_VERTICES = 200; // 2x2 mean of the 400x400 input; approximately 20 m spacing.
 const T3D_POLL_MS = 500; // Check live mission changes only while open.
 const T3D_CLEARANCE_METERS = 2, T3D_FLIGHT_METERS = 25; // Display offsets, not terrain measurements.

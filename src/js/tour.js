@@ -60,7 +60,7 @@ async function runTour() {
 
   try {
     // Pre-load three.js now so the 3D step starts instantly later (module cache)
-    import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js').catch(() => null);
+    import(new URL('./vendor/three.module.js', document.baseURI).href).catch(() => null);
     if (STATE.map) map.setView([c.centerLat, c.centerLon], CONFIG.studyArea.defaultZoom - 2, { animate: false });
     tourCaption('Today\'s Mars maps are global. Astronauts will walk a few kilometres.', 'Gale Crater, Mars · global basemap: NASA Viking + MOLA');
     if (!(await tourWait(TOUR_STEP_MS))) return;

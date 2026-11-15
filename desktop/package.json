@@ -1,0 +1,52 @@
+{
+  "name": "marswalk-desktop",
+  "productName": "MarsWalk",
+  "version": "1.0.0",
+  "description": "MarsWalk EVA planner — desktop app (offline). NASA Space Apps 2026, Dark Matter Devs.",
+  "author": "Dark Matter Devs",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "copy-app": "node copy-app.js",
+    "start": "npm run copy-app && electron .",
+    "dist": "npm run copy-app && electron-builder --win portable nsis"
+  },
+  "build": {
+    "appId": "org.darkmatterdevs.marswalk",
+    "productName": "MarsWalk",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "app-src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "portable",
+        "nsis"
+      ]
+    },
+    "portable": {
+      "artifactName": "MarsWalk-${version}-portable.exe"
+    },
+    "nsis": {
+      "artifactName": "MarsWalk-${version}-setup.exe",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "MarsWalk"
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "allowScripts": {
+    "electron@33.2.1": true
+  }
+}
