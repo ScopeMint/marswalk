@@ -118,9 +118,9 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    center:  [0, 137],   // near Mars center longitude, equator — wide starting view
-    zoom:    2,          // fully zoomed out — user sees all of Mars before flying in
-    minZoom: 2,
+    center:  [-5, 137],  // near Gale Crater longitude — wide starting view
+    zoom:    1,          // fully zoomed out — user sees all of Mars before flying in
+    minZoom: 1,
     maxZoom: 18,
     worldCopyJump:       false,
     maxBounds:           [[-90, -185], [90, 185]],
@@ -153,10 +153,18 @@ function initMap() {
     });
   }
 
-  // Fly in to Gale Crater slowly — user sees all of Mars before zooming to the study area
+  // Mark intro as in-flight so overlays stay hidden until we land
+  STATE.introFlying = true;
+
+  // Fly in to Gale Crater slowly — 2.5 s pause then 16 s cinematic zoom
   setTimeout(() => {
-    map.flyTo([centerLat, centerLon], defaultZoom, { duration: 12 });
-  }, 1800);
+    map.flyTo([centerLat, centerLon], defaultZoom, { duration: 16 });
+    // Once the animation lands (or the user interrupts it), reveal the overlays
+    map.once('moveend', () => {
+      STATE.introFlying = false;
+      document.dispatchEvent(new Event('marsIntroLanded'));
+    });
+  }, 2500);
 
   // routePane: the main teal route line. hazardPane sits one level above it so hazard
   // colour segments always render on top of the route — both are above tile layers (z 200).
