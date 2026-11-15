@@ -30,6 +30,15 @@ const WALK_CORRIDOR_MARGIN_M = 140, WALK_CORRIDOR_MAX_PX = 4096;
 const WALK_SKY_HORIZON = '#d9b48c', WALK_SKY_ZENITH = '#9a7b5e';  // dusty tan sky [OUR ASSUMPTION]
 const WALK_DETAIL_PHOTO = './data/pov/pov-3-nevado-sajama.jpg';   // Curiosity Mastcam, sol 4711
 const WALK_DEG = Math.PI / 180;
+/* EVA base camp (walkCamp). Only the habitat floor area and the mast height come from sources;
+   every other size is OUR ASSUMPTION and the camp is labelled a concept on screen. */
+const CAMP_HAB_LENGTH_M = 17.5, CAMP_HAB_WIDTH_M = 9;   // 17.5 x 9 = 157.5 m2 = NASA's 1,700 sq ft Mars Dune Alpha (CHAPEA) habitat
+const CAMP_MAST_M = 10;                                  // same 10 m mast the Communication zones layer assumes
+const CAMP_BEHIND_M = 22, CAMP_SIDE_M = 7;               // habitat sits behind and beside the route start [OUR ASSUMPTION]
+const CAMP_PAD_RADIUS_M = 15;                            // no rock bumps within this distance of the habitat [OUR ASSUMPTION]
+const CAMP_PAD_LONG_M = 12.5, CAMP_PAD_SHORT_M = 7;      // levelled terrace under the habitat (half-lengths) [OUR ASSUMPTION]
+const CAMP_ROVER_L = 3.0, CAMP_ROVER_W = 2.7, CAMP_ROVER_H = 2.2;   // Curiosity's size: about 10 x 9 x 7 ft (NASA)
+const CAMP_ROVER_LOOP_M = 34, CAMP_ROVER_MPS = 0.7;      // rover drives a slow loop around the camp [ILLUSTRATIVE]
 let _walk = null;
 
 /* ── Small math helpers ─────────────────────────────────────────────────── */
@@ -68,7 +77,9 @@ function walkBump(x, z) {
   const rough = walkGrid(STATE.grids.roughness, x, z);
   const amp = walkClamp(rough * 2.5, 0.03, 1.1);
   const n = 0.65 * walkNoise(x / 3.2, z / 3.2) + 0.35 * walkNoise(x / 1.1 + 17, z / 1.1 - 9);
-  return amp * walkSmooth(0.35, 1, n);
+  const camp = _walk.camp;                                  // the camp stands on levelled ground: no rocks on the pad
+  const pad = camp ? walkSmooth(CAMP_PAD_RADIUS_M * 0.8, CAMP_PAD_RADIUS_M * 1.6, Math.hypot(x - camp.x, z - camp.z)) : 1;
+  return amp * walkSmooth(0.35, 1, n) * pad;
 }
 
 /* ── Open / close ───────────────────────────────────────────────────────── */
@@ -89,9 +100,9 @@ function initWalk3D() {
     </header>
     <div class="walk-compass" aria-hidden="true"><div class="walk-compass-strip" data-w="compass"></div><b>▼</b></div>
     <div class="walk-readouts">
-      <div><label>Walked</label><output data-w="walked">0 m</output></div>
+      <div><label>Distance</label><output data-w="walked">—</output></div>
       <div><label>To target</label><output data-w="togo">—</output></div>
-      <div><label>EVA clock</label><output data-w="clock">0:00</output></div>
+      <div><label>One-way time</label><output data-w="clock">—</output></div>
       <div><label>Slope here</label><output data-w="slope">—</output></div>
       <div><label>Elevation</label><output data-w="elev">—</output></div>
       <div><label>Heading</label><output data-w="heading">—</output></div>
@@ -109,8 +120,8 @@ function initWalk3D() {
       <span class="walk-help">Drag: look around · W A S D / arrows: explore freely · Space: pause</span>
     </footer>
     <p class="walk-note">Real: HiRISE terrain shape (no exaggeration), HiRISE image, colours and near-ground texture from
-      Curiosity Mastcam (sol 4711), rockiness from measured 1 m relief. Illustrative: exact rock positions, sky colour,
-      sun path, haze distance.</p>`;
+      Curiosity Mastcam (sol 4711), rockiness from measured 1 m relief. Distance, time, elevation = the planner's route numbers. Illustrative: exact rock
+      positions, sky, sun path, haze, base camp layout (habitat floor area: NASA Mars Dune Alpha) and the rover's loop.</p>`;
   document.body.appendChild(root);
   const el = {};
   root.querySelectorAll('[data-w]').forEach(n => { el[n.dataset.w] = n; });
@@ -212,11 +223,15 @@ function walkBuild() {
   w.scene.add(new T.HemisphereLight('#f0d9bd', '#7a5a3c', 1.25));
   w.sun = new T.DirectionalLight('#fff0d8', 2.4); w.scene.add(w.sun);
 
-  walkPath(); walkMarkers(); walkCorridor(); walkLook(canvas);
+  walkPath(); walkCamp(); walkMarkers(); walkCorridor(); walkLook(canvas);
 
   // Start state
   w.mode = 'route'; w.distM = 0; w.elapsedS = 0; w.lookYaw = 0; w.lookPitch = 0; w.yaw = null; w.eyeY = null;
-  w.lapse = Number(w.el.speed.value); w.lastMs = null; w.bobT = 0; w.lastDragMs = 0;
+  w.lapse = Number(w.el.speed.value); w.lastMs = null; w.bobT = 0;
+  // Open with a look back at the base camp; the view then turns to the route by itself
+  let back = Math.atan2(w.camp.x - w.camp.startX, -(w.camp.z - w.camp.startZ)) - Math.atan2(w.camp.dirX, -w.camp.dirZ);
+  while (back > Math.PI) back -= 2 * Math.PI; while (back < -Math.PI) back += 2 * Math.PI;
+  w.lookYaw = back; w.lastDragMs = performance.now() - 1200;
   w.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   w.paused = w.reduced; w.el.play.textContent = w.paused ? 'Play' : 'Pause';
   w.el.route.hidden = true; w.el.scrub.value = 0;
@@ -374,16 +389,26 @@ function walkSky() {
 function walkPath() {
   const w = _walk, T = w.T, a = w.aoi, pts = [];
   STATE.route.cells.forEach((cell, i) => {
-    if (i % 2 && i !== STATE.route.cells.length - 1) return;           // every 2nd cell: removes grid zig-zag
     pts.push(new T.Vector3(((cell.col + 0.5) / a.width - 0.5) * w.widthM, 0, ((cell.row + 0.5) / a.height - 0.5) * w.depthM));
   });
   w.curve = new T.CatmullRomCurve3(pts, false, 'centripetal');
   w.curve.arcLengthDivisions = Math.max(400, pts.length * 12); w.curve.updateArcLengths();
   w.lengthM = w.curve.getLength();
-  // Real average walking speed on this route, straight from the planner's time model
+  // CROSS-REFERENCE: distance, time and elevation shown in this view are the planner's own numbers
+  // (STATE.route: the same values as the summary card, the elevation chart and the visor HUD).
+  // The smooth 3D line is only for the picture; progress along it is a FRACTION 0..1, and
+  //   walked distance = fraction x route.distanceMeters,  time = fraction x route.timeSeconds.
   const r = STATE.route;
-  w.walkMps = (r.timeSeconds > 0 && r.distanceMeters > 0) ? r.distanceMeters / r.timeSeconds : (STATE.speedKmh || 3) / 3.6;
+  w.planDistM = r.distanceMeters; w.planTimeS = r.timeSeconds > 0 ? r.timeSeconds : w.lengthM / ((STATE.speedKmh || 3) / 3.6);
+  w.walkMps = w.lengthM / w.planTimeS;                      // speed along the drawn line, so the walk ends exactly at the planner's time
+  w.profile = Array.isArray(r.profile) ? r.profile : [];    // planner's elevation profile (distance, elevation)
   w.endPoint = w.curve.getPointAt(1);
+  // Where the base camp stands: behind and beside the route start, so you walk out of it
+  const p0 = w.curve.getPointAt(0), p1 = w.curve.getPointAt(Math.min(1, 12 / w.lengthM));
+  let dx = p1.x - p0.x, dz = p1.z - p0.z; const dl = Math.hypot(dx, dz) || 1; dx /= dl; dz /= dl;
+  w.camp = { x: walkClamp(p0.x - dx * CAMP_BEHIND_M - dz * CAMP_SIDE_M, -w.widthM / 2 + 40, w.widthM / 2 - 40),
+             z: walkClamp(p0.z - dz * CAMP_BEHIND_M + dx * CAMP_SIDE_M, -w.depthM / 2 + 40, w.depthM / 2 - 40),
+             dirX: dx, dirZ: dz, startX: p0.x, startZ: p0.z };
 }
 
 /* Route ribbon on the ground, plus tall thin beacons and name labels for base and targets. */
@@ -579,6 +604,7 @@ function walkFrame(nowMs) {
   w.sun.intensity = elev > 0 ? 0.9 + 1.7 * Math.sin(elev) : 0.15;
   w.skyUniforms.uSunDir.value.set(sx, sunY, sz).normalize();
   w.sky.position.copy(w.camera.position);
+  walkCampFrame(dt);
 
   walkPatchUpdate(x, z);
   w.renderer.render(w.scene, w.camera);
@@ -599,19 +625,27 @@ function walkHud() {
   const { x, z } = w.pos, a = w.aoi, el = w.el;
   const col = walkClamp(Math.floor((x / w.widthM + 0.5) * a.width), 0, a.width - 1), row = walkClamp(Math.floor((z / w.depthM + 0.5) * a.height), 0, a.height - 1);
   const slope = STATE.grids.slope[row * a.width + col], elevation = STATE.grids.elevation[row * a.width + col];
-  const meters = m => (m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m');
-  el.walked.textContent = w.mode === 'route' ? meters(w.distM) + ' of ' + meters(w.lengthM) : 'off route';
-  el.togo.textContent = meters(Math.hypot(x - w.endPoint.x, z - w.endPoint.z)) + (w.mode === 'route' ? '' : ' (straight)');
-  const mins = Math.floor(w.elapsedS / 60);
-  el.clock.textContent = Math.floor(mins / 60) + ':' + String(mins % 60).padStart(2, '0') + ' h';
+  // Same numbers and the same rounding as the main page's summary card (km to 2 decimals, whole minutes)
+  const km = m => (m / 1000).toFixed(2), fraction = walkClamp(w.distM / w.lengthM, 0, 1);
+  const walkedM = fraction * w.planDistM, elapsedMin = fraction * w.planTimeS / 60;
+  if (w.mode === 'route') {
+    el.walked.textContent = km(walkedM) + ' / ' + km(w.planDistM) + ' km';
+    el.togo.textContent = km(w.planDistM - walkedM) + ' km';
+  } else {
+    el.walked.textContent = 'off route';
+    el.togo.textContent = km(Math.hypot(x - w.endPoint.x, z - w.endPoint.z)) + ' km straight';
+  }
+  el.clock.textContent = Math.round(elapsedMin) + ' / ' + Math.round(w.planTimeS / 60) + ' min';
   el.slope.textContent = Number.isFinite(slope) ? slope.toFixed(1) + '°' : 'no data';
   el.slope.classList.toggle('warn', Number.isFinite(slope) && slope > (STATE.slopeLimitDeg || 15));
-  el.elev.textContent = Number.isFinite(elevation) ? Math.round(elevation) + ' m' : 'no data';
+  // On the route: elevation from the planner's own profile (the chart on the main page). Off it: the map cell.
+  const here = w.mode === 'route' ? walkProfileElevation(walkedM) : elevation;
+  el.elev.textContent = Number.isFinite(here) ? Math.round(here) + ' m' : 'no data';
   const heading = (((w.yaw + w.lookYaw) / WALK_DEG) % 360 + 360) % 360;
   el.heading.textContent = String(Math.round(heading)).padStart(3, '0') + '° ' + ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(heading / 45) % 8];
   el.compass.style.transform = 'translateX(' + (-(heading + 360) / 15 * 44) + 'px)';
   el.lapse.textContent = w.mode === 'free' ? 'FREE LOOK-AROUND · not walking speed'
-    : (w.lapse === 1 ? 'REAL WALKING SPEED' : 'TIME-LAPSE ×' + w.lapse) + ' · ' + (w.walkMps * 3.6).toFixed(1) + ' km/h average on this route';
+    : (w.lapse === 1 ? 'REAL WALKING SPEED' : 'TIME-LAPSE ×' + w.lapse) + ' · ' + (w.planDistM / w.planTimeS * 3.6).toFixed(1) + ' km/h average on this route';
 
   // Real rover photo when you reach a science target that has one
   let near = null;
@@ -632,4 +666,132 @@ function walkResize() {
   if (!w || !w.renderer) return;
   w.widthPx = w.el.stage.clientWidth; w.heightPx = w.el.stage.clientHeight;
   w.renderer.setSize(w.widthPx, w.heightPx); w.camera.aspect = w.widthPx / Math.max(1, w.heightPx); w.camera.updateProjectionMatrix();
+}
+
+/* ── Planner cross-reference ─────────────────────────────────────────────── */
+
+/* Elevation (meters) at a walked distance, read from the planner's elevation profile
+   (STATE.route.profile, the same data as the chart on the main page). Blends between two profile points. */
+function walkProfileElevation(walkedM) {
+  const p = _walk.profile;
+  if (!p || !p.length) return NaN;
+  if (walkedM <= p[0].distanceMeters) return p[0].elevationM;
+  for (let i = 1; i < p.length; i++) {
+    if (walkedM <= p[i].distanceMeters) {
+      const span = p[i].distanceMeters - p[i - 1].distanceMeters, t = span > 0 ? (walkedM - p[i - 1].distanceMeters) / span : 0;
+      return p[i - 1].elevationM + (p[i].elevationM - p[i - 1].elevationM) * t;
+    }
+  }
+  return p[p.length - 1].elevationM;
+}
+
+/* ── EVA base camp and rover ─────────────────────────────────────────────── */
+
+/* Builds a concept base camp at the route start: a 3D-printed habitat with the floor area of NASA's
+   Mars Dune Alpha (1,700 sq ft), an airlock facing the route, a 10 m comm mast (the height our
+   Communication zones layer assumes), solar arrays, a levelled pad, and a Curiosity-sized rover.
+   Layout and all other sizes are OUR ASSUMPTION (a concept, not a NASA design). */
+function walkCamp() {
+  const w = _walk, T = w.T, c = w.camp, g = new T.Group();
+  // Build ALONG the hillside (on the contour), like a real terrace: the long side stays level, so the pad stays low.
+  // The real terrain decides the direction: we read the slope direction from the elevation grid.
+  const slopeX = walkBase(c.x + 6, c.z) - walkBase(c.x - 6, c.z), slopeZ = walkBase(c.x, c.z + 6) - walkBase(c.x, c.z - 6);
+  let alongX = -slopeZ, alongZ = slopeX; const alongLen = Math.hypot(alongX, alongZ);
+  if (alongLen < 1e-6) { alongX = c.startX - c.x; alongZ = c.startZ - c.z; }               // flat ground: just face the route
+  if (alongX * (c.startX - c.x) + alongZ * (c.startZ - c.z) < 0) { alongX = -alongX; alongZ = -alongZ; }   // airlock end nearest the route
+  const yawCamp = Math.atan2(-alongZ, alongX), cosY = Math.cos(yawCamp), sinY = Math.sin(yawCamp);
+  const toWorld = (lx, lz) => [c.x + lx * cosY + lz * sinY, c.z - lx * sinY + lz * cosY];   // camp-local meters to scene meters
+  // Terrace height: just above the highest ground under it, so nothing pokes through the floor
+  let top = -Infinity;
+  for (let a = 0; a < 16; a++) for (const r of [0, 0.5, 1]) {
+    const p = toWorld(Math.cos(a / 16 * 6.283) * CAMP_PAD_LONG_M * r, Math.sin(a / 16 * 6.283) * CAMP_PAD_SHORT_M * r);
+    top = Math.max(top, walkBase(p[0], p[1]));
+  }
+  c.y = top + 0.1;
+  const regolith = new T.Color().copy(w.uniforms.uTint.value);          // graded local soil: same colour as the ground
+  const mat = (color, rough, extra) => new T.MeshStandardMaterial(Object.assign({ color, roughness: rough == null ? 0.9 : rough, metalness: 0 }, extra || {}));
+
+  const pad = new T.Mesh(new T.CylinderGeometry(1, 1.35, 6, 40), mat(regolith));
+  pad.scale.set(CAMP_PAD_LONG_M, 1, CAMP_PAD_SHORT_M); pad.position.y = -3; g.add(pad);
+
+  // Habitat: a printed vault. Printed layer lines drawn as a simple striped texture.
+  const stripes = document.createElement('canvas'); stripes.width = 64; stripes.height = 8;
+  const sc = stripes.getContext('2d');
+  for (let px = 0; px < 64; px++) { sc.fillStyle = px % 4 === 0 ? '#a98466' : '#c6a07e'; sc.fillRect(px, 0, 1, 8); }
+  const stripeTex = new T.CanvasTexture(stripes); stripeTex.wrapS = stripeTex.wrapT = T.RepeatWrapping; stripeTex.repeat.set(5, 1);   // lines run along the habitat
+  stripeTex.colorSpace = T.SRGBColorSpace;
+  const hab = new T.Mesh(new T.CylinderGeometry(CAMP_HAB_WIDTH_M / 2, CAMP_HAB_WIDTH_M / 2, CAMP_HAB_LENGTH_M, 28, 1, false, 0, Math.PI),
+    mat('#ffffff', 0.95, { map: stripeTex, side: T.DoubleSide }));
+  hab.geometry.rotateZ(Math.PI / 2);       // lay the half-cylinder down: long axis along local x, curved roof up
+  g.add(hab);
+
+  // Airlock on the end that faces the route start (+x end), with a dark hatch and a lit window strip
+  const lock = new T.Mesh(new T.BoxGeometry(2.6, 2.4, 2.4), mat('#d9d4cc', 0.6));
+  lock.position.set(CAMP_HAB_LENGTH_M / 2 + 1.3, 1.2, 0); g.add(lock);
+  const hatch = new T.Mesh(new T.BoxGeometry(0.08, 1.9, 1.1), mat('#22262e', 0.5));
+  hatch.position.set(CAMP_HAB_LENGTH_M / 2 + 2.62, 1.05, 0); g.add(hatch);
+  const glow = new T.MeshBasicMaterial({ color: '#ffd9a0' });
+  for (let i = -2; i <= 2; i++) {                                   // small windows along both sides
+    for (const side of [-1, 1]) {
+      const win = new T.Mesh(new T.BoxGeometry(0.9, 0.5, 0.12), glow);
+      win.position.set(i * 3.1, 2.3, side * (CAMP_HAB_WIDTH_M / 2 - 0.62)); win.rotation.x = side * -0.55; g.add(win);
+    }
+  }
+
+  // Comm mast: 10 m, with a small dish. Same height the line-of-sight layer uses.
+  const mast = new T.Mesh(new T.CylinderGeometry(0.06, 0.1, CAMP_MAST_M, 8), mat('#cfd3da', 0.4, { metalness: 0.6 }));
+  mast.position.set(-CAMP_HAB_LENGTH_M / 2 - 2, CAMP_MAST_M / 2, 2.5); g.add(mast);
+  const dish = new T.Mesh(new T.SphereGeometry(0.6, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2.6), mat('#e8e6e3', 0.5, { side: T.DoubleSide }));
+  dish.position.set(-CAMP_HAB_LENGTH_M / 2 - 2, CAMP_MAST_M - 0.4, 2.5); dish.rotation.x = Math.PI * 0.75; g.add(dish);
+
+  // Solar arrays: three tilted panels in a row beyond the mast end, each standing on the real ground
+  for (let i = 0; i < 3; i++) {
+    const lx = -CAMP_PAD_LONG_M - 5 - i * 6.2, spot = toWorld(lx, 0), groundY = walkBase(spot[0], spot[1]) - c.y;
+    const panel = new T.Mesh(new T.BoxGeometry(5.2, 0.08, 2.8), mat('#16243f', 0.35, { metalness: 0.4 }));
+    panel.position.set(lx, groundY + 1.7, 0); panel.rotation.x = 0.45; g.add(panel);
+    const post = new T.Mesh(new T.CylinderGeometry(0.07, 0.07, 1.7, 6), mat('#9aa0aa', 0.5));
+    post.position.set(lx, groundY + 0.85, 0); g.add(post);
+  }
+
+  // Place the camp: long axis along the hillside, airlock end (+x) on the side nearest the route start
+  g.position.set(c.x, c.y, c.z);
+  g.rotation.y = yawCamp;
+  w.scene.add(g);
+
+  // Rover: Curiosity's overall size, six wheels, camera mast. Drives a slow loop round the camp.
+  const rover = new T.Group(), wheelR = 0.25, bodyY = 0.95;
+  const body = new T.Mesh(new T.BoxGeometry(CAMP_ROVER_L * 0.62, 0.5, CAMP_ROVER_W * 0.5), mat('#e9e6df', 0.6)); body.position.y = bodyY; rover.add(body);
+  const deck = new T.Mesh(new T.BoxGeometry(CAMP_ROVER_L * 0.66, 0.05, CAMP_ROVER_W * 0.56), mat('#3a3d44', 0.5)); deck.position.y = bodyY + 0.28; rover.add(deck);
+  const power = new T.Mesh(new T.CylinderGeometry(0.2, 0.2, 0.9, 10), mat('#2b2e35', 0.6)); power.rotation.z = 1.1; power.position.set(-CAMP_ROVER_L * 0.42, bodyY + 0.25, 0); rover.add(power);
+  const neck = new T.Mesh(new T.CylinderGeometry(0.05, 0.05, CAMP_ROVER_H - bodyY - 0.45, 8), mat('#dcd9d2', 0.5));
+  neck.position.set(CAMP_ROVER_L * 0.22, bodyY + 0.25 + (CAMP_ROVER_H - bodyY - 0.45) / 2, CAMP_ROVER_W * 0.16); rover.add(neck);
+  const head = new T.Mesh(new T.BoxGeometry(0.22, 0.2, 0.42), mat('#f2efe8', 0.5)); head.position.set(CAMP_ROVER_L * 0.24, CAMP_ROVER_H - 0.1, CAMP_ROVER_W * 0.16); rover.add(head);
+  w.roverWheels = [];
+  [-1, 0, 1].forEach(ix => [-1, 1].forEach(side => {
+    const wheel = new T.Mesh(new T.CylinderGeometry(wheelR, wheelR, 0.4, 14), mat('#55585f', 0.8, { metalness: 0.3 }));
+    wheel.rotation.x = Math.PI / 2; wheel.position.set(ix * CAMP_ROVER_L * 0.38, wheelR, side * (CAMP_ROVER_W / 2 - 0.2)); rover.add(wheel); w.roverWheels.push(wheel);
+    const leg = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, 0.85, 6), mat('#9aa0aa', 0.5));
+    leg.position.set(ix * CAMP_ROVER_L * 0.3, wheelR + 0.38, side * (CAMP_ROVER_W / 2 - 0.42)); leg.rotation.z = -ix * 0.5; rover.add(leg);
+  }));
+  w.rover = rover; w.roverAngle = 0.6; w.scene.add(rover);
+  const label = document.createElement('span'); label.className = 'walk-label'; label.textContent = 'ROVER (illustrative)'; label.style.color = '#E8E6E3';
+  w.el.labels.appendChild(label); w.roverLabel = { point: new T.Vector3(), el: label }; w.labels.push(w.roverLabel);
+  walkCampFrame(0);
+}
+
+/* Moves the rover along its loop, keeping its wheels on the real ground and tilting it with the slope. */
+function walkCampFrame(dt) {
+  const w = _walk;
+  if (!w.rover) return;
+  if (!w.reduced) w.roverAngle += CAMP_ROVER_MPS / CAMP_ROVER_LOOP_M * dt;
+  const a = w.roverAngle, x = w.camp.x + Math.cos(a) * CAMP_ROVER_LOOP_M, z = w.camp.z + Math.sin(a) * CAMP_ROVER_LOOP_M;
+  const fx = -Math.sin(a), fz = Math.cos(a);                        // direction of travel along the loop
+  const here = walkBase(x, z) + walkBump(x, z) * 0.5, ahead = walkBase(x + fx * 1.5, z + fz * 1.5), sideways = walkBase(x - fz * 1.3, z + fx * 1.3);
+  w.rover.position.set(x, here, z);
+  w.rover.rotation.order = 'YZX';
+  w.rover.rotation.y = Math.atan2(-fz, fx);                        // local +x is the rover's front
+  w.rover.rotation.z = Math.atan2(ahead - walkBase(x, z), 1.5);    // nose up or down with the slope
+  w.rover.rotation.x = -Math.atan2(sideways - walkBase(x, z), 1.3); // lean sideways with the slope
+  w.roverWheels.forEach(wheel => { wheel.rotation.y -= CAMP_ROVER_MPS / 0.25 * dt; });
+  w.roverLabel.point.set(x, here + CAMP_ROVER_H + 0.6, z);
 }

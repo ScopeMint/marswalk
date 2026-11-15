@@ -265,3 +265,17 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
   OUR ASSUMPTIONS (labelled on screen): eye height 1.7 m, field of view 70 degrees, sky colours #d9b48c / #9a7b5e,
     east-to-west sun arc, haze ending at 2.3 km (hides the edge of the 4 km terrain model), time-lapse factors.
   Library: three.js r160 (MIT), already bundled in src/vendor.
+
+[CONFIRMED] First-person walk: readouts are cross-referenced to the planner (no separate numbers)
+  Distance and "to target" = fraction walked x STATE.route.distanceMeters; one-way time = fraction x STATE.route.timeSeconds;
+  elevation = STATE.route.profile (the main page's elevation chart). Same values and rounding as the summary card and visor HUD.
+[CONFIRMED] Base camp habitat floor area (src/js/walk3d.js, walkCamp): 17.5 m x 9 m = 157.5 m2 = 1,700 sq ft
+  Source: NASA CHAPEA "Mars Dune Alpha", a 1,700-square-foot 3D-printed habitat for a crew of four
+  https://www.nasa.gov/humans-in-space/chapea/about-chapea/ and https://www.nasa.gov/humans-in-space/chapea/
+  Note: one NASA photo caption says 1,200 sq ft; the CHAPEA pages say 1,700. We use 1,700.
+  Comm mast 10 m: the same height our Communication zones (line-of-sight) layer already assumes.
+  OUR ASSUMPTION (concept only, not a NASA design): vault shape, airlock size, windows, solar arrays, terrace, layout,
+    and the camp's position 22 m behind and 7 m beside the route start. The camp is built along the hillside contour
+    read from the HiRISE elevation grid.
+[TO VERIFY] Rover size 3.0 x 2.7 x 2.2 m = Curiosity's published size (about 10 ft long, 9 ft wide, 7 ft tall; NASA Curiosity
+  fact sheet). Team to confirm on nasa.gov before submission. The rover's loop around the camp and its speed are ILLUSTRATIVE.
