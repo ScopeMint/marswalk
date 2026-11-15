@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v3';
+const CACHE_VERSION = 'marswalk-v4';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -99,7 +99,7 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  if (url.pathname.includes('/tiles/hirise/') || url.hostname === 'unpkg.com') {
+  if (url.pathname.includes('/tiles/hirise/') || url.hostname === 'unpkg.com' || url.href.startsWith('https://cdn.jsdelivr.net/npm/three@0.160.0/')) {
     event.respondWith(cacheFirst(req, TILE_CACHE));
   } else if (url.hostname.includes('cartocdn') || url.hostname.includes('fastly.net')) {
     event.respondWith(cacheFirst(req, OPM_CACHE, OPM_MAX_ENTRIES));

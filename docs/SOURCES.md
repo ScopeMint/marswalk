@@ -227,3 +227,4 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
 [CONFIRMED] Walking energy: Pandolf, K. B., Givoni, B. & Goldman, R. F. (1977), Predicting energy expenditure with loads while standing or walking very slowly, J. Appl. Physiol. 43(4), 577-581
 [CONFIRMED] Oxygen energy equivalent: Weir, J. B. de V. (1949), New methods for calculating metabolic rate with special reference to protein metabolism, J. Physiol. 109, 1-9
 [CONFIRMED] Mars surface gravity 3.721 m/s^2: NASA Mars Fact Sheet https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+[CONFIRMED] three.js r160 (MIT) — 3D terrain view, loaded from https://cdn.jsdelivr.net/npm/three@0.160.0/
