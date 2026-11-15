@@ -125,12 +125,13 @@ async function runTour() {
     const t3dBtn = [...document.querySelectorAll('#top-bar button')].find(b => /3D/.test(b.textContent));
     if (t3dBtn) {
       t3dBtn.click();
-      tourCaption('…and rehearses it on the real terrain in 3D, at eye level, before ever leaving the habitat.',
+      tourCaption('…and rehearses it on the real terrain in 3D before ever leaving the habitat.',
         'HiRISE 1 m terrain + 25 cm image · vertical exaggeration 1.5× (labelled)');
+      // Stay in the 3D terrain orbit view (HiRISE terrain + planned route). "Fly the route" now opens the
+      // first-person walk, which starts at the habitat and barely moves within a few seconds of tour time.
       for (let i = 0; i < 60; i++) {
         const fly = document.querySelector('[data-t3d="fly"]');
-        // wait past the 3D view's first overlay refresh (it resets the camera to orbit), then fly
-        if (fly && !fly.disabled) { await tourWait(700); fly.click(); break; }
+        if (fly && !fly.disabled) break;
         if (!(await tourWait(150))) return;
       }
       if (!(await tourWait(TOUR_VIDEO ? 5000 : TOUR_STEP_MS + 3000))) return;

@@ -108,8 +108,7 @@ def screenshots(p):
     # 5. 3D fly-through
     page.evaluate("() => [...document.querySelectorAll('#top-bar button')].find(b => /3D/.test(b.textContent)).click()")
     page.wait_for_function("() => { const f = document.querySelector('[data-t3d=\"fly\"]'); return f && !f.disabled; }", timeout=30000)
-    page.evaluate("() => document.querySelector('[data-t3d=\"fly\"]').click()")
-    page.wait_for_timeout(7000)
+    page.wait_for_timeout(6000)   # orbit view of the HiRISE terrain + route ('Fly' now opens the first-person walk)
     shot('shot-5-3d-flythrough.png')
     ctx.close()
     browser.close()
