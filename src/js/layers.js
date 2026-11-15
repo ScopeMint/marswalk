@@ -100,7 +100,7 @@ const LAYER_CATALOG = [
   {
     id: 'themisNight',
     name: 'THEMIS Night IR (Thermal)',
-    description: 'Night-time infrared brightness (relative). Ground that stays warm at night has high thermal inertia: bedrock or rocks, not loose sand. Good footing.',
+    description: 'Night-time infrared brightness (relative). Ground that stays warm at night has high thermal inertia: likely bedrock or rocks rather than loose sand, so probably firmer footing (an interpretation, not a measurement).',
     mission: 'Mars Odyssey',
     instrument: 'THEMIS, controlled mosaic v2',
     resolution: '~100 m/px',
