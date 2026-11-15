@@ -128,7 +128,7 @@ function tempSpreadText(temp) {
 /* Text for the radiation dose range, e.g. " (45 to 56)", from the measured daily range. Empty if unknown.
    Used by every screen that shows the EVA dose. */
 function doseRangeText(rad) {
-  return rad && rad.doseLowMuGy != null ? ` (${rad.doseLowMuGy} to ${rad.doseHighMuGy})` : '';
+  return rad && rad.doseLowMuGy != null && rad.doseHighMuGy > 0 ? ` (${rad.doseLowMuGy} to ${rad.doseHighMuGy})` : '';
 }
 
 /* Runs the full safety checklist given a route result and EVA parameters.

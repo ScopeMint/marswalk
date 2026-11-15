@@ -9,7 +9,9 @@ Work from `MARSWALK_NEXT_PROMPT.md`. Every new number is cited in `docs/SOURCES.
   (our 4.44 km vs rover 7.29 km, gap 20 m). Leg length and limits are in `config.js` and the Assumptions panel.
 - **2.2 Straight line vs safe route** (`src/js/straightline.js`). Route-card section plus a dashed map line with the
   too-steep stretches in red; a checkbox hides it.
-- **2.6 Ranges.** Temperature P10-P90 and radiation 180-225 uGy/day on the route card, cue card, HUD and Weather page.
+- **2.6 Ranges.** Radiation range (from 180-225 uGy/day) on the route card, cue card, visor HUD and Weather page.
+  Temperature day-to-day range (P10-P90) on the route card, Weather page and temperature chart. The cue card and HUD
+  have no temperature line, so there is nothing to add a range to.
 - **1.4 Extra REMS (part).** `scripts/13_prepare_rems_daily.py` -> `src/data/rems-daily.json`; Weather page cards for
   ground temperature, pressure and UV for the current Mars month (`src/js/weatherextra.js`).
 - **1.5 Wind (note only).** The REMS daily report has no wind or humidity value for any of its 4,745 sols; the Weather

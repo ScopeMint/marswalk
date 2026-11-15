@@ -283,7 +283,7 @@ function t3dOverlays() {
   }
   // Turn-back point: same rule as the 2D map, cue card and HUD (computePointOfNoReturn in route.js, timed with cellTimeSeconds).
   const ponr = s.curve && typeof computePointOfNoReturn === 'function' ? computePointOfNoReturn() : null;
-  const ponrCell = Number.isInteger(ponr) && ponr < route.cells.length - 1 ? route.cells[ponr] : null;
+  const ponrCell = Number.isInteger(ponr) && ponr > 0 && ponr < route.cells.length - 1 ? route.cells[ponr] : null;
   if (ponrCell) t3dPin(t3dPoint(((ponrCell.col + 0.5) / s.aoi.width - 0.5) * s.widthMeters,
     ((ponrCell.row + 0.5) / s.aoi.height - 0.5) * s.depthMeters), 'TURN-BACK POINT', T3D_CAUTION, 40);
   t3dTraverse(); t3dFlyReady(!!s.curve);

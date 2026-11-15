@@ -232,3 +232,7 @@ body.tidy #layer-panel-content .layer-row:not(:has(input:checked)) + .layer-opac
 /* 3D button: terrain3d.css forces teal with !important; match the other view buttons unless it is switched on */
 body.tidy #top-bar .t3d-toggle:not(.active):not([aria-pressed="true"]) { color: var(--text) !important; border-color: var(--border) !important; }
 body.tidy #top-bar .t3d-toggle:not(.active):not([aria-pressed="true"]):hover { color: var(--route) !important; border-color: var(--route) !important; }
+
+/* The Menu dropdown hangs below the top bar. Keep the top bar above the page-tab bar (pages.css, z-index 1100)
+   so the page tabs do not cover the first menu item. */
+body.tidy #top-bar { z-index: 1150; }
