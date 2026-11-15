@@ -38,3 +38,10 @@
 4. Upload the demo video to YouTube (Unlisted/Public), paste the link in the form. Re-record if the UI changed a lot.
 5. Read docs/SUBMISSION_FORM_DRAFT.md once before pasting it into the form.
 6. Deadline: Sun Nov 15, 11:59 PM local (unless the Local Lead says earlier).
+
+## Datasets dropped on Nov 15 (next-improvements branch)
+Not obtained in the time left, so not shown. Nothing was approximated or faked.
+- CRISM minerals (prompt 1.1): needs a CRISM targeted cube over the 4 km box and parameter maps (e.g. BD1900, SINDEX2).
+- CTX context mosaic (prompt 1.2): needs Murray Lab mosaic tiles cut around the box (Dickson et al.).
+- Dust opacity (prompt 1.3): needs Mastcam tau or REMS UV opacity from PDS; the REMS daily report has only a UV category.
+- Insolation (prompt 1.7): needs a cited model (e.g. Appelbaum & Flood) and dust opacity; skipped as the prompt allows.
