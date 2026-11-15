@@ -2,7 +2,8 @@
      1 Plan route   : choose where to walk and set the limits  (mission panel + map + short route card)
      2 Map layers   : study the ground                         (map + layer switches only)
      3 Weather      : temperature, sunlight, radiation         (the two weather charts, big, + the numbers)
-     4 Summary      : everything about this EVA                (full route card + map + hills chart)
+     4 Solar storms : real storms, the storm drill, what to do (built by storms.js)
+     5 Summary      : everything about this EVA                (full route card + map + hills chart)
    It adds NO features and calculates NOTHING. It only shows or hides parts other scripts already built
    (the hiding is done in css/pages.css from the page name on <body data-page="...">), and the Weather
    numbers are read from the same functions the route card uses (safety.js, marsclock.js).
@@ -12,8 +13,10 @@ const PAGES = [
   { key: 'plan',    label: 'Plan route',  hint: 'Choose where to walk and set your limits. The route draws itself.' },
   { key: 'layers',  label: 'Map layers',  hint: 'Switch map layers on and off to study the ground.' },
   { key: 'weather', label: 'Weather',     hint: 'Temperature, sunlight and radiation for the time of your EVA.' },
+  { key: 'storm',   label: 'Solar storms', hint: 'Real storms NASA measured on Mars, and what one would do to your walk.' },
   { key: 'summary', label: 'Summary',     hint: 'Everything about this EVA on one page.' }
 ];
+const PAGES_WITHOUT_MAP = ['weather', 'storm'];
 let _pg = null;
 
 /* Makes an element with a class and (optional) text. */
@@ -44,11 +47,12 @@ function initPages() {
 
   _pg = { page: null, tabs, hint, back, next, weather: pagesBuildWeather() };
   pagesBuildSummaryHead();
+  if (typeof stormsBuild === 'function') stormsBuild();      // the Solar storms page (storms.js)
   document.body.classList.add('paged');
 
-  // The tour and the visor HUD draw on the map, and the Weather page has no map: go back to page 1 first
+  // The tour and the visor HUD draw on the map, and these pages have no map: go back to page 1 first
   document.addEventListener('click', e => {
-    if (_pg.page === 'weather' && e.target.closest && e.target.closest('.hud-toggle, #btn-tour')) pagesShow('plan');
+    if (PAGES_WITHOUT_MAP.includes(_pg.page) && e.target.closest && e.target.closest('.hud-toggle, #btn-tour')) pagesShow('plan');
   }, true);
 
   pagesShow('plan');
@@ -67,10 +71,11 @@ function pagesShow(key) {
   if (index > 0) _pg.back.textContent = '← ' + PAGES[index - 1].label;
   if (index < PAGES.length - 1) _pg.next.textContent = 'Next: ' + PAGES[index + 1].label + ' →';
   if ((key === 'summary') !== (before === 'summary')) pagesCardDetail(key === 'summary');
+  if (key === 'storm' && typeof stormsOpen === 'function') stormsOpen();
   pagesTick();
   // The map and the charts have just changed size: let them re-measure themselves
   setTimeout(() => {
-    if (STATE.map && key !== 'weather') STATE.map.invalidateSize();
+    if (STATE.map && !PAGES_WITHOUT_MAP.includes(key)) STATE.map.invalidateSize();
     window.dispatchEvent(new Event('resize'));
   }, 60);
 }
@@ -98,6 +103,7 @@ function pagesTick() {
   document.body.classList.toggle('pg-noroute', !hasRoute);
   _pg.tabs.plan.classList.toggle('pg-done', hasRoute);
   if (_pg.page === 'weather') pagesWeatherRefresh();
+  if (_pg.page === 'storm' && typeof stormsRefresh === 'function') stormsRefresh();
 }
 
 /* ── Summary page header ────────────────────────────────────────────────── */

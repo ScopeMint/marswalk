@@ -1,0 +1,67 @@
+{
+  "note": "Solar-storm facts for the Solar storms page (src/js/storms.js). Every number below was read from the linked NASA page or paper on 2026-11-15. Nothing here is estimated by us. Where the app combines two of these numbers, the page labels the result 'our calculation'.",
+  "events": [
+    {
+      "id": "2013-04",
+      "date": "11-12 April 2013",
+      "title": "First solar storm RAD saw from the ground",
+      "measured": "Dose rate rose about 30% above the normal cosmic-ray level. The whole event added 0.025 mGy (25 μGy).",
+      "meaning": "A small storm: Mars' thin air stopped most of it.",
+      "source": "Hassler et al. (2014), Science 343(6169), 1244797",
+      "url": "https://doi.org/10.1126/science.1244797"
+    },
+    {
+      "id": "2017-09",
+      "date": "11 September 2017",
+      "title": "Radiation on the ground more than doubled",
+      "measured": "Dose rates rose to 2 to 3 times the normal cosmic-ray level, stayed at that peak for about 12 hours, then fell over the next 36 hours. NASA: the high readings lasted more than two days. This was under 23 g/cm² of Mars air.",
+      "meaning": "RAD's lead scientist, Don Hassler, said that someone outdoors on a Mars walk who learned such an event was coming \"would definitely want to take shelter.\"",
+      "source": "NASA/JPL news, 29 Sept 2017; Zeitlin et al. (2018), Geophys. Res. Lett., doi:10.1029/2018GL077760",
+      "url": "https://www.jpl.nasa.gov/news/large-solar-storm-sparks-global-aurora-and-doubles-radiation-levels-on-the-martian-surface/",
+      "url2": "https://doi.org/10.1029/2018GL077760",
+      "peakFactorLow": 2,
+      "peakFactorHigh": 3,
+      "peakHours": 12,
+      "declineHours": 36
+    },
+    {
+      "id": "2024-05",
+      "date": "20 May 2024",
+      "title": "The biggest surge RAD has measured",
+      "measured": "After an X12 solar flare, a person standing next to Curiosity would have received 8,100 μGy, which NASA compares to 30 chest X-rays. The flare's X-rays and gamma rays arrived first; the charged particles reached Mars \"in just tens of minutes.\"",
+      "meaning": "Hassler: \"Cliffsides or lava tubes would provide additional shielding for an astronaut from such an event.\"",
+      "source": "NASA/JPL, \"NASA Watches Mars Light Up During Epic Solar Storm\", 10 June 2024",
+      "url": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/",
+      "doseMuGy": 8100
+    }
+  ],
+  "context": {
+    "stormCount": "RAD had measured more than a dozen solar storms by November 2021, five of them on the way to Mars.",
+    "stormCountSource": "NASA/JPL, \"How NASA's Curiosity Rover Is Making Mars Safer for Astronauts\", 15 Nov 2021",
+    "stormCountUrl": "https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/",
+    "cliffShielding": "Parked at the foot of a cliff at Murray Buttes (9-21 Sept 2016), RAD measured 4% less radiation overall and 7.5% less neutral-particle radiation.",
+    "cliffSource": "NASA/JPL, 15 Nov 2021; Ehresmann et al. (2021), JGR Planets, doi:10.1029/2021JE006851",
+    "cliffUrl": "https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/"
+  },
+  "health": {
+    "source": "NASA-STD-3001 Technical Brief OCHMO-TB-020 Rev E, \"Design for Ionizing Radiation Protection\" (27 Dec 2022)",
+    "url": "https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf",
+    "duringMission": "Acute radiation syndromes such as nausea, vomiting and fatigue, as well as skin injuries and depletion of blood-forming organs.",
+    "afterMission": "A higher risk of cancer, and a risk of changes in thinking, movement and behaviour.",
+    "howLikely": "NASA's brief says about 95% of solar particle events do not come near the dose limits, and that the chance of an EVA organ dose above 100 mSv is less than one in a million.",
+    "sepLimitMsv": 250,
+    "careerLimitMsv": 600,
+    "limits": "NASA limits: under 250 mSv effective dose from any one solar particle event (to minimise acute effects), and under 600 mSv over a whole career.",
+    "unitNote": "RAD reports absorbed dose (gray). NASA's limits are effective dose (sievert), which also weighs how damaging each kind of particle is. The two cannot be compared one-to-one, so this page does not convert between them.",
+    "evaTerminateHours": 2,
+    "evaRule": "Real-time alert dosimetry gives a very high level of protection for EVAs if the EVA is ended within 2 hours and there is access to shielding."
+  },
+  "precautions": [
+    { "step": "Stop work and start back at once.", "why": "NASA: ending the EVA within 2 hours, with shielding to go to, gives a very high level of protection.", "source": "OCHMO-TB-020 Rev E" },
+    { "step": "Do not wait to see anything.", "why": "In May 2024 the charged particles reached Mars tens of minutes after the flare's light. A storm cannot be seen or felt.", "source": "NASA/JPL, 10 June 2024" },
+    { "step": "Go straight to the habitat's storm shelter.", "why": "NASA plans a shelter with about 10 cm of water (or similar material) added around crew quarters for a once-in-100-years storm.", "source": "OCHMO-TB-020 Rev E" },
+    { "step": "Too far from the habitat? Put rock between you and the sky.", "why": "Cliffsides or lava tubes give extra shielding (Hassler, 2024). The measured gain at the foot of one cliff was small: 4% (Curiosity, 2016). It is a stop-gap, not a shelter.", "source": "NASA/JPL, 10 June 2024 and 15 Nov 2021" },
+    { "step": "Read and report your dosimeter.", "why": "NASA requires personal dose monitoring, so the crew and Earth know what each person received.", "source": "NASA-STD-3001 Vol. 2 [V2 6101]" },
+    { "step": "Stay inside until monitoring gives the all-clear.", "why": "In September 2017 the high readings lasted more than two days. NASA requires real-time space-weather monitoring and crew alerts.", "source": "NASA/JPL, 29 Sept 2017; NASA-STD-3001 Vol. 2 [V2 6099, V2 6100]" }
+  ]
+}
