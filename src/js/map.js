@@ -10,11 +10,16 @@
    but we use 111320 from Earth for Leaflet which treats coords as Earth-like — close enough
    for a 6 km box; label this as a display approximation on the Assumptions panel). */
 function studyAreaBounds() {
+  // Prefer the exact bounds from aoi.json once loaded
+  const aoi = STATE.grids && STATE.grids.aoi;
+  if (aoi) return L.latLngBounds([aoi.south, aoi.west], [aoi.north, aoi.east]);
   const { centerLat, centerLon, sizeMeters } = CONFIG.studyArea;
-  const halfDeg = (sizeMeters / 2) / 111320;
+  // Mars meters per degree (not Earth's 111,320): pi * R / 180 ~ 59,274 m
+  const halfLatDeg = (sizeMeters / 2) / (Math.PI * CONFIG.mars.radiusMeters / 180);
+  const halfLonDeg = halfLatDeg / Math.cos(centerLat * Math.PI / 180);
   return L.latLngBounds(
-    [centerLat - halfDeg, centerLon - halfDeg],
-    [centerLat + halfDeg, centerLon + halfDeg]
+    [centerLat - halfLatDeg, centerLon - halfLonDeg],
+    [centerLat + halfLatDeg, centerLon + halfLonDeg]
   );
 }
 
@@ -85,7 +90,7 @@ function checkStudyAreaBounds() {
   const center = STATE.map.getCenter();
   const bounds = studyAreaBounds();
   // Use a generous check (3× the study area) so the notice only shows when clearly away
-  const pad = (CONFIG.studyArea.sizeMeters / 2) / 111320 * 3;
+  const pad = (CONFIG.studyArea.sizeMeters / 2) / (Math.PI * CONFIG.mars.radiusMeters / 180) * 3;
   const nearBounds = L.latLngBounds(
     [CONFIG.studyArea.centerLat - pad, CONFIG.studyArea.centerLon - pad],
     [CONFIG.studyArea.centerLat + pad, CONFIG.studyArea.centerLon + pad]
@@ -156,9 +161,9 @@ function initMap() {
    These use Leaflet tooltips set to permanent so they always show. */
 function addTerrainLabels(map) {
   const labels = [
-    { lat: -5.065, lon: 137.730, text: 'Murray Formation', icon: '▲' },
-    { lat: -5.140, lon: 137.720, text: 'Crater Floor',     icon: '▽' },
-    { lat: -5.095, lon: 137.790, text: '↑ Mt. Sharp slope', icon: '' },
+    { lat: -4.8035, lon: 137.3870, text: 'Boxwork unit',              icon: '▦' },
+    { lat: -4.8380, lon: 137.3920, text: 'Upslope: Mount Sharp',      icon: '▲' },
+    { lat: -4.7780, lon: 137.3420, text: 'Downslope: crater floor',   icon: '▽' },
   ];
 
   labels.forEach(({ lat, lon, text, icon }) => {

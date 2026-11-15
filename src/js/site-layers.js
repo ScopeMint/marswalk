@@ -1,0 +1,134 @@
+/* site-layers.js — Real-site layers for the Curiosity boxwork study area.
+   Depends on: config.js (CONFIG), state.js (STATE), grid.js (STATE.grids, latLonToCell, getCellValue).
+
+   Adds:
+     - HiRISE 25 cm orthoimage tiles (walking-scale imagery, cut by scripts/08_build_real_site.py)
+     - Rock & ridge relief overlay (1 m HiRISE relief; boulder fields, ridges, scarps)
+     - THEMIS day / night thermal infrared overlays (cut by scripts/09_get_themis.py)
+     - Curiosity's real traverse + end-of-drive waypoints with sol numbers (NASA/JPL MMGIS)
+   Also computes a validation number: how well our terrain model matches the rover's own
+   reported elevations along its real path (STATE.validation). */
+
+/* Returns Leaflet bounds [[south, west], [north, east]] for the loaded study area, or null. */
+function _aoiBounds() {
+  const aoi = STATE.grids && STATE.grids.aoi;
+  return aoi ? [[aoi.south, aoi.west], [aoi.north, aoi.east]] : null;
+}
+
+/* Adds the HiRISE orthoimage tile layer on top of the global basemap. Needs aoi.json loaded. */
+function addHiriseTiles(map) {
+  const aoi = STATE.grids && STATE.grids.aoi;
+  if (!aoi || !aoi.hiriseTiles) return;
+  const t = aoi.hiriseTiles;
+  const layer = L.tileLayer(t.urlTemplate, {
+    minZoom:       CONFIG.hirise.minZoom,
+    minNativeZoom: t.minZoom,
+    maxNativeZoom: t.maxNativeZoom,
+    maxZoom:       CONFIG.hirise.maxZoom,
+    bounds:        _aoiBounds(),
+    opacity:       STATE.layers.hirise.opacity,
+    attribution:   CONFIG.hirise.attribution,
+    errorTileUrl:  'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+  });
+  if (STATE.layers.hirise.visible) layer.addTo(map);
+  STATE.tileLayers.hirise = layer;
+}
+
+/* Adds a study-area image overlay (PNG from src/data/) under the given layer id. */
+function addSiteImageLayer(map, layerId, fileName, extraClass) {
+  const bounds = _aoiBounds();
+  if (!bounds || !STATE.layers[layerId]) return;
+  const overlay = L.imageOverlay('./data/' + fileName, bounds, {
+    opacity:     STATE.layers[layerId].opacity,
+    interactive: false,
+    className:   extraClass || ''
+  });
+  if (STATE.layers[layerId].visible) overlay.addTo(map);
+  STATE.tileLayers[layerId] = overlay;
+}
+
+/* Loads curiosity-traverse.geojson and draws the rover path + waypoint dots + latest position.
+   Also runs the terrain-model validation against the rover's reported elevations. */
+async function addCuriosityTraverse(map) {
+  let gj;
+  try {
+    const resp = await fetch('./data/curiosity-traverse.geojson');
+    if (!resp.ok) throw new Error(resp.status);
+    gj = await resp.json();
+  } catch (err) {
+    console.warn('[site] traverse not loaded:', err);
+    return;
+  }
+
+  const group = L.layerGroup();
+  const waypoints = gj.features.filter(f => f.properties.kind === 'waypoint');
+  const latest = waypoints.reduce((a, b) => (b.properties.sol > (a ? a.properties.sol : -1) ? b : a), null);
+
+  gj.features.forEach(f => {
+    if (f.properties.kind !== 'traverse') return;
+    const latlngs = f.geometry.coordinates.map(([lon, lat]) => [lat, lon]);
+    L.polyline(latlngs, { color: '#FFFFFF', weight: 2, opacity: 0.85, dashArray: '2 5', interactive: false }).addTo(group);
+  });
+
+  waypoints.forEach(f => {
+    const [lon, lat] = f.geometry.coordinates;
+    const p = f.properties;
+    L.circleMarker([lat, lon], { radius: 2.5, color: '#FFFFFF', weight: 1, fillColor: '#3FD0C9', fillOpacity: 0.9 })
+      .bindTooltip(`Curiosity, sol ${p.sol}<br>${p.distTotalKm.toFixed(2)} km driven since landing`, { direction: 'top', className: 'target-tooltip' })
+      .addTo(group);
+  });
+
+  if (latest) {
+    const [lon, lat] = latest.geometry.coordinates;
+    L.marker([lat, lon], {
+      icon: L.divIcon({ className: 'rover-icon', html: '<div class="rover-pin" title="Curiosity">MSL</div>', iconSize: [34, 18], iconAnchor: [17, 9] }),
+      zIndexOffset: 400
+    }).bindTooltip(`Curiosity's latest reported position: sol ${latest.properties.sol}`, { direction: 'right', className: 'target-tooltip' })
+      .addTo(group);
+  }
+
+  if (STATE.layers.traverse.visible) group.addTo(map);
+  STATE.tileLayers.traverse = group;
+  STATE.curiosity = { waypoints: waypoints.length, latestSol: latest ? latest.properties.sol : null };
+  _validateTerrain(waypoints);
+}
+
+/* Compares our HiRISE elevation grid with the elevation Curiosity reported at each waypoint.
+   Stores { n, meanOffsetM, rmsAfterOffsetM } in STATE.validation. A constant offset is expected
+   (different vertical datums); the scatter after removing it shows how good the terrain model is. */
+function _validateTerrain(waypoints) {
+  if (!STATE.grids.loaded) return;
+  const diffs = [];
+  waypoints.forEach(f => {
+    const [lon, lat] = f.geometry.coordinates;
+    const cell = latLonToCell(lat, lon);
+    if (!cell) return;
+    const ours = getCellValue(STATE.grids.elevation, cell.row, cell.col);
+    if (isFinite(ours) && isFinite(f.properties.elevGeoidM)) diffs.push(ours - f.properties.elevGeoidM);
+  });
+  if (diffs.length < 5) return;
+  const mean = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+  const rms = Math.sqrt(diffs.reduce((a, d) => a + (d - mean) * (d - mean), 0) / diffs.length);
+  STATE.validation = { n: diffs.length, meanOffsetM: mean, rmsAfterOffsetM: rms };
+  console.log(`[site] terrain check vs ${diffs.length} rover waypoints: offset ${mean.toFixed(1)} m, scatter ${rms.toFixed(2)} m`);
+}
+
+/* Lets layer opacity sliders work on vector layer groups (traverse) as well as tiles/images. */
+function setSiteLayerOpacity(layer, opacity) {
+  if (typeof layer.setOpacity === 'function') { layer.setOpacity(opacity); return true; }
+  if (typeof layer.eachLayer === 'function') {
+    layer.eachLayer(l => { if (l.setStyle) l.setStyle({ opacity, fillOpacity: opacity }); if (l.setOpacity) l.setOpacity(opacity); });
+    return true;
+  }
+  return false;
+}
+
+/* Adds every real-site layer. Call once after loadGrids(). Order = drawing order (bottom to top). */
+async function initSiteLayers(map) {
+  if (!map || !STATE.grids.loaded) return;
+  addHiriseTiles(map);
+  addSiteImageLayer(map, 'themisDay',   'themis-day.png',   'themis-overlay');
+  addSiteImageLayer(map, 'themisNight', 'themis-night.png', 'themis-overlay');
+  addSiteImageLayer(map, 'relief',      'relief-overlay.png');
+  await addCuriosityTraverse(map);
+}

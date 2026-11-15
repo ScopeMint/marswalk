@@ -217,6 +217,8 @@ function computePointOfNoReturn() {
 function updatePonrMarker(ponrIndex) {
   clearPonrMarker();
   if (ponrIndex === null || !STATE.route.cells) return;
+  // Whole route is within the turn-back limit: no flag needed
+  if (ponrIndex >= STATE.route.cells.length - 1) return;
   const cell = STATE.route.cells[ponrIndex];
   if (!cell) return;
   const pt = cellToLatLon(cell.row, cell.col);

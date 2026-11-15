@@ -32,6 +32,10 @@ async function initApp() {
   if (typeof addHillshadeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addHillshadeOverlay(STATE.map);
   }
+  // Real-site layers: HiRISE 25 cm tiles, THEMIS, rock & ridge relief, Curiosity's path
+  if (typeof initSiteLayers === 'function' && STATE.map && STATE.grids.loaded) {
+    await initSiteLayers(STATE.map);
+  }
   if (typeof addSlopeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addSlopeOverlay(STATE.map);
   }
@@ -61,6 +65,9 @@ async function initApp() {
   if (typeof clearProfile === 'function') {
     setTimeout(() => clearProfile('profile-canvas'), 100);
   }
+
+  // 9. Visor HUD + walk simulation (adds its own button to the top bar)
+  if (typeof initHud === 'function') initHud();
 
   console.log('[main] MarsWalk ready');
 }

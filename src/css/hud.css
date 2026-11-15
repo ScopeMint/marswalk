@@ -1,0 +1,97 @@
+/* Visor-only styling. The map receives pointer events through all instrumentation. */
+.hud-overlay {
+  position: fixed; inset: 0; z-index: 2400; pointer-events: none;
+  color: #e8f6f5; font: 18px/1.45 ui-monospace, 'SF Mono', Consolas, monospace;
+  background: radial-gradient(ellipse at 50% 44%, transparent 24%, rgba(5, 13, 17, .28) 48%, rgba(5, 13, 17, .95) 100%);
+  text-shadow: 0 2px 5px #000; font-variant-numeric: tabular-nums;
+}
+.hud-overlay[hidden], .hud-overlay [hidden] { display: none !important; }
+.hud-overlay::before {
+  content: ''; position: absolute; inset: 18px; border: 1px solid rgba(63, 208, 201, .5);
+  border-radius: 110px 110px 150px 150px; box-shadow: inset 0 0 45px rgba(63, 208, 201, .05);
+}
+.hud-overlay::after {
+  content: ''; position: absolute; inset: 32px 40px; border-top: 2px solid rgba(63, 208, 201, .25);
+  border-bottom: 2px solid rgba(63, 208, 201, .25); border-radius: 70px;
+}
+.hud-overlay button, .hud-overlay select, .hud-controls label {
+  pointer-events: auto; position: relative; z-index: 1;
+}
+.hud-overlay button, .hud-overlay select {
+  font: inherit; color: #e8f6f5; background: #10242b; border: 1px solid #3FD0C9;
+  border-radius: 5px; padding: 8px 16px; cursor: pointer; text-shadow: none;
+}
+.hud-overlay button:hover { background: #1c4047; }
+.hud-overlay button:disabled { opacity: .45; cursor: default; }
+.hud-overlay button:focus-visible, .hud-overlay select:focus-visible, .hud-overlay input:focus-visible {
+  outline: 3px solid #F2B134; outline-offset: 4px;
+}
+.hud-close { position: absolute !important; top: 38px; right: 64px; }
+.hud-heading { position: absolute; top: 42px; left: 30%; width: 40%; text-align: center; }
+.hud-heading strong { display: block; color: #3FD0C9; font-size: 42px; letter-spacing: .08em; }
+.hud-label, .hud-right dt, .hud-profile-label { display: block; color: #b7d1d2; font-size: 14px; letter-spacing: .08em; }
+.hud-target { display: block; overflow-wrap: anywhere; color: #fff; font-size: 20px; }
+.hud-panel { position: absolute; top: 24%; padding: 22px; background: rgba(5, 13, 17, .86); border-radius: 16px; }
+.hud-left { left: 4%; width: 285px; border-left: 2px solid #3FD0C9; }
+.hud-right { right: 4%; width: 320px; border-right: 2px solid #3FD0C9; }
+.hud-clock { display: block; font-size: 34px; color: #3FD0C9; margin-bottom: 18px; }
+.hud-right dd { color: #3FD0C9; font-size: 24px; margin: 0 0 13px; }
+.hud-right dd:last-child { margin-bottom: 0; }
+.hud-consumables { display: flex; gap: 20px; align-items: center; }
+.hud-consumables strong { display: block; font-size: 30px; }
+.hud-bar { height: 160px; width: 25px; border: 1px solid #3FD0C9; position: relative; background: #071114; }
+.hud-bar > div { position: absolute; bottom: 0; width: 100%; background: #3FD0C9; }
+.hud-note { font-size: 12px; color: #b7d1d2; }
+.hud-bottom { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: min(680px, 52vw); text-align: center; }
+.hud-phase { color: #f49a70; font-size: 18px; margin-bottom: 5px; }
+.hud-status { font-size: 32px; font-weight: bold; letter-spacing: .15em; }
+.hud-go { color: #46C37B; }
+.hud-caution { color: #F2B134; }
+.hud-danger { color: #E5484D; }
+.hud-countdown { margin-bottom: 12px; }
+.hud-profile-label { display: flex; justify-content: space-between; font-size: 12px; }
+.hud-profile { display: block; width: 100%; height: 72px; background: rgba(5, 13, 17, .85); border-bottom: 1px solid #3FD0C9; }
+.hud-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; white-space: nowrap; }
+.hud-controls label { display: inline-flex; align-items: center; gap: 8px; }
+.hud-controls input { accent-color: #3FD0C9; width: 18px; height: 18px; }
+.hud-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 24px; background: #10242b; border: 1px solid #3FD0C9; border-radius: 12px; text-align: center; }
+.hud-astronaut { background: transparent; pointer-events: none; }
+.hud-astronaut-body { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: #10242b; border: 2px solid #3FD0C9; color: white; font-size: 25px; animation: hud-pulse 2s ease-in-out infinite; }
+.hud-astronaut-body::before { content: ''; position: absolute; top: 5px; left: 9px; width: 14px; height: 12px; border: 3px solid #e8f6f5; border-radius: 50%; background: #D9622B; }
+.hud-astronaut-body::after { content: ''; position: absolute; top: 18px; left: 8px; width: 16px; height: 9px; border-radius: 5px 5px 2px 2px; background: #e8f6f5; }
+@keyframes hud-pulse { 50% { box-shadow: 0 0 0 10px rgba(63, 208, 201, .2), 0 0 18px #3FD0C9; } }
+@media (max-width: 1100px), (max-height: 800px) {
+  .hud-overlay { font-size: 14px; }
+  .hud-panel { top: 22%; padding: 12px; }
+  .hud-left { left: 3%; width: 220px; }
+  .hud-right { right: 3%; width: 260px; }
+  .hud-clock { font-size: 26px; margin-bottom: 8px; }
+  .hud-right dd { font-size: 19px; margin-bottom: 6px; }
+  .hud-bar { height: 100px; }
+  .hud-bottom { bottom: 25px; width: min(600px, 56vw); }
+  .hud-profile { height: 45px; }
+  .hud-close { top: 20px; right: 30px; }
+  .hud-heading { top: 20px; }
+  .hud-heading strong { font-size: 28px; }
+  .hud-controls { flex-wrap: wrap; gap: 6px; }
+}
+@media (max-width: 700px) {
+  .hud-heading { top: 70px; left: 15%; width: 70%; }
+  .hud-panel { top: 190px; width: 45%; font-size: 12px; }
+  .hud-label, .hud-right dt { font-size: 10px; }
+  .hud-right dd { font-size: 14px; }
+  .hud-clock { font-size: 20px; }
+  .hud-bottom { width: 90vw; }
+  .hud-note { display: none; }
+  .hud-consumables { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud-astronaut-body, .hud-overlay *, .hud-overlay::before, .hud-overlay::after { animation: none !important; transition: none !important; }
+}
+/* Full-screen map while the visor is open (body.hud-active set by hudSetFullscreenMap) */
+body.hud-active #map-container { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; z-index: 2000; }
+body.hud-active #summary-card, body.hud-active #pov-panel, body.hud-active #rad-badge,
+body.hud-active .leaflet-control-container { display: none !important; }
+body.hud-active #top-bar, body.hud-active #bottom-bar,
+body.hud-active #left-panel, body.hud-active #right-panel { visibility: hidden !important; }
+body.hud-active #main-area { position: fixed; inset: 0; }

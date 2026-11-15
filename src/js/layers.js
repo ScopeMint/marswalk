@@ -17,9 +17,18 @@ const SLOPE_LEGEND = [
 /* Layer catalog — used by the right panel "i" info buttons */
 const LAYER_CATALOG = [
   {
+    id: 'hirise',
+    name: 'HiRISE Imagery (25 cm)',
+    description: 'Walking-scale orbital photo of the study area. Individual ridges, sand ripples and large rocks are visible.',
+    mission: 'Mars Reconnaissance Orbiter (MRO)',
+    instrument: 'HiRISE camera, orthoimage ESP_019988_1750_RED_A_01_ORTHO',
+    resolution: '0.25 m/px source; tiles to ~0.6 m/px',
+    source: 'NASA/JPL/University of Arizona; USGS Astrogeology analysis-ready data (CC0)'
+  },
+  {
     id: 'opm',
-    name: 'Mars Imagery (OPM)',
-    description: 'Global Mars basemap combining NASA Viking MDIM 2.1 optical imagery with MOLA colorized elevation.',
+    name: 'Global Mars Basemap (OPM)',
+    description: 'Context map outside the study area: NASA Viking MDIM 2.1 imagery with MOLA colorized elevation.',
     mission: 'Viking Orbiter + MGS MOLA',
     instrument: 'MDIM 2.1 camera mosaic + MOLA altimeter',
     resolution: '~232 m/px global',
@@ -28,37 +37,55 @@ const LAYER_CATALOG = [
   {
     id: 'hillshade',
     name: 'Terrain Shading',
-    description: 'Elevation colour + hillshade shadows showing height and depth. Darker = lower elevation; lighter = higher. Shadows from NW light source reveal ridge shapes.',
-    mission: 'Computed from elevation data (synthetic for development)',
-    instrument: 'Elevation grid + hillshade algorithm',
-    resolution: '20 m/cell [our assumption]',
-    source: 'Synthetic terrain — replace with HiRISE/CTX DTM before submission'
+    description: 'Elevation colour + hillshade shadows from the HiRISE terrain model. Darker = lower; lighter = higher.',
+    mission: 'Mars Reconnaissance Orbiter (MRO)',
+    instrument: 'HiRISE DTM DTEEC_019698_1750_019988_1750_U01',
+    resolution: '4 m/px (from 1 m DTM)',
+    source: 'HiRISE team, University of Arizona; USGS Astrogeology (CC0)'
   },
   {
     id: 'slope',
     name: 'Slope Classes',
-    description: 'Terrain steepness in 5 classes. Orange/red = too steep for EVA at the default 15° limit. Computed from elevation data.',
-    mission: 'Computed from elevation source (HiRISE DTM / CTX DTM / MOLA)',
-    instrument: 'DTM + slope computation',
-    resolution: '20 m/cell [our assumption]',
-    source: 'See docs/SOURCES.md for elevation data source'
+    description: 'Terrain steepness in 5 classes. Orange/red = too steep for EVA at the default 15° limit.',
+    mission: 'Mars Reconnaissance Orbiter (MRO)',
+    instrument: 'Computed from HiRISE DTM (1 m), averaged to 10 m cells',
+    resolution: '10 m/cell [our assumption]',
+    source: 'HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (CC0)'
+  },
+  {
+    id: 'relief',
+    name: 'Rock & Ridge Relief (boulders)',
+    description: 'How bumpy the ground is at 1 m scale inside each 10 m cell, after removing the hill shape. Amber = some rocks or small ridges; orange = rocky/ridged (route slows 25%); red = very rocky, blocks or scarps. Single rocks under ~2 m are not resolved.',
+    mission: 'Mars Reconnaissance Orbiter (MRO)',
+    instrument: 'HiRISE DTM (1 m/px): std. dev. of de-trended elevation',
+    resolution: '1 m relief, shown per 10 m cell',
+    source: 'Our calculation from HiRISE DTM DTEEC_019698_1750_019988_1750_U01; class limits are OUR ASSUMPTION'
+  },
+  {
+    id: 'traverse',
+    name: "Curiosity's Real Path",
+    description: 'The rover’s actual drive path and end-of-drive positions (hover a dot for the sol). The MSL marker is its latest reported position.',
+    mission: 'Mars Science Laboratory (Curiosity)',
+    instrument: 'Rover localization (MMGIS traverse + waypoint layers)',
+    resolution: 'Per drive',
+    source: 'NASA/JPL-Caltech MMGIS: mars.nasa.gov/mmgis-maps/MSL/Layers/json/'
   },
   {
     id: 'los',
     name: 'Communication Zones (Line-of-Sight)',
-    description: 'Amber/red = terrain blocks radio line-of-sight to the EVA Base from that cell. Transparent = clear signal path. Computed from elevation grid using Bresenham\'s line algorithm. [Synthetic terrain — verify with real DTM]',
-    mission: 'Computed from elevation data',
-    instrument: 'Elevation grid + LOS algorithm',
-    resolution: '20 m/cell [our assumption]',
-    source: 'Our calculation — see docs/SOURCES.md. Terrain is synthetic for development.'
+    description: 'Amber/red = terrain blocks a direct radio line from the habitat mast (10 m) to a suit antenna (2 m). Transparent = clear. Beyond line-of-sight a relay (rover or orbiter) is needed.',
+    mission: 'Computed from HiRISE DTM',
+    instrument: 'Elevation grid + line-of-sight algorithm',
+    resolution: '10 m/cell',
+    source: 'Our calculation. Mast and antenna heights are OUR ASSUMPTION.'
   },
   {
     id: 'rad',
     name: 'Radiation Zones (Approximate)',
-    description: 'Green = near baseline dose (233 μGy/day, Hassler et al. 2014); red = slightly elevated dose at higher elevation (thinner atmosphere = less shielding). Model: +1.5% per 100m elevation [OUR ASSUMPTION]. Not a forecast — planning estimate only.',
-    mission: 'MSL/Curiosity RAD + elevation model',
+    description: 'Green = near baseline dose (233 μGy/day, Hassler et al. 2014); red = slightly higher dose at higher elevation (thinner air above). Model: +1.5% per 100 m elevation [OUR ASSUMPTION]. Planning estimate only.',
+    mission: 'MSL/Curiosity RAD + HiRISE elevation',
     instrument: 'RAD + DTM-derived altitude model',
-    resolution: '20 m/cell [our assumption]',
+    resolution: '10 m/cell',
     source: 'Base dose: Hassler et al. (2014), Science 343(6169). Elevation scaling: OUR ASSUMPTION.'
   },
   {
@@ -67,26 +94,26 @@ const LAYER_CATALOG = [
     description: 'Minutes to walk back to the habitat from any point, using the slope-aware speed model.',
     mission: 'Computed from elevation + slope grids',
     instrument: 'Route model [our assumption]',
-    resolution: '20 m/cell',
+    resolution: '10 m/cell',
     source: 'Our calculation — see Assumptions panel'
   },
   {
     id: 'themisDay',
     name: 'THEMIS Day IR (Thermal)',
-    description: 'Daytime infrared brightness. Brighter = higher thermal inertia (rock/sand mix). Darker = loose dust.',
+    description: 'Daytime infrared brightness (relative). Brighter = warmer surface in the afternoon. Shown without temperature units (relative brightness only).',
     mission: 'Mars Odyssey',
-    instrument: 'THEMIS (Thermal Emission Imaging System)',
+    instrument: 'THEMIS (Thermal Emission Imaging System), controlled mosaic v2',
     resolution: '~100 m/px',
-    source: 'NASA/JPL-Caltech/ASU via Mars Trek'
+    source: 'NASA/JPL-Caltech/ASU via NASA Mars Trek; Edwards et al. (2011), JGR 116, E10008'
   },
   {
     id: 'themisNight',
     name: 'THEMIS Night IR (Thermal)',
-    description: 'Nighttime infrared. Areas that stay warm overnight have higher thermal inertia (bedrock or large rocks).',
+    description: 'Night-time infrared brightness (relative). Ground that stays warm at night has high thermal inertia: bedrock or rocks, not loose sand. Good footing.',
     mission: 'Mars Odyssey',
-    instrument: 'THEMIS',
+    instrument: 'THEMIS, controlled mosaic v2',
     resolution: '~100 m/px',
-    source: 'NASA/JPL-Caltech/ASU via Mars Trek'
+    source: 'NASA/JPL-Caltech/ASU via NASA Mars Trek; Edwards et al. (2011), JGR 116, E10008'
   }
 ];
 
@@ -216,7 +243,8 @@ function addThermisNight(map) {
 function updateLayerOpacity(layerId, opacity) {
   const layer = STATE.tileLayers[layerId];
   if (!layer) return;
-  layer.setOpacity(opacity);
+  if (typeof setSiteLayerOpacity === 'function') setSiteLayerOpacity(layer, opacity);
+  else if (layer.setOpacity) layer.setOpacity(opacity);
   if (STATE.layers[layerId]) STATE.layers[layerId].opacity = opacity;
 }
 

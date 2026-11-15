@@ -1470,3 +1470,17 @@ body {
     animation: none !important;
   }
 }
+
+/* ── Real-site layers (site-layers.js) ───────────────────────────────────── */
+.rover-pin {
+  background: #0F1115;
+  color: #3FD0C9;
+  border: 1.5px solid #3FD0C9;
+  border-radius: 4px;
+  font: 700 10px/16px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
+  letter-spacing: 0.08em;
+  box-shadow: 0 0 6px rgba(63, 208, 201, 0.6);
+}
+.themis-overlay { image-rendering: auto; mix-blend-mode: normal; }
+.sum-val.sum-pass { color: var(--pass, #46C37B); }

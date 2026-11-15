@@ -2,18 +2,31 @@
    The Assumptions panel reads directly from this object. */
 const CONFIG = {
 
-  /* Study area: ~6 km x 6 km box around boxwork formations at Mount Sharp, Gale Crater.
-     OUR ASSUMPTION: 6 km walkable range for a single Marswalk. */
+  /* Study area: 4 km x 4 km box on Curiosity's real 2025-2026 boxwork route, Mount Sharp, Gale Crater.
+     Box size limited by the HiRISE 1 m terrain model strip (~5.4 km wide here).
+     OUR ASSUMPTION: 4 km covers a single Marswalk (all targets within ~2 km of the habitat). */
   studyArea: {
-    centerLat:    -5.10,    // Murray formation boxwork zone, Mount Sharp (not Bradbury Landing)
-    centerLon:    137.75,   // degrees, east longitude
-    sizeMeters:   6000,     // side length of the study area square [OUR ASSUMPTION]
-    defaultZoom:  12,       // shows Gale Crater terrain detail on load
-    planningZoom: 14,       // zoom used when flying to the planning area / clicking a target
-    // Default habitat position (NW quadrant of study area, flattest zone near targets)
+    centerLat:    -4.808,   // center of Curiosity's boxwork traverse (MMGIS waypoints, sols 4500-5073)
+    centerLon:    137.372,  // degrees, east longitude
+    sizeMeters:   4000,     // side length of the study area square [OUR ASSUMPTION]
+    defaultZoom:  14,       // shows the whole study area on load
+    planningZoom: 15,       // zoom used when flying to the planning area / clicking a target
+    // Default habitat position: flattest wide pad near the targets (our selection from HiRISE DTM).
     // Matches aoi.json defaultHabitatLat/Lon — duplicated here as fallback if aoi.json fails
-    defaultHabitatLat: -5.0747,
-    defaultHabitatLon: 137.7247
+    defaultHabitatLat: -4.82276,
+    defaultHabitatLon: 137.36447
+  },
+
+  /* Mars size, for converting meters to degrees on the map (IAU 2015 Mars sphere). */
+  mars: {
+    radiusMeters: 3396190
+  },
+
+  /* HiRISE 25 cm orthoimage tiles cut for the study area (scripts/08_build_real_site.py). */
+  hirise: {
+    minZoom: 12,   // below this the global basemap is enough
+    maxZoom: 19,   // Leaflet over-zooms past the native z17 (~0.6 m/px)
+    attribution: 'HiRISE: NASA/JPL/University of Arizona; DTM/ortho via USGS Astrogeology'
   },
 
   /* Tile layers for the map.

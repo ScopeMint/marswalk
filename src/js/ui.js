@@ -93,17 +93,17 @@ function updateSummaryCard() {
     const ponrIdx = computePointOfNoReturn();
     if (ponrIdx !== null && route.cells && route.cells.length > ponrIdx) {
       const ponrCell = route.cells[ponrIdx];
-      const ponrDistKm = route.profile && route.profile[ponrIdx]
-        ? (route.profile[ponrIdx].distanceMeters / 1000).toFixed(2)
-        : ((ponrIdx / route.cells.length) * (route.distanceMeters / 1000)).toFixed(2);
+      // ponrIdx indexes the thinned display path (route.cells), not route.profile — use the fraction
+      const wholeRouteSafe = ponrIdx >= route.cells.length - 1;
+      const ponrDistKm = ((ponrIdx / Math.max(1, route.cells.length - 1)) * (route.distanceMeters / 1000)).toFixed(2);
       const ponrRow = document.createElement('div');
       ponrRow.className = 'sum-row';
       const ponrLabel = document.createElement('span');
       ponrLabel.className = 'sum-label';
       ponrLabel.textContent = '↩ Turn-back point';
       const ponrVal = document.createElement('span');
-      ponrVal.className = 'sum-val sum-caution';
-      ponrVal.textContent = ponrDistKm + ' km from base';
+      ponrVal.className = wholeRouteSafe ? 'sum-val sum-pass' : 'sum-val sum-caution';
+      ponrVal.textContent = wholeRouteSafe ? 'none: whole route OK' : ponrDistKm + ' km from base';
       ponrVal.title = 'Past this point you cannot complete the EVA within your time budget (including work time and 25% reserve). The amber flag on the map marks this position.';
       ponrRow.appendChild(ponrLabel);
       ponrRow.appendChild(ponrVal);
@@ -205,12 +205,17 @@ function buildLayerPanel() {
   if (!panel) return;
 
   const layerDefs = [
-    { id: 'opm',       label: 'Imagery (OPM)',           defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'slope',     label: 'Slope classes',           defaultOn: true,  defaultOpacity: 0.45 },
+    { id: 'hirise',    label: 'HiRISE imagery (25 cm)',  defaultOn: true,  defaultOpacity: 1.00 },
+    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 1.00 },
+    { id: 'traverse',  label: "Curiosity's real path",   defaultOn: true,  defaultOpacity: 0.90 },
+    { id: 'slope',     label: 'Slope classes',           defaultOn: true,  defaultOpacity: 0.35 },
+    { id: 'relief',    label: 'Rocks & ridges (1 m)',    defaultOn: false, defaultOpacity: 0.85 },
     { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
     { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
     { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'themisNight', label: 'THEMIS Night IR',       defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'hillshade', label: 'Terrain shading',         defaultOn: false, defaultOpacity: 0.70 },
   ];
 
   panel.innerHTML = '';
@@ -286,7 +291,7 @@ function buildLayerPanel() {
   pathPanel.className = 'route-data-panel';
   panel.appendChild(pathPanel);
 
-  updateRouteDataPanel(null);
+  if (typeof updateRouteDataPanel === 'function') updateRouteDataPanel(null);
 }
 
 /* ── Coordinate tooltip on hover ───────────────────────────────────────────── */
@@ -347,8 +352,8 @@ function _buildAssumptionsModal() {
   box.appendChild(disclaimer);
 
   const assumptions = [
-    { name: 'Study area size',    value: '6 km × 6 km',  why: 'Walkable range for a single Marswalk', type: 'OUR ASSUMPTION' },
-    { name: 'Grid cell size',      value: '20 m',         why: 'Fast enough for real-time route; upgradeable to 10 m', type: 'OUR ASSUMPTION' },
+    { name: 'Study area size',    value: '4 km × 4 km',  why: 'Walkable range for a single Marswalk; limited by the HiRISE 1 m terrain strip', type: 'OUR ASSUMPTION' },
+    { name: 'Grid cell size',      value: '10 m',         why: 'Fast real-time route (160,000 cells); elevation averaged from 1 m HiRISE', type: 'OUR ASSUMPTION' },
     { name: 'Slope limit (default)', value: '15°',        why: 'Conservative estimate for suited EVA traverse', type: 'OUR ASSUMPTION' },
     { name: 'Walking speed (normal)', value: '3 km/h',    why: 'Suited astronaut estimated pace on flat terrain', type: 'OUR ASSUMPTION' },
     { name: 'Uphill speed at limit', value: '40% of flat', why: 'Linear model — becomes very slow near the slope limit', type: 'OUR ASSUMPTION' },
@@ -423,16 +428,20 @@ function _buildAboutModal() {
   box.appendChild(header);
 
   const content = [
-    ['What is MarsWalk?', 'A layered EVA planning tool for the Gale Crater / Mount Sharp study area on Mars. It layers NASA data at walking scale to help plan a safe Marswalk.'],
+    ['What is MarsWalk?', "A layered EVA planning tool for the real site where NASA's Curiosity rover studied boxwork ridges in 2025-2026 (Mount Sharp, Gale Crater). It layers NASA data from 4 missions at walking scale to help plan a safe Marswalk."],
     ['This is a planning concept', 'Not flight software. All assumptions are stated on screen. Data sources are listed below.'],
-    ['Cannot model', 'Single boulders (elevation resolution limit), soil softness, suit or gear details, radiation forecasts, or real-time conditions.'],
-    ['Imagery layer', 'OpenPlanetaryMap (OPM) — NASA Viking MDIM 2.1 + MOLA colorized elevation. openplanetary.org/opm'],
-    ['Elevation data', 'See docs/SOURCES.md for the specific DTM used. Fallback: MOLA 128ppd (Smith et al. 2001, JGR).'],
+    ['Cannot model', 'Single rocks smaller than ~2 m (they only show as extra relief), soil softness, suit or gear details, radiation forecasts, or real-time conditions.'],
+    ['Imagery layers', 'HiRISE orthoimage ESP_019988_1750 (0.25 m/px; NASA/JPL/University of Arizona, via USGS Astrogeology, CC0). Outside the study area: OpenPlanetaryMap (NASA Viking MDIM 2.1 + MOLA). THEMIS day/night IR mosaics (NASA/JPL/ASU via NASA Mars Trek; Edwards et al. 2011).'],
+    ['Elevation data', 'HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (1 m/px; HiRISE team, University of Arizona; McEwen et al. 2007, JGR 112). Slope = 10 m cells; rock & ridge relief = 1 m. Check: matches the elevations Curiosity reported along its real path (see Validation).'],
+    ['Validation', (STATE.validation
+      ? `We compared our terrain model with the elevation Curiosity itself reported at ${STATE.validation.n} real stops inside the study area. After removing a constant ${Math.abs(STATE.validation.meanOffsetM).toFixed(1)} m datum offset, they agree to within ${STATE.validation.rmsAfterOffsetM.toFixed(1)} m (RMS). The rover's own path also stays on slopes our model rates as walkable.`
+      : 'Terrain check against Curiosity waypoints runs after the data loads.')],
+    ['Curiosity path + photos', 'Rover traverse and waypoints: NASA/JPL-Caltech MMGIS. Photos: Curiosity Navcam/Mastcam raw images from the sol the rover stood at each target (NASA/JPL-Caltech/MSSS).'],
     ['Radiation baseline', 'Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797'],
     ['Temperature data', 'Martínez et al. (2017), JGR Planets + REMS team (cab.inta-csic.es/rems/en/)'],
-    ['Science targets', 'Our selection based on: Rapin et al. 2021 (boxwork); Bristow et al. 2021 (clay); Fraeman et al. 2020 (hematite); Edgar et al. 2020 (pediment); NASA/JPL 2023 (Gediz Vallis)'],
+    ['Science targets', 'Targets 1-4 sit at Curiosity’s real positions: Altadena drill (sol 4571), Monte Grande hollow / Nevado Sajama ridge drills (sols ~4695-4718), boxwork entry (sol 4548), latest position (sol 5073). Sources: NASA/JPL news (June 2025); Curiosity blog sols 4709-4722 (Nov 2025); Siebach & Grotzinger 2014, JGR Planets 119 (boxwork). Target 5 is our own pick from HiRISE.'],
     ['Route model', 'Dijkstra (walk-back map) + gradient descent (route). Speed model is a linear approximation [OUR ASSUMPTION].'],
-    ['AI use', 'Claude Code (Anthropic) wrote the application code. Humans chose the concept, verified data sources, and tested. No AI-generated images or video.'],
+    ['AI use', 'Claude Code (Anthropic) wrote most application code and data scripts; OpenAI Codex wrote the visor HUD module (hud.js, hud.css). Humans chose the concept, verified data sources, and tested. No AI-generated images or video.'],
     ['Challenge', 'NASA Space Apps 2026 — "The Next Frontier". Team: Dark Matter Devs.'],
   ];
 
@@ -496,8 +505,8 @@ function _buildHowToUseModal() {
     {
       heading: '🌍 The Map',
       items: [
-        'The map shows Mars using NASA Viking and MOLA data (provided by OpenPlanetaryMap).',
-        'The orange dashed box is your 6 km × 6 km planning area centered on the boxwork formations at Mount Sharp.',
+        'Inside the study area the map shows 25 cm HiRISE images; outside, a global NASA Viking + MOLA basemap.',
+        "The orange dashed box is your 4 km × 4 km planning area on Curiosity's real boxwork route. The white dotted line is the rover's actual path.",
         'Pan by clicking and dragging. Zoom with the scroll wheel or +/− buttons.',
         'You can explore anywhere on Mars using the location library in the left panel — but EVA planning only works inside the orange box.',
         'If you pan away from Gale Crater, a yellow banner appears. Click "Return to study area" to come back.',
@@ -528,7 +537,7 @@ function _buildHowToUseModal() {
     {
       heading: '🛤 Planning a Route',
       items: [
-        '1. The habitat (green tent) is your starting point. It is placed on flat terrain in the northwest of the study area.',
+        '1. The habitat (green tent) is your starting point. It sits on the flattest wide pad in the southwest of the study area.',
         '2. Click a science target card and press "Plan route" — or click directly on a numbered marker on the map.',
         '3. The route (teal/cyan line) will appear in under a second, following the flattest path that respects your slope limit.',
         '4. The Summary Card appears in the top-right corner of the map with all the numbers you need.',
@@ -566,7 +575,7 @@ function _buildHowToUseModal() {
         'Each row is a data layer. The toggle switch (blue = on, grey = off) turns it on or off.',
         'The opacity slider below each layer name adjusts how transparent the layer is.',
         'The ⓘ button shows the data source, mission, and resolution for that layer.',
-        'Imagery (OPM) — the base map showing Mars terrain from NASA Viking and MOLA data.',
+        'HiRISE imagery — 25 cm orbital photos of the study area. Global basemap (OPM) — NASA Viking + MOLA context outside it.',
         'Slope classes — a colour overlay showing terrain steepness: green = gentle, yellow = moderate, orange = steep, red = very steep. See the SLOPE LEGEND below.',
         'Walk-back time — colour bands showing how many minutes it takes to walk back to the habitat from any point (requires a route to be computed first).',
         'THEMIS Day IR — thermal infrared from the Mars Odyssey spacecraft showing surface warmth during the day.',
@@ -606,7 +615,7 @@ function _buildHowToUseModal() {
     {
       heading: '⚠ What This Tool Cannot Do',
       items: [
-        'Single boulders — the terrain grid is 20 m cells; individual rocks are invisible.',
+        'Single small rocks — the terrain model is 1 m; rocks under ~2 m only show up as extra relief in the Rocks & ridges layer.',
         'Soil softness or dust depth — cannot predict whether the ground will bear weight.',
         'Suit or life support details — no suit pressure, oxygen, or cooling modeled.',
         'Radiation forecasts — the radiation number is a baseline from calm solar conditions, not a forecast.',
