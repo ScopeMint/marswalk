@@ -331,16 +331,16 @@ function initCharts() {
   if (_charts.ready) return;
   _charts.ready = true;
   document.body.classList.add('charts2');
-  chartFrame('profile', 'profile-canvas', 'Hills along your route',
-    'Height of the ground along the planned route, from the HiRISE terrain model. Left = base, right = target.',
+  chartFrame('profile', 'profile-canvas', 'Hills along your route · HiRISE DTM 1 m/px',
+    'Height of the ground along the planned route. Source: HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (NASA/JPL/University of Arizona, 1 m/px, CC0). Left = base, right = target.',
     () => drawProfile('profile-canvas'),
     () => { const d = _charts.profile.data; return d && d.length > 1 ? [0, d[d.length - 1].distanceMeters] : null; },
     () => { const d = _charts.profile.data; return d && d.length > 1 ? d[d.length - 1].distanceMeters / 100 : 10; });
-  chartFrame('temp', 'temp-canvas', 'Outside temperature through the day',
-    'Air temperature at Gale Crater by hour of the Mars day. Each curve\'s daily low and high are averages measured by Curiosity REMS over thousands of sols; the hours in between follow a typical shape and are approximate.',
+  chartFrame('temp', 'temp-canvas', 'Outside temperature through the day · Curiosity REMS',
+    'Air temperature at Gale Crater by local hour. Each curve is the median of real hourly Curiosity REMS measurements (NASA PDS, MODRDR product) over 186 Mars sols, in each half of the Mars year. Hours between measurements follow a typical diurnal shape and are approximate.',
     () => drawTempChart('temp-canvas'), () => [0, 24], 0.5);
-  chartFrame('sun', 'sun-canvas', 'Sun height today',
-    'How high the sun is above the horizon at the site through today\'s Mars day (Mars24 algorithm). Below 0° is night.',
+  chartFrame('sun', 'sun-canvas', 'Sun height today · Mars24',
+    'How high the sun is above the horizon at the site through today\'s Mars day, calculated from the Mars24 algorithm (Allison & McEwen 2000, Planetary and Space Science). Below 0° is night.',
     () => drawSunChart('sun-canvas'), () => [0, 24], 0.25);
   const all = () => {
     if (_charts.profile) drawProfile('profile-canvas');
