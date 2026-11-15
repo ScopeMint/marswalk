@@ -53,9 +53,12 @@ function slDrawMap(m) {
   if (!_sl.showOnMap || !STATE.map || !m) return;
   const group = L.layerGroup();
   L.polyline([[STATE.habitat.lat, STATE.habitat.lon], [STATE.target.lat, STATE.target.lon]],
-    { color: SL_COLORS.line, weight: 2, opacity: 0.85, dashArray: '6 8', interactive: false }).addTo(group);
+    { color: SL_COLORS.line, weight: 2, opacity: 0.85, dashArray: '6 8', interactive: false,
+      pane: 'routePane', renderer: STATE.routeRenderer }).addTo(group);
   m.steepRuns.forEach(([p, q]) => {
-    L.polyline([[p.lat, p.lon], [q.lat, q.lon]], { color: SL_COLORS.steep, weight: 5, opacity: 0.9, interactive: false }).addTo(group);
+    L.polyline([[p.lat, p.lon], [q.lat, q.lon]],
+      { color: SL_COLORS.steep, weight: 5, opacity: 0.9, interactive: false,
+        pane: 'routePane', renderer: STATE.routeRenderer }).addTo(group);
   });
   group.addTo(STATE.map);
   _sl.layer = group;

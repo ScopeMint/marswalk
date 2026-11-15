@@ -14,9 +14,9 @@ const HAZ_NEAR_LIMIT_DEG = 2;      // "near the slope limit" margin (docs/ROUTE_
 const HAZ_MIN_RANGE_M = 30;        // ignore hazard stretches shorter than this
 
 const HAZ_STYLE = {
-  radio: { color: '#B07CFF', label: 'Radio shadow (no direct line to base: relay via rover/orbiter)', icon: '📡' },
-  rocky: { color: '#E8742E', label: 'Rocky / ridged ground (slower, watch footing)', icon: '🪨' },
-  steep: { color: '#E5484D', label: 'Near slope limit', icon: '⛰' }
+  radio: { color: '#8C7FAD', label: 'Radio shadow (no direct line to base: relay via rover/orbiter)', icon: 'icon-radio' },
+  rocky: { color: '#E8742E', label: 'Rocky / ridged ground (slower, watch footing)', icon: 'icon-rock' },
+  steep: { color: '#E5484D', label: 'Near slope limit', icon: 'icon-slope' }
 };
 
 let _hazLayer = null;
@@ -141,7 +141,7 @@ function renderHazardSection() {
   if (!any) {
     const ok = document.createElement('div');
     ok.className = 'haz-row haz-clear';
-    ok.textContent = '✓ Clear: direct radio to base the whole way, no rocky or near-limit stretches.';
+    ok.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg> Clear: direct radio to base the whole way, no rocky or near-limit stretches.';
     block.appendChild(ok);
   } else if (hz.targetInShadow) {
     const warn = document.createElement('div');

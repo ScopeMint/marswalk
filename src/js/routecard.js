@@ -130,7 +130,7 @@ function stopRoute() {
   if (typeof _customMarker !== 'undefined' && _customMarker && STATE.map) { STATE.map.removeLayer(_customMarker); }   // "any point" marker
   STATE.route = { status: 'none' };
   STATE.selectedTarget = null; STATE.target = null; STATE.targetCell = null;
-  if (STATE.map) { STATE.map.setMinZoom(1); STATE.map.setMaxZoom(18); }  // unlock zoom
+  if (typeof unlockMapZoom === 'function') unlockMapZoom();
   document.querySelectorAll('.target-card.active').forEach(c => c.classList.remove('active'));
   if (typeof clearMapMessage === 'function') clearMapMessage();
   if (typeof clearProfile === 'function') clearProfile('profile-canvas');

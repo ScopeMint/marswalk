@@ -115,7 +115,7 @@ function initWalk3D() {
       <button data-w="play">Pause</button>
       <label class="walk-speed">Time-lapse <select data-w="speed" aria-label="Time-lapse speed"></select></label>
       <input data-w="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Position along the route">
-      <button data-w="route" hidden>↩ Back to route</button>
+      <button data-w="route" hidden aria-label="Back to route"><svg class="icon" aria-hidden="true"><use href="#icon-turn-back"/></svg> Back to route</button>
       <button data-w="visorBtn" aria-pressed="true">Visor</button>
       <span class="walk-help">Drag: look around · W A S D / arrows: explore freely · Space: pause</span>
     </footer>

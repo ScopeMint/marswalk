@@ -84,6 +84,11 @@
   --mono: ui-monospace, 'SF Mono', monospace;
 }
 
+/* ── SVG icon utility ── */
+.icon { display:inline-block; width:1em; height:1em; vertical-align:-0.125em; flex-shrink:0; }
+.icon-16 { width:16px; height:16px; }
+.icon-20 { width:20px; height:20px; }
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -374,7 +379,7 @@ body.intro-flying .leaflet-hazardPane-pane {
   background: rgba(15, 17, 21, 0.85);
   color: var(--muted);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 3px 8px;
   border-radius: 3px;
   pointer-events: none;
@@ -382,7 +387,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 
 /* ── Utility ── */
 .panel-heading {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--muted);
   text-transform: uppercase;
@@ -431,7 +436,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 }
 
 .search-result-type {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -439,7 +444,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 }
 
 .search-result-coords {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   font-family: var(--mono);
   margin-top: 2px;
@@ -496,7 +501,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 }
 
 .loc-card-type {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -511,7 +516,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 .loc-card.expanded .loc-card-body { display: block; }
 
 .loc-card-desc {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--muted);
   line-height: 1.55;
   margin: 8px 0 6px;
@@ -520,14 +525,14 @@ body.intro-flying .leaflet-hazardPane-pane {
 
 .loc-card-coords {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   margin-bottom: 8px;
   opacity: 0.6;
 }
 
 .loc-safety-heading {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
@@ -537,7 +542,7 @@ body.intro-flying .leaflet-hazardPane-pane {
 }
 
 .loc-safety-note {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text);
   line-height: 1.5;
   padding: 3px 0;
@@ -546,15 +551,16 @@ body.intro-flying .leaflet-hazardPane-pane {
   opacity: 0.8;
 }
 .loc-safety-note::before {
-  content: '⚠';
+  content: '!';
   color: var(--caution);
   flex-shrink: 0;
   font-size: 10px;
+  font-weight: 700;
   margin-top: 2px;
   opacity: 0.9;
 }
-.loc-safety-note.info::before { content: 'ℹ'; color: var(--muted); }
-.loc-safety-note.ok::before   { content: '✓'; color: var(--pass); }
+.loc-safety-note.info::before { content: 'i'; color: var(--muted); font-style: italic; font-weight: 700; }
+.loc-safety-note.ok::before   { content: '\2713'; color: var(--pass); }
 .loc-safety-note.warn::before { content: '!'; color: var(--danger); font-weight: 700; }
 
 .loc-fly-btn {
@@ -566,7 +572,7 @@ body.intro-flying .leaflet-hazardPane-pane {
   border: 1px solid var(--accent);
   color: var(--accent);
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 12px;
   cursor: pointer;
   font-family: var(--font);
   transition: background 0.15s;
@@ -667,7 +673,7 @@ body.intro-flying .leaflet-hazardPane-pane {
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 5px 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: var(--mono);
   color: var(--text);
   z-index: 700;
@@ -756,10 +762,42 @@ body.intro-flying .leaflet-hazardPane-pane {
   background: var(--panel) !important;
   border: 1px solid var(--border) !important;
   color: var(--text) !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
   padding: 4px 8px !important;
   border-radius: 4px !important;
   box-shadow: none !important;
+}
+
+/* ── Route colour legend (bottom-right of map, shown when a route is active) ── */
+.route-legend {
+  background: rgba(15, 17, 21, 0.90);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  min-width: 148px;
+  pointer-events: none;
+}
+.route-legend .rl-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.route-legend .rl-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 3px 0;
+  font-size: 11px;
+  color: var(--text);
+}
+.route-legend .rl-line {
+  flex-shrink: 0;
+  width: 36px;
+  height: 10px;
+  overflow: visible;
 }
 
 /* ── Summary card (floating top-right on map) ── */

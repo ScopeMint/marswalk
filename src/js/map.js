@@ -144,22 +144,31 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
-  // While a route is active zoom is fully locked (min = max = current zoom).
-  // Show a message on any scroll or +/- button press so the user knows why.
-  const _zoomMsg = () => {
-    if (STATE.selectedTarget && typeof showMapMessage === 'function') {
+  // ── Zoom lock while route is active ─────────────────────────────────────────
+  // Three layers so nothing slips through:
+  // 1. Override map.zoomIn / map.zoomOut (zoom control buttons call these directly)
+  // 2. zoomend snap-back (catches scroll wheel, touch, keyboard, anything else)
+  // 3. scrollWheelZoom/touch/keyboard.disable() in lockMapZoom() as first-pass block
+
+  const _showZoomBlockMsg = () => {
+    if (typeof showMapMessage === 'function')
       showMapMessage('Stop the current route first to change the zoom level.');
-    }
   };
-  map.getContainer().addEventListener('wheel', () => {
-    if (STATE.selectedTarget) _zoomMsg();
-  }, { passive: true });
-  setTimeout(() => {
-    const zIn  = document.querySelector('.leaflet-control-zoom-in');
-    const zOut = document.querySelector('.leaflet-control-zoom-out');
-    if (zIn)  zIn.addEventListener('click',  () => { if (STATE.selectedTarget) _zoomMsg(); });
-    if (zOut) zOut.addEventListener('click', () => { if (STATE.selectedTarget) _zoomMsg(); });
-  }, 500);
+
+  const _origZoomIn  = map.zoomIn.bind(map);
+  const _origZoomOut = map.zoomOut.bind(map);
+  map.zoomIn  = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomIn(...a);  };
+  map.zoomOut = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomOut(...a); };
+
+  let _snapBusy = false;
+  map.on('zoomend', () => {
+    if (_snapBusy) { _snapBusy = false; return; }
+    if (_routeZoomLock !== null && Math.round(map.getZoom()) !== _routeZoomLock) {
+      _snapBusy = true;
+      map.setZoom(_routeZoomLock, { animate: false });
+      _showZoomBlockMsg();
+    }
+  });
 
   // Wire the "Return to study area" button
   const galeBtn = document.getElementById('btn-goto-gale');
@@ -199,8 +208,36 @@ function initMap() {
   STATE.hazardRenderer = L.svg({ pane: 'hazardPane' });
 
   STATE.map = map;
+  addRouteLegend(map);
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
+}
+
+/* Shared lock state — read by initMap()'s zoomend listener and by lock/unlock below. */
+let _routeZoomLock = null;   // null = unlocked; integer = locked zoom level
+
+/* Locks the map zoom at the current level. Called by targets.js on route start. */
+function lockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  _routeZoomLock = Math.round(m.getZoom());
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.disable();
+  if (m.touchZoom)        m.touchZoom.disable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.disable();
+  if (m.keyboard)         m.keyboard.disable();
+  if (m.boxZoom)          m.boxZoom.disable();
+}
+
+/* Unlocks zoom. Called by routecard.js when route is stopped. */
+function unlockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  _routeZoomLock = null;
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.enable();
+  if (m.touchZoom)        m.touchZoom.enable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.enable();
+  if (m.keyboard)         m.keyboard.enable();
+  if (m.boxZoom)          m.boxZoom.enable();
 }
 
 /* Watches the routePane SVG for new path elements (new route line) and
@@ -230,6 +267,43 @@ function initRouteAnimation() {
     });
   });
   observer.observe(pane, { childList: true, subtree: true });
+}
+
+/* ── Route legend (shown only while a route is active) ───────────────────── */
+
+let _routeLegendControl = null;
+
+/* Builds and attaches a small floating route-colour legend at the bottom-right of the map.
+   Hidden by default; shown by showRouteLegend(), hidden by hideRouteLegend(). */
+function addRouteLegend(map) {
+  const RouteLegend = L.Control.extend({
+    onAdd: function() {
+      const el = L.DomUtil.create('div', 'route-legend');
+      el.id = 'route-legend';
+      el.style.display = 'none';
+      el.innerHTML =
+        '<div class="rl-title">Route key</div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#3FD0C9" stroke-width="3"/></svg><span>Route</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#8C7FAD" stroke-width="3" stroke-dasharray="5 3"/></svg><span>Radio shadow</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E8742E" stroke-width="3"/></svg><span>Rocky ground</span></div>' +
+        '<div class="rl-row"><svg class="rl-line" viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" stroke="#E5484D" stroke-width="3"/></svg><span>Near slope limit</span></div>';
+      L.DomEvent.disableClickPropagation(el);
+      L.DomEvent.disableScrollPropagation(el);
+      return el;
+    }
+  });
+  _routeLegendControl = new RouteLegend({ position: 'bottomright' });
+  _routeLegendControl.addTo(map);
+}
+
+function showRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'block';
+}
+
+function hideRouteLegend() {
+  const el = document.getElementById('route-legend');
+  if (el) el.style.display = 'none';
 }
 
 /* Adds permanent text labels for terrain features inside the study area.

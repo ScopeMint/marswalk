@@ -67,12 +67,12 @@ function planRouteToPoint(lat, lng) {
   const feature = {
     type: 'Feature', id: 'custom',
     geometry: { type: 'Point', coordinates: [lng, lat] },
-    properties: { index: '★', targetId: 'custom', name: `Custom point ${Math.abs(lat).toFixed(4)}°S ${lng.toFixed(4)}°E`,
+    properties: { index: '+', targetId: 'custom', name: `Custom point ${Math.abs(lat).toFixed(4)}°S ${lng.toFixed(4)}°E`,
       findings: 'Survey the site; photo-document; collect samples if safe.' }
   };
   if (_customMarker) STATE.map.removeLayer(_customMarker);
   _customMarker = L.marker([lat, lng], {
-    icon: L.divIcon({ className: 'target-icon', html: '<div class="target-pin custom-pin">★</div>', iconSize: [26, 26], iconAnchor: [13, 13] }),
+    icon: L.divIcon({ className: 'target-icon', html: '<div class="target-pin custom-pin">+</div>', iconSize: [26, 26], iconAnchor: [13, 13] }),
     zIndexOffset: 500
   }).addTo(STATE.map);
   selectTarget(feature);
@@ -135,7 +135,8 @@ function renderNoGoList() {
     const hM = (z.north - z.south) * Math.PI / 180 * CONFIG.mars.radiusMeters;
     t.textContent = `Zone ${z.id} · ${Math.round(wM)} × ${Math.round(hM)} m`;
     const del = document.createElement('button');
-    del.textContent = '✕';
+    del.setAttribute('aria-label', 'Delete this no-go zone');
+    del.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg>';
     del.title = 'Delete this no-go zone';
     del.addEventListener('click', () => removeNoGoZone(z.id));
     row.append(t, del);
@@ -152,9 +153,9 @@ function initInteract() {
   wrap.innerHTML = `
     <div class="panel-heading" style="margin-top:12px;">Mission tools</div>
     <div class="tool-row">
-      <button class="tool-btn" data-mode="base" title="Click the map to move the EVA base">⌂ Move base</button>
-      <button class="tool-btn" data-mode="target" title="Click any point to plan a route there">★ Any point</button>
-      <button class="tool-btn" data-mode="nogo" title="Draw a rectangle the route must avoid">⛔ No-go zone</button>
+      <button class="tool-btn" data-mode="base" title="Click the map to move the EVA base"><svg class="icon" aria-hidden="true"><use href="#icon-map-pin"/></svg> Move base</button>
+      <button class="tool-btn" data-mode="target" title="Click any point to plan a route there"><svg class="icon" aria-hidden="true"><use href="#icon-map-pin"/></svg> Any point</button>
+      <button class="tool-btn" data-mode="nogo" title="Draw a rectangle the route must avoid"><svg class="icon" aria-hidden="true"><use href="#icon-nogo"/></svg> No-go zone</button>
     </div>
     <div id="nogo-list"></div>
     <div class="ctrl-hint">No-go zones mark ground the crew will not enter (soft sand, hazards seen on site). The route re-plans around them.</div>`;

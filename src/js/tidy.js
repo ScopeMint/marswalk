@@ -75,7 +75,7 @@ function tidyTopBar() {
     menu.className = 'tidy-menu';
     const toggle = document.createElement('button');
     toggle.id = 'btn-menu';
-    toggle.textContent = '☰ Menu';
+    toggle.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#icon-menu"/></svg> Menu';
     toggle.setAttribute('aria-haspopup', 'true');
     toggle.setAttribute('aria-expanded', 'false');
     toggle.title = 'How to use, sources, assumptions, reload example, offline options';

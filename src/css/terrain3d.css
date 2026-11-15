@@ -32,7 +32,7 @@
 .t3d-nudge { animation: t3d-nudge 1.4s ease-out 1; }
 @keyframes t3d-nudge { 0%, 40% { box-shadow: 0 0 0 3px #F2B134; } 100% { box-shadow: 0 0 0 3px transparent; } }
 .t3d-overlay button.t3d-locked { opacity: .55; border-style: dashed; }
-.t3d-overlay button.t3d-locked::before { content: "🔒 "; font-size: 10px; }
+.t3d-overlay button.t3d-locked::before { content: "[locked]\A0"; font-size: 10px; letter-spacing: 0; }
 .t3d-overlay button.t3d-ready { border-color: #3FD0C9; color: #0F1115; background: #3FD0C9; font-weight: 600; }
 .t3d-overlay button.t3d-ready:hover { color: #0F1115; background: #6fe0da; }
 .t3d-plan-banner { position: absolute; z-index: 3; top: 132px; left: 374px; right: 32px; width: fit-content; max-width: 560px; margin: 0 auto; padding: 10px 16px; border: 1px solid #3FD0C9; border-radius: 999px; background: #0f1115e6; color: #E8E6E3; font-size: 13px; text-align: center; white-space: pre-wrap; pointer-events: none; box-shadow: 0 8px 30px #0006; }
