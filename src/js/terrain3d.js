@@ -22,7 +22,7 @@ function initTerrain3D() {
     <div class="t3d-stage" data-t3d="stage"><div class="t3d-labels" data-t3d="labels"></div></div>
     <div class="t3d-message" data-t3d="message" role="status"></div>
     <aside class="t3d-controls"><div class="t3d-modes" aria-label="Camera modes">
-      <button data-t3d="orbit" aria-pressed="true">Orbit</button><button data-t3d="fly" disabled aria-pressed="false">Fly the route</button>
+      <button data-t3d="orbit" aria-pressed="true">Orbit</button><button data-t3d="fly" disabled aria-pressed="false" title="First-person view along the planned route">Walk the route</button>
       <button data-t3d="top" aria-pressed="false">Top-down</button></div>
       <div class="t3d-flight" data-t3d="flight" hidden><button data-t3d="pause">Pause</button>
       <progress data-t3d="progress" max="1" value="0" aria-label="Route flight progress"></progress><span>25 m preview · not walking speed</span></div>
@@ -43,7 +43,9 @@ function initTerrain3D() {
   root.querySelectorAll('[data-t3d]').forEach(node => { el[node.dataset.t3d] = node; });
   _t3d = { root, button, el, open: false, token: 0, ex: 1.5, labels: [], pointers: new Map(), notices: {}, mode: 'orbit' };
   button.addEventListener('click', t3dOpen); el.close.addEventListener('click', t3dClose);
-  ['orbit', 'fly', 'top'].forEach(mode => el[mode].addEventListener('click', () => t3dMode(mode)));
+  // 'fly' opens the first-person walk (walk3d.js) when it is loaded; otherwise the old 25 m fly-over
+  ['orbit', 'fly', 'top'].forEach(mode => el[mode].addEventListener('click', () =>
+    (mode === 'fly' && typeof walkOpen === 'function') ? walkOpen() : t3dMode(mode)));
   el.pause.addEventListener('click', () => { _t3d.paused = !_t3d.paused; el.pause.textContent = _t3d.paused ? 'Resume' : 'Pause'; });
   el.ex.addEventListener('input', () => {
     _t3d.ex = Number(el.ex.value); el.exLabel.textContent = _t3d.ex.toFixed(1) + '×';
@@ -75,6 +77,7 @@ async function t3dOpen() {
 /* Frees every scene resource and stops requests, timers and animation on close. */
 function t3dClose() {
   const s = _t3d;
+  if (typeof walkClose === 'function') walkClose();   // the first-person walk sits on top of this view
   if (!s.open) return;
   s.open = false; ++s.token; clearInterval(s.timer); cancelAnimationFrame(s.frame);
   if (s.abort) s.abort.abort();

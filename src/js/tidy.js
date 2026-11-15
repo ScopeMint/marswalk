@@ -276,7 +276,7 @@ function tidyLeftPanel() {
   if (targetsList) ours.body.appendChild(targetsList);
   locationsPane.appendChild(ours.box);
 
-  const sites = _tidySection('Explored by NASA: landing sites', false, '');
+  const sites = _tidySection('Extra sites explored by NASA', false, '');
   sites.box.id = 'tidy-sites';
   sites.body.id = 'tidy-sites-body';
   const sitesHint = document.createElement('p');

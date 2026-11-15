@@ -252,3 +252,16 @@ RESEARCH / INSPIRATION (read during planning, nothing copied)
   Check: every landing point falls inside the bounds of the NASA mosaic it is drawn on (script stops a site if not).
 [TO VERIFY] "Thomas Mutch / Gerald Soffen / Carl Sagan / Columbia / Challenger Memorial Station", "Bradbury Landing",
   "Octavia E. Butler Landing" place names: taken from the NASA GISS Mars24 page above; team to re-read before submission.
+
+[CONFIRMED] First-person walk view (src/js/walk3d.js): where each part of the picture comes from
+  Ground shape: src/data/elevation.bin (HiRISE DTM DTEEC_019698_1750_019988_1750_U01, 10 m cells), no vertical exaggeration.
+  Ground pattern: src/data/hirise-texture.jpg (2 m/px) plus the app's HiRISE map tiles src/tiles/hirise (zoom 17, about 0.64 m/px)
+    stitched along the route. HiRISE ESP_019988_1750, NASA/JPL/University of Arizona.
+  Ground colour + near-ground texture: Curiosity Mastcam photo src/data/pov/pov-3-nevado-sajama.jpg
+    (NASA image 4711MR1085840182401710E01_DXXX, sol 4711, https://mars.nasa.gov/raw_images/1529646, credit NASA/JPL-Caltech/MSSS).
+    The photo's average colour tints the ground; the photo itself is repeated every 2.6 m near the viewer [OUR ASSUMPTION for the scale].
+  Rockiness: bump height = 2.5 x the measured 1 m relief in src/data/roughness.bin (capped at 1.1 m). Bump POSITIONS are illustrative.
+  Walking speed: route distance / route time from the planner. Photos shown at targets: src/data/pov-images.json (real Curiosity images).
+  OUR ASSUMPTIONS (labelled on screen): eye height 1.7 m, field of view 70 degrees, sky colours #d9b48c / #9a7b5e,
+    east-to-west sun arc, haze ending at 2.3 km (hides the edge of the 4 km terrain model), time-lapse factors.
+  Library: three.js r160 (MIT), already bundled in src/vendor.
