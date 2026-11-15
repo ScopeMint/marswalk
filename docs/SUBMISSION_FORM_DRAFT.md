@@ -20,9 +20,10 @@ turn-back point, prints an astronaut cue card, and replays the walk in a helmet-
 ===========================================================================
 3. LINK TO PROJECT DEMO (ONE public link — video or slide deck)
 ===========================================================================
-https://scopemint.github.io/marswalk/media/marswalk-demo-30s.mp4
-(30 s, 1920x1080, English captions on screen; .srt also in media/. Works once GitHub Pages is on.
- Backup: upload media/marswalk-demo-30s.mp4 + .srt to YouTube as unlisted and paste that link instead.)
+[PASTE YOUTUBE LINK HERE]
+(Upload media/marswalk-demo-30s.mp4 + media/marswalk-demo-30s.srt to YouTube as Unlisted or Public,
+ test the link logged out, paste it here. Re-record first if the UI changed a lot after the ui-polish merge.
+ Fallback if YouTube fails: https://scopemint.github.io/marswalk/media/marswalk-demo-30s.mp4 once Pages is on.)
 Screenshots to upload: media/shot-1-map-route.png, shot-2-cue-card.png, shot-3-traverse.png, shot-4-visor-hud.png, shot-5-3d-flythrough.png
 
 ===========================================================================
@@ -51,8 +52,8 @@ For a chosen target MarsWalk:
 (2) Computes a walk-back-time field from the habitat and the point of no return on the route.
 (3) Runs a suit & crew model: walking energy from the Pandolf (1977) equation scaled to Mars
     gravity, oxygen (Weir 1949), CO2 and cooling water against suit capacity, for a buddy pair.
-(4) Checks radiation (Curiosity RAD surface baseline, with a solar-storm scenario), temperature
-    (REMS), daylight (live Mars24 clock: today's sol, local Mars time, sunrise and sunset), and the
+(4) Checks radiation (Curiosity RAD surface baseline: 210 +/- 40 uGy/day, Hassler et al. 2014),
+    air temperature (real REMS hourly measurements for today's Mars season at Gale), daylight (live Mars24 clock: today's sol, local Mars time, sunrise and sunset), and the
     EVA time budget with a 25% reserve, then gives GO / NO-GO.
 (5) Prints an EVA cue card (timeline in elapsed time and local Mars time, stations, oxygen left,
     turn-back rule). This is what an astronaut would carry.
@@ -68,9 +69,13 @@ It installs like a native app and works fully offline. On Mars there is no inter
 WHY WE TRUST THE NUMBERS:
 - Our terrain matches the elevations Curiosity itself reported at 227 stops: 2.4 m RMS after a
   constant 12.8 m datum offset (computed live in the app).
-- Curiosity's own path stays on slopes our model rates as walkable.
+- 99.9% of the distance Curiosity actually drove inside our study area is on 10 m cells under our
+  15 degree default slope limit; the steepest cell it crossed is 19.7 degrees (computed live in the app).
+- Every science number was re-checked against the original source: radiation against the Hassler et
+  al. (2014) paper text, temperatures from raw REMS files in NASA's Planetary Data System.
 - The Mars clock passes 80 tests (GISS worked example + every photo's sol and time).
-- Every number on screen is either cited or labelled "OUR ASSUMPTION"; Assumptions panel lists all.
+- Every number on screen is either cited or labelled "OUR ASSUMPTION"; the Assumptions panel lists
+  every model value (about 35), read live from the code.
 
 WHAT WE HOPE TO ACHIEVE:
 A concrete, open prototype of the walking-scale planning layer that Mars mission planners and crews
@@ -104,7 +109,8 @@ Four NASA missions, seven instruments/products:
 4. MSL Curiosity traverse + waypoints (NASA/JPL MMGIS) — rover path, target positions, validation.
 5. MSL Curiosity Navcam / Mastcam raw images — point-of-view photos per target.
 6. MSL Curiosity RAD — surface dose baseline (Hassler et al. 2014, Science 343).
-7. MSL Curiosity REMS — temperature by local time.
+7. MSL Curiosity REMS — hourly air temperature (MODRDR product, NASA PDS Atmospheres Node), median by
+   local true solar time for the two halves of the Mars year.
 Context basemap: Viking MDIM 2.1 + MGS MOLA (via OpenPlanetaryMap).
 
 ===========================================================================
@@ -113,11 +119,11 @@ Context basemap: Viking MDIM 2.1 + MGS MOLA (via OpenPlanetaryMap).
 - NASA Mars Trek tile service; NASA/JPL MMGIS; NASA raw-image service; NASA GISS Mars24 algorithm
 - USGS Astrogeology analysis-ready data + STAC API (HiRISE DTM/orthoimages)
 - University of Arizona HiRISE team (DTM producer)
-- CAB-INTA-CSIC REMS team; OpenPlanetaryMap
+- NASA Planetary Data System Atmospheres Node (REMS MODRDR); CAB-INTA-CSIC REMS team; OpenPlanetaryMap
 - Libraries: Leaflet (BSD-2), three.js (MIT); Python numpy/scipy/rasterio/Pillow
 
 ===========================================================================
-8. USE OF ARTIFICIAL INTELLIGENCE
+8. USE OF ARTIFICIAL INTELLIGENCE (the 2026 form may call this "Super Intelligence (SI)")
 ===========================================================================
 Claude Code (Anthropic) wrote most of the application code and the Python data scripts from our
 specifications. OpenAI Codex wrote three modules from written specs: the visor HUD, the Mars24
@@ -134,17 +140,23 @@ or real screenshots.
 - Curiosity MMGIS traverse/waypoints: https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/
 - Curiosity raw images: https://mars.nasa.gov/msl/multimedia/raw-images/
 - THEMIS mosaics via Mars Trek: https://trek.nasa.gov/mars/ ; Edwards et al. (2011), JGR 116, E10008
-- Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797 (RAD)
-- Martinez et al. (2017), JGR Planets (REMS); https://cab.inta-csic.es/rems/en/
+- Hassler et al. (2014), Science 343(6169), 1244797, doi:10.1126/science.1244797 (RAD)
+- REMS MODRDR data, NASA PDS Atmospheres Node: https://atmos.nmsu.edu/PDS/data/mslrem_1001/
+- Gomez-Elvira et al. (2012), REMS, Space Sci. Rev. 170, 583-640, doi:10.1007/s11214-012-9921-1
+- REMS daily summaries, CAB/INTA-CSIC: https://cab.inta-csic.es/rems/en/
 - Allison & McEwen (2000), Planet. Space Sci. 48, 215-235; https://www.giss.nasa.gov/tools/mars24/help/algorithm.html
-- Pandolf, Givoni & Goldman (1977), J. Appl. Physiol. 43(4), 577-581
-- Weir (1949), J. Physiol. 109, 1-9
+- Pandolf, Givoni & Goldman (1977), J. Appl. Physiol. 43(4), 577-581, doi:10.1152/jappl.1977.43.4.577
+- Weir (1949), J. Physiol. 109, 1-9, doi:10.1113/jphysiol.1949.sp004363
+- Edwards et al. (2011), THEMIS mosaics, JGR 116, E10008, doi:10.1029/2010JE003755
+- Mars landing-site coordinates: https://en.wikipedia.org/wiki/List_of_artificial_objects_on_Mars
 - Siebach & Grotzinger (2014), JGR Planets 119, doi:10.1002/2013JE004508 (boxwork)
 - NASA/JPL news, Curiosity starts unpacking boxwork formations (June 2025)
 - Curiosity blog posts, sols 4641-4648, 4695-4701, 4709-4715, 4716-4722 (science.nasa.gov)
 - NASA Mars Fact Sheet (gravity): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
 - OpenPlanetaryMap: https://www.openplanetary.org/opm
-- Leaflet: https://leafletjs.com ; three.js: https://threejs.org
+- Leaflet 1.9.4 (BSD-2-Clause): https://leafletjs.com ; three.js r160 (MIT): https://threejs.org
+- Rover photos: NASA/JPL-Caltech/MSSS raw images (image IDs listed in src/data/pov-images.json)
+- Add here any font, icon set or 3D model added by the ui-polish branch (see docs/SOURCES.md)
 Full list with licences: docs/SOURCES.md
 
 ===========================================================================

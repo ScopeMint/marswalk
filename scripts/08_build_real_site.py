@@ -18,7 +18,7 @@ WHAT IT DOES
 HOW TO RUN (from the repo root):
   python scripts/08_build_real_site.py            (everything)
   python scripts/08_build_real_site.py --no-tiles (skip map tiles; faster)
-Then re-run: python scripts/04_make_overlays.py, scripts/generate_los_overlay.py, scripts/generate_rad_overlay.py
+Then re-run: python scripts/04_make_overlays.py, scripts/generate_los_overlay.py
 
 DATA SOURCES (all public; HiRISE DTM products are CC0 via USGS Astrogeology STAC):
   HiRISE DTM DTEEC_019698_1750_019988_1750_U01 (University of Arizona; USGS Astrogeology analysis-ready data)

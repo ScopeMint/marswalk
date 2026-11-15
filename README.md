@@ -30,7 +30,7 @@ Today's Mars maps (JPL Mars Trek, USGS geologic maps) are built for global and r
 | **Real time** | Live Mars clock (NASA GISS Mars24 algorithm): today's Curiosity sol, local Mars time, season, sunrise and sunset at the site. Covered by 80 passing tests. |
 
 ## Features
-- **Layered map:** HiRISE 25 cm imagery, slope classes, 1 m rock & ridge relief ("boulder" layer), THEMIS day and night thermal IR, Curiosity's real path, radio line-of-sight, relative radiation, walk-back time.
+- **Layered map:** HiRISE 25 cm imagery, slope classes, 1 m rock & ridge relief ("boulder" layer), THEMIS day and night thermal IR, Curiosity's real path, radio line-of-sight, walk-back time.
 - **Route planner:** fastest walkable path under a slope limit you choose. It slows on uphill and rocky ground and runs in a Web Worker (~100 ms).
 - **Multi-stop traverse:** tick 2–5 targets. MarsWalk times every leg on the real terrain, compares every visiting order and loads the fastest Base → stops → Base traverse. The safety card, suit model, HUD and cue card all cover the full traverse.
 - **Mission tools:** move the base (slope-checked), route to any point on the map, and draw no-go zones that the route re-plans around.
@@ -51,8 +51,8 @@ Today's Mars maps (JPL Mars Trek, USGS geologic maps) are built for global and r
 | Thermal | THEMIS Day/Night IR controlled mosaics (Mars Odyssey) via NASA Mars Trek | 100 m |
 | Rover path, positions | Curiosity MMGIS traverse + waypoints (NASA/JPL) | per drive |
 | Surface photos | Curiosity Navcam / Mastcam raw images | — |
-| Radiation | Curiosity RAD surface dose (Hassler et al. 2014, *Science*) | site |
-| Temperature | Curiosity REMS (Martínez et al. 2017) | site |
+| Radiation | Curiosity RAD surface dose, 210 ± 40 μGy/day (Hassler et al. 2014, *Science*) | site |
+| Temperature | Curiosity REMS hourly air temperature (NASA PDS MODRDR; Gómez-Elvira et al. 2012) | site |
 | Context basemap | Viking MDIM 2.1 + MOLA (OpenPlanetaryMap) | 232 m |
 
 Every source, link and licence is listed in [`docs/SOURCES.md`](docs/SOURCES.md) and in the app's **About & Sources** panel. Every number that is our own planning guess is labelled **OUR ASSUMPTION** on screen and in `src/js/config.js`.
@@ -67,11 +67,11 @@ It is the same app in its own window, fully offline. Maps, terrain, 3D and routi
 ## Run it
 - **Online:** open the live link. Use **Install app** in the header to add it to your desktop, phone or tablet.
 - **Locally:** `python -m http.server 8080 --directory src`, then open http://localhost:8080. A local server is needed for the data files.
-- **Rebuild the data:** `python scripts/08_build_real_site.py`, then `09_get_themis.py`, `04_make_overlays.py`, `generate_los_overlay.py`, `generate_rad_overlay.py`, `10_make_app_assets.py`, `11_make_3d_texture.py`. These need `rasterio`, `numpy`, `scipy` and `Pillow`, and read only the needed window from NASA/USGS cloud-optimised files.
+- **Rebuild the data:** `python scripts/08_build_real_site.py`, then `09_get_themis.py`, `04_make_overlays.py`, `generate_los_overlay.py`, `05_prepare_rems.py` (real REMS temperatures from NASA PDS, ~1 h first run), `06_prepare_rad.py`, `10_make_app_assets.py`, `11_make_3d_texture.py`. These need `rasterio`, `numpy`, `scipy` and `Pillow`, and read only the needed window from NASA/USGS cloud-optimised files.
 - **Tests:** `node tests/marsclock.test.js`
 
 ## Honest limits
-This is a planning concept, not flight software. Rocks smaller than ~2 m are not resolved; they show only as extra relief. Soil strength, live weather and solar-storm forecasts are not modelled. The radiation figure is the rover's surface baseline, not the dose inside a suit. Suit capacities are generic planning values.
+This is a planning concept, not flight software. Rocks smaller than ~2 m are not resolved; they show only as extra relief. Soil strength, live weather and solar-storm forecasts are not modelled. The radiation figure is the average galactic cosmic-ray dose Curiosity's RAD measured at the surface in 2012-2013 (210 ± 40 μGy/day, Hassler et al. 2014), not the dose inside a suit. Suit capacities are generic planning values.
 
 ## AI use
 Claude Code (Anthropic) wrote most of the application code and data scripts. OpenAI Codex wrote the visor HUD, the Mars24 clock module and the 3D terrain view from written specifications. The team chose the concept, the site and the targets, checked the sources and tested the app. No AI-generated images or video were used; every picture is NASA data or a screenshot. Full log: [`docs/AI_USE.md`](docs/AI_USE.md).
