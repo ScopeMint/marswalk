@@ -66,12 +66,40 @@ function bootStart() {
   }, APP_BOOT_POLL_MS);
 }
 
-/* Fades the boot overlay out and removes it. */
+/* Fades the boot overlay out and removes it, then shows the welcome card on first visit. */
 function bootFinish() {
   const el = document.getElementById('boot');
   if (!el || el.classList.contains('boot-out')) return;
   el.classList.add('boot-out');
-  setTimeout(() => el.remove(), 500);
+  setTimeout(() => { el.remove(); showWelcome(); }, 500);
+}
+
+/* First-visit welcome card: three-line pitch + "Take the tour" / "Explore". Remembered per browser. */
+function showWelcome() {
+  let seen = false;
+  try { seen = localStorage.getItem('marswalk-welcome') === '1'; } catch (e) { seen = false; }
+  if (seen || document.getElementById('welcome')) return;
+  const card = document.createElement('div');
+  card.id = 'welcome';
+  card.className = 'welcome';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-label', 'Welcome to MarsWalk');
+  card.innerHTML = `
+    <div class="welcome-kicker">WELCOME, EVA PLANNER</div>
+    <div class="welcome-title">Plan a safe Marswalk on Curiosity's real route</div>
+    <ol class="welcome-steps">
+      <li><b>Pick a science target</b>: real Curiosity drill sites on Mount Sharp.</li>
+      <li><b>Read the plan</b>: safest route, oxygen, radiation, daylight, turn-back point.</li>
+      <li><b>Brief &amp; walk it</b>: print the EVA cue card, replay it in the visor HUD or in 3D.</li>
+    </ol>
+    <div class="welcome-actions">
+      <button type="button" class="welcome-tour">▶ Take the 45-second tour</button>
+      <button type="button" class="welcome-close">Explore on my own</button>
+    </div>`;
+  document.body.appendChild(card);
+  const done = () => { try { localStorage.setItem('marswalk-welcome', '1'); } catch (e) { /* private mode */ } card.remove(); };
+  card.querySelector('.welcome-close').addEventListener('click', done);
+  card.querySelector('.welcome-tour').addEventListener('click', () => { done(); if (typeof runTour === 'function') runTour(); });
 }
 
 /* Registers the service worker and wires install / offline-pack buttons into the top bar. */

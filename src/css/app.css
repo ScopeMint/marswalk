@@ -142,3 +142,17 @@ body.hud-active .tour-caption { top: 120px; z-index: 2600; }
 .trav-item input { accent-color: #3FD0C9; }
 .trav-go { margin: 6px 8px 2px; width: calc(100% - 16px); color: #3FD0C9; border-color: rgba(63,208,201,.55); font-weight: 600; }
 #trav-result { padding: 2px 8px; }
+
+/* ── First-visit welcome card (app.js) ── */
+.welcome {
+  position: fixed; z-index: 4800; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(560px, 92vw); background: #12151b; border: 1px solid #2A2F3A; border-top: 3px solid #D9622B;
+  border-radius: 12px; padding: 22px 24px; color: #E8E6E3; box-shadow: 0 30px 80px rgba(0,0,0,.65);
+}
+.welcome-kicker { font: 700 11px system-ui; letter-spacing: .2em; color: #D9622B; }
+.welcome-title { font: 700 22px/1.25 system-ui; margin: 6px 0 12px; }
+.welcome-steps { margin: 0 0 16px 18px; padding: 0; line-height: 1.6; font-size: 14px; color: #c9ccd2; }
+.welcome-steps b { color: #E8E6E3; }
+.welcome-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.welcome-actions button { border-radius: 8px; padding: 10px 16px; font-size: 14px; cursor: pointer; border: 1px solid #3a4150; background: #1d2129; color: #E8E6E3; }
+.welcome-actions .welcome-tour { background: #D9622B; border-color: #D9622B; color: #fff; font-weight: 700; }
