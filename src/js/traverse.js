@@ -78,9 +78,15 @@ async function planTraverse() {
 
   // Stitch legs into one route
   let cells = [], profile = [], dist = 0, time = 0, steep = 0, climb = 0, descent = 0, prev = 0;
+  let cellTimes = [], cellDists = [];   // walking time / distance from base to each display cell (no stop work)
   best.order.forEach(j => {
     const leg = legs[prev + '-' + j];
-    cells = cells.concat(cells.length ? leg.cells.slice(1) : leg.cells);
+    const skip = cells.length ? 1 : 0;
+    cells = cells.concat(leg.cells.slice(skip));
+    if (leg.cellTimeSeconds && leg.cellDistanceMeters) {
+      cellTimes = cellTimes.concat(leg.cellTimeSeconds.slice(skip).map(v => v + time));
+      cellDists = cellDists.concat(leg.cellDistanceMeters.slice(skip).map(v => v + dist));
+    }
     leg.profile.forEach((p, k) => { if (profile.length && k === 0) return; profile.push(Object.assign({}, p, { distanceMeters: p.distanceMeters + dist })); });
     dist += leg.distanceMeters; time += leg.timeSeconds;
     steep = Math.max(steep, leg.steepestDeg); climb += leg.climbMeters; descent += leg.descentMeters;
@@ -99,7 +105,9 @@ async function planTraverse() {
   };
   STATE.target = { lat: last.geometry.coordinates[1], lon: last.geometry.coordinates[0] };
   STATE.route = { status: 'ok', cells, distanceMeters: dist, timeSeconds: time, steepestDeg: steep,
-    climbMeters: climb, descentMeters: descent, profile };
+    climbMeters: climb, descentMeters: descent, profile,
+    cellTimeSeconds: cellTimes.length === cells.length ? cellTimes : undefined,
+    cellDistanceMeters: cellDists.length === cells.length ? cellDists : undefined };
   clearMapMessage();
   drawRouteLine(cells);
   updateSummaryCard();
