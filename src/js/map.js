@@ -117,15 +117,16 @@ function initMap() {
   const { centerLat, centerLon, defaultZoom } = CONFIG.studyArea;
 
   const map = L.map('map-container', {
-    center:  [centerLat, centerLon],
-    zoom:    defaultZoom,
-    minZoom: 3,     // zoom 3 ≈ full Mars fits the viewport without white edges
+    center:  [0, 137],   // near Mars center longitude, equator — wide starting view
+    zoom:    2,          // fully zoomed out — user sees all of Mars before flying in
+    minZoom: 2,
     maxZoom: 18,
     worldCopyJump:       false,
-    maxBounds:           [[-90, -185], [90, 185]], // 5° of padding prevents hard-edge artifacts
+    maxBounds:           [[-90, -185], [90, 185]],
     maxBoundsViscosity:  1.0,
     zoomControl:         true,
-    attributionControl:  true
+    attributionControl:  true,
+    fadeAnimation:       false,  // prevents blue/red tile-fade mist during zoom
   });
 
   // Add OPM base layer (always on)
@@ -150,6 +151,11 @@ function initMap() {
                 CONFIG.studyArea.defaultZoom, { duration: 1.2 });
     });
   }
+
+  // Fly in to Gale Crater slowly — user sees all of Mars before zooming to the study area
+  setTimeout(() => {
+    map.flyTo([centerLat, centerLon], defaultZoom, { duration: 12 });
+  }, 1800);
 
   STATE.map = map;
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');

@@ -96,7 +96,7 @@ function initWalk3D() {
     <div class="walk-visor" data-w="visor" aria-hidden="true"><i></i></div>
     <header class="walk-top">
       <div><span class="walk-kicker">MARSWALK / FIRST-PERSON EVA</span><h2 data-w="title">Walking the route</h2></div>
-      <div class="walk-top-right"><span class="walk-pill" data-w="lapse"></span><button data-w="close">Close · Esc</button></div>
+      <div class="walk-top-right"><button data-w="close">Close · Esc</button></div>
     </header>
     <div class="walk-compass" aria-hidden="true"><div class="walk-compass-strip" data-w="compass"></div><b>▼</b></div>
     <div class="walk-readouts">

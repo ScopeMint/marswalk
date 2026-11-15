@@ -262,24 +262,63 @@ function buildLayerPanel() {
   const panel = document.getElementById('layer-panel-content');
   if (!panel) return;
 
-  const layerDefs = [
-    { id: 'hirise',    label: 'HiRISE imagery (25 cm)',  defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'traverse',  label: "Curiosity's real path",   defaultOn: false, defaultOpacity: 0.90 },
-    { id: 'slope',     label: 'Slope classes',           defaultOn: false, defaultOpacity: 0.35 },
-    { id: 'relief',    label: 'Rocks & ridges (1 m)',    defaultOn: false, defaultOpacity: 0.85 },
-    { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
-    { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
-    { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
-    { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
-    { id: 'themisNight', label: 'THEMIS Night IR',       defaultOn: false, defaultOpacity: 0.70 },
-    { id: 'sites',     label: 'Explored sites (9 NASA landings)', defaultOn: true, defaultOpacity: 1.00 },
-    { id: 'grid',      label: 'Coordinate grid (lat/lon)', defaultOn: false, defaultOpacity: 0.60 },
+  const HINT = '⚑ One at a time for best view';
+  const layerGroups = [
+    {
+      layers: [
+        { id: 'hirise',   label: 'HiRISE imagery (25 cm)', defaultOn: true,  defaultOpacity: 1.00 },
+        { id: 'opm',      label: 'Global basemap (OPM)',   defaultOn: true,  defaultOpacity: 1.00 },
+        { id: 'traverse', label: "Curiosity's real path",  defaultOn: false, defaultOpacity: 0.90 },
+      ]
+    },
+    {
+      heading: 'Terrain', hint: HINT,
+      layers: [
+        { id: 'slope',  label: 'Slope classes',      defaultOn: false, defaultOpacity: 0.35 },
+        { id: 'relief', label: 'Rocks & ridges (1 m)', defaultOn: false, defaultOpacity: 0.85 },
+      ]
+    },
+    {
+      heading: 'Safety', hint: HINT,
+      layers: [
+        { id: 'los',      label: 'Communication zones', defaultOn: false, defaultOpacity: 0.75 },
+        { id: 'rad',      label: 'Radiation zones',     defaultOn: false, defaultOpacity: 0.65 },
+        { id: 'walkback', label: 'Walk-back time',      defaultOn: false, defaultOpacity: 0.70 },
+      ]
+    },
+    {
+      heading: 'THEMIS IR', hint: HINT,
+      layers: [
+        { id: 'themisDay',   label: 'THEMIS Day IR',   defaultOn: false, defaultOpacity: 0.70 },
+        { id: 'themisNight', label: 'THEMIS Night IR', defaultOn: false, defaultOpacity: 0.70 },
+      ]
+    },
+    {
+      layers: [
+        { id: 'sites', label: 'Explored sites (9 NASA landings)', defaultOn: true,  defaultOpacity: 1.00 },
+        { id: 'grid',  label: 'Coordinate grid (lat/lon)',        defaultOn: false, defaultOpacity: 0.60 },
+      ]
+    },
   ];
 
+  // Flatten into a single list with injected group headers
   panel.innerHTML = '';
 
-  layerDefs.forEach(def => {
+  layerGroups.forEach(group => {
+    if (group.heading) {
+      const groupHead = document.createElement('div');
+      groupHead.className = 'layer-group-heading';
+      groupHead.textContent = group.heading;
+      if (group.hint) {
+        const hintSpan = document.createElement('span');
+        hintSpan.className = 'layer-one-at-a-time';
+        hintSpan.textContent = group.hint;
+        groupHead.appendChild(hintSpan);
+      }
+      panel.appendChild(groupHead);
+    }
+
+    group.layers.forEach(def => {
     const catalogEntry = (typeof LAYER_CATALOG !== 'undefined')
       ? LAYER_CATALOG.find(c => c.id === def.id)
       : null;
@@ -353,7 +392,8 @@ function buildLayerPanel() {
     });
     opacityRow.appendChild(opSlider);
     panel.appendChild(opacityRow);
-  });
+    });  // end group.layers.forEach
+  });    // end layerGroups.forEach
 
   // Route data section — filled by updateRouteDataPanel() after route computed
   const pathPanel = document.createElement('div');

@@ -1,35 +1,84 @@
 /* MarsWalk — all colors and layout sizes defined here, nowhere else */
+
+/* IBM Plex Sans — self-hosted, OFL-1.1, aerospace/technical feel */
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./vendor/fonts/IBMPlexSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./vendor/fonts/IBMPlexSans-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./vendor/fonts/IBMPlexSans-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./vendor/fonts/IBMPlexSans-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('./vendor/fonts/IBMPlexSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  /* Colors */
-  --bg:      #0F1115;
-  --panel:   #181B22;
-  --border:  #2A2F3A;
-  --text:    #E8E6E3;
-  --muted:   #A3A8B3;
-  --accent:  #D9622B;
-  --route:   #3FD0C9;
+  /* ── UI colors ── warm-grey mission-ops palette */
+  --bg:      #100E0D;   /* very dark warm brown-black */
+  --panel:   #191614;   /* warm dark panel */
+  --border:  #2D2A28;   /* warm border */
+  --text:    #EAE7E2;   /* warm off-white */
+  --muted:   #9E9890;   /* warm grey */
+  --accent:  #B07D4A;   /* desaturated Martian ochre — restrained use */
+  --route:   #3FD0C9;   /* teal — route line, consistent across 2D/3D/HUD */
   --pass:    #46C37B;
   --caution: #F2B134;
   --danger:  #E5484D;
 
-  /* Slope class colors (0-5°, 5-10°, 10-15°, 15-20°, >20°) */
-  --slope-0: #2E7D5B;
-  --slope-1: #8FBF4D;
-  --slope-2: #F2B134;
-  --slope-3: #E8742E;
-  --slope-4: #E5484D;
+  /* ── Mars environment colors (read by canvas/Three.js via getComputedStyle) ── */
+  --mars-sky-horizon: #c8a87a;   /* dusty tan near horizon */
+  --mars-sky-zenith:  #8c6e4d;   /* darker ochre overhead */
+  --mars-ground:      #9e7d5e;   /* Martian regolith mid-tone */
 
-  /* Layout sizes */
+  /* ── Slope class colors ── */
+  --slope-0: #2E7D5B;   /* 0–5°   very gentle */
+  --slope-1: #8FBF4D;   /* 5–10°  gentle */
+  --slope-2: #F2B134;   /* 10–15° moderate */
+  --slope-3: #E8742E;   /* 15–20° steep */
+  --slope-4: #E5484D;   /* >20°   very steep */
+
+  /* ── Layout sizes ── */
   --top-h:    56px;
   --left-w:   300px;
   --right-w:  260px;
   --bottom-h: 200px;
 
-  /* Spacing */
+  /* ── Spacing ── */
   --gap: 8px;
+  --r:   4px;   /* one border-radius everywhere */
 
-  /* Typography */
-  --font: system-ui, -apple-system, sans-serif;
+  /* ── Type scale ── */
+  --t-xs:   11px;
+  --t-sm:   12.5px;
+  --t-base: 14px;
+  --t-md:   16px;
+  --t-lg:   18px;
+  --t-xl:   24px;
+  --t-hero: 32px;
+
+  /* ── Typography ── */
+  --font: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --mono: ui-monospace, 'SF Mono', monospace;
 }
 
@@ -78,16 +127,63 @@ body {
   color: var(--text);
 }
 
+/* ── Button system ─────────────────────────────────────────── */
+/* All buttons share the same base; override per variant */
+button, .btn {
+  font-family: var(--font);
+  font-size: var(--t-sm);
+  cursor: pointer;
+  border-radius: var(--r);
+  border: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+button:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--route);
+  outline-offset: 2px;
+}
+
+/* Primary: filled ochre — single key CTA per view */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0 14px;
+  height: 32px;
+  font-weight: 600;
+}
+.btn-primary:hover { background: #c48d58; }
+
+/* Secondary: outlined — main toolbar / modal actions */
+.btn-secondary {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0 12px;
+  height: 32px;
+}
+.btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+/* Ghost: no border — inline / lower-hierarchy */
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--muted);
+  padding: 0 10px;
+  height: 28px;
+}
+.btn-ghost:hover { color: var(--text); }
+
+/* ── Top bar buttons ── */
 #top-bar button {
   background: none;
   border: 1px solid var(--border);
   color: var(--muted);
-  padding: 4px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
+  padding: 0 10px;
+  height: 30px;
+  border-radius: var(--r);
+  font-size: var(--t-sm);
   font-family: var(--font);
-  transition: color 0.2s, border-color 0.2s;
+  transition: color 0.15s, border-color 0.15s;
 }
 
 #top-bar button:hover {
@@ -96,20 +192,21 @@ body {
 }
 
 #top-bar button:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--route);
   outline-offset: 2px;
 }
 
+/* How to Use — same secondary style, no special orange */
 #btn-how-to-use {
-  color: var(--accent);
-  border-color: var(--accent);
-  font-weight: 600;
+  color: var(--text);
+  font-weight: 500;
 }
 
-#btn-how-to-use:hover {
-  background: rgba(217,98,43,0.12);
-  color: var(--accent);
-  border-color: var(--accent);
+/* ── Tabular figures for all data numbers ── */
+.sum-val, .rc-tile b, .hud-clock, .hud-right dd,
+#coord-readout, .ctrl-label span, .eva-pct,
+.target-card-coords, .brief-table td {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Main area: left panel + map + right panel ── */
@@ -837,6 +934,27 @@ body {
   height: 2px;
   accent-color: var(--accent);
   cursor: pointer;
+}
+
+.layer-group-heading {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 10px 4px 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layer-one-at-a-time {
+  font-size: 10px;
+  color: var(--caution);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.85;
 }
 
 /* Slope legend */
