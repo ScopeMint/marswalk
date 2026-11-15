@@ -164,7 +164,7 @@ function updateSummaryCard() {
     const tempVal = document.createElement('span');
     tempVal.className = 'sum-val sum-sourced';
     tempVal.textContent = temp.minC + '°C to ' + temp.maxC + '°C' + tempSpreadText(temp);
-    tempVal.title = temp.note;
+    tempVal.title = temp.note + '\nSource: ' + temp.source;
     tempRow.appendChild(tempLabel);
     tempRow.appendChild(tempVal);
     card.appendChild(tempRow);
@@ -809,8 +809,8 @@ function _buildHowToUseModal() {
         'Climb / Descent — total height gained and lost along the route in metres.',
         'Walk-back time — estimated time to walk back from the target to the habitat.',
         'EVA used — percentage of your EVA time that the full trip (out + science work + back) will use. Green = safe, amber = tight, red = over budget.',
-        'Radiation est. — estimated radiation dose for the EVA duration, based on Curiosity RAD data [Hassler et al. 2014]. Hover to see the source.',
-        'Temp range — estimated air temperature range during your EVA window, from Curiosity REMS data. Hover to see the source.',
+        'Radiation dose (estimate) — estimated radiation dose for the EVA duration, based on Curiosity RAD data [Hassler et al. 2014, doi:10.1126/science.1244797]. Hover the value to see the full source.',
+        'Outside temperature — estimated air temperature range during your EVA window, from real Curiosity REMS measurements (NASA PDS). Hover the value to see the full source.',
         'Safety checklist — pass / caution / fail for each safety check. Hover any item for details.',
       ]
     },
