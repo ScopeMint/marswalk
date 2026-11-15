@@ -5,7 +5,7 @@ body.charts2 #bottom-bar { gap: 12px; }
 body.charts2 { --bottom-h: 232px; }   /* a little taller: room for the two-line header above each plot */
 body.charts2 #bottom-bar .chart-slot.chart-framed { height: 208px; min-width: 0; }
 body.charts2 #bottom-bar .chart-slot.chart-framed canvas { top: 50px; height: calc(100% - 50px); cursor: crosshair; outline: none; }
-body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-shadow: inset 0 0 0 2px #3FD0C9; }
+body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-shadow: inset 0 0 0 2px var(--route); }
 /* Line 1: title + what the colours mean. Line 2: the live readout, full width so it is never cut off. */
 .chart-head { position: absolute; top: 0; left: 0; right: 0; height: 50px; display: flex; flex-wrap: wrap; align-items: center;
   column-gap: 10px; align-content: center; padding: 0 10px; border-bottom: 1px solid var(--border); background: var(--panel);
@@ -17,7 +17,7 @@ body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-sha
 .chart-swatch.dot { width: 8px; height: 8px; border-radius: 50%; }
 .chart-swatch.box { width: 10px; height: 10px; border-radius: 2px; }
 .chart-readout { flex: 0 0 100%; min-width: 0; height: 18px; text-align: left; overflow: hidden; text-overflow: ellipsis;
-  font: 600 11.5px ui-monospace, Consolas, monospace; color: #3FD0C9; }
+  font: 600 11.5px ui-monospace, Consolas, monospace; color: var(--route); }
 @media (max-width: 1150px) { .chart-legend .chart-key:nth-child(n+3) { display: none; } }
 
 /* ── Route card ── */
@@ -25,9 +25,9 @@ body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-sha
 #summary-card { display: flex; flex-direction: column; width: 268px; }
 #summary-card[style*="display: none"] { display: none !important; }
 #summary-card .rc-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; line-height: 1.25; color: var(--text); }
-#summary-card .rc-btn { flex: 0 0 auto; padding: 3px 8px; border: 1px solid #3a4150; border-radius: 5px; background: #1d2129; color: var(--text);
+#summary-card .rc-btn { flex: 0 0 auto; padding: 3px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--panel); color: var(--text);
   font-size: 11.5px; cursor: pointer; }
-#summary-card .rc-btn:hover { border-color: #3FD0C9; color: #3FD0C9; }
+#summary-card .rc-btn:hover { border-color: var(--route); color: var(--route); }
 #summary-card .rc-btn.rc-stop { border-color: rgba(229, 72, 77, 0.6); color: #ff8589; }
 #summary-card .rc-btn.rc-stop:hover { background: rgba(229, 72, 77, 0.15); border-color: #E5484D; color: #ffb3b5; }
 #summary-card.rc-min .rc-body { display: none; }
@@ -40,7 +40,7 @@ body.charts2 #bottom-bar .chart-slot.chart-framed canvas:focus-visible { box-sha
 #summary-card .rc-verdict.fail { background: rgba(229, 72, 77, 0.16); color: #ff8589; }
 #summary-card .rc-verdict .eva-bar-wrap { margin: 0; }
 #summary-card .rc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-#summary-card .rc-tile { padding: 7px 8px; border: 1px solid var(--border); border-radius: 6px; background: #1d2129; }
+#summary-card .rc-tile { padding: 7px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); }
 #summary-card .rc-tile b { display: block; font: 600 16px ui-monospace, Consolas, monospace; color: var(--text); }
 #summary-card .rc-tile span { display: block; margin-top: 1px; font-size: 10.5px; color: var(--muted); }
 #summary-card .rc-section { border-top: 1px solid var(--border); }
