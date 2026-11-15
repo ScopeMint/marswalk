@@ -18,7 +18,7 @@ const STATE = {
 
   /* Layer visibility and opacity for each layer */
   layers: {
-    opm:        { visible: true,  opacity: 0.5 },   // global basemap — semi-transparent so HiRISE dominates
+    opm:        { visible: true,  opacity: 1.0 },   // global basemap — HiRISE tiles layer over this automatically
     hirise:     { visible: true,  opacity: 1.0 },   // HiRISE 25 cm orthoimage tiles (study area)
     relief:     { visible: false, opacity: 0.85 },  // rock & ridge relief from 1 m HiRISE DTM
     traverse:   { visible: false, opacity: 0.9 },   // Curiosity's real path + waypoints

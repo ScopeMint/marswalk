@@ -128,7 +128,7 @@ function initMap() {
   });
 
   // Add OPM base layer (always on)
-  const opmLayer = makeTileLayer(CONFIG.tileLayers.opm, STATE.layers.opm ? STATE.layers.opm.opacity : 0.5);
+  const opmLayer = makeTileLayer(CONFIG.tileLayers.opm, STATE.layers.opm ? STATE.layers.opm.opacity : 1.0);
   opmLayer.addTo(map);
   STATE.tileLayers.opm = opmLayer;
 

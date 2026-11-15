@@ -85,7 +85,10 @@ function runSafetyChecklist(route, evaParams) {
 
   const outMinutes    = timeSeconds / 60;
   const workMinutesUsed = workMinutes;
-  const totalUsedMinutes = outMinutes + workMinutesUsed + outMinutes;  // out + work + back (symmetric walk)
+  // Use real Dijkstra walkback time if passed in; fallback to symmetric (outbound = walkback)
+  const backMinutes  = (evaParams.walkbackMinutes && evaParams.walkbackMinutes > 0)
+    ? evaParams.walkbackMinutes : outMinutes;
+  const totalUsedMinutes = outMinutes + workMinutesUsed + backMinutes;
   const totalEvaMinutes  = evaHours * 60;
   const budgetFraction   = totalUsedMinutes / totalEvaMinutes;
 

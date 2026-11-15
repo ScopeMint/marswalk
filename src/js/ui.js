@@ -36,7 +36,17 @@ function updateSummaryCard() {
 
   const workMin     = CONFIG.eva.workMinutes;
   const outMin      = timeSeconds / 60;
-  const totalMin    = outMin + workMin + outMin;
+
+  // Use real Dijkstra walk-back time for the target, not outbound × 2
+  let walkbackMin = outMin;  // fallback if walkback map not ready yet
+  if (STATE.walkback && STATE.walkback.status === 'ready' && STATE.walkback.data && STATE.targetCell) {
+    const aoi = STATE.grids && STATE.grids.aoi;
+    const W   = aoi ? aoi.width : (STATE.grids ? STATE.grids.width : 400);
+    const wb  = STATE.walkback.data[STATE.targetCell.row * W + STATE.targetCell.col];
+    if (isFinite(wb) && wb > 0) walkbackMin = wb / 60;
+  }
+
+  const totalMin    = outMin + workMin + walkbackMin;
   const budgetFrac  = totalMin / (evaHours * 60);
   const budgetPct   = Math.min(100, Math.round(budgetFrac * 100));
 
@@ -45,7 +55,7 @@ function updateSummaryCard() {
     { label: 'One-way time',    value: Math.round(outMin) + ' min' },
     { label: 'Steepest slope',  value: steepestDeg.toFixed(1) + '°',  tag: 'limit ' + slopeLimit + '°' },
     { label: 'Climb / Descent', value: '+' + Math.round(climbMeters) + ' / −' + Math.round(descentMeters) + ' m' },
-    { label: 'Walk-back time',  value: Math.round(outMin) + ' min' },
+    { label: 'Walk-back time',  value: Math.round(walkbackMin) + ' min' },
   ];
 
   rows.forEach(({ label, value, tag }) => {
@@ -153,11 +163,12 @@ function updateSummaryCard() {
 
   // Safety checklist
   const evaParams = {
-    slopeLimitDeg: STATE.slopeLimitDeg,
-    evaHours:      STATE.evaHours,
-    speedKmh:      STATE.speedKmh,
-    evaStartHour:  STATE.evaStartHour || 8,
-    season:        'northern_spring_summer'
+    slopeLimitDeg:    STATE.slopeLimitDeg,
+    evaHours:         STATE.evaHours,
+    speedKmh:         STATE.speedKmh,
+    evaStartHour:     STATE.evaStartHour || 8,
+    season:           'northern_spring_summer',
+    walkbackMinutes:  walkbackMin  // real Dijkstra walkback, not outbound × 2
   };
   const checklist = runSafetyChecklist(route, evaParams);
   checklist.forEach(item => {
@@ -204,7 +215,7 @@ function buildLayerPanel() {
 
   const layerDefs = [
     { id: 'hirise',    label: 'HiRISE imagery (25 cm)',  defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 0.50 },
+    { id: 'opm',       label: 'Global basemap (OPM)',    defaultOn: true,  defaultOpacity: 1.00 },
     { id: 'traverse',  label: "Curiosity's real path",   defaultOn: false, defaultOpacity: 0.90 },
     { id: 'slope',     label: 'Slope classes',           defaultOn: false, defaultOpacity: 0.35 },
     { id: 'relief',    label: 'Rocks & ridges (1 m)',    defaultOn: false, defaultOpacity: 0.85 },
