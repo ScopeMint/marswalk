@@ -215,7 +215,6 @@ function buildLayerPanel() {
     { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
     { id: 'themisNight', label: 'THEMIS Night IR',       defaultOn: false, defaultOpacity: 0.70 },
-    { id: 'hillshade', label: 'Terrain shading',         defaultOn: false, defaultOpacity: 0.70 },
   ];
 
   panel.innerHTML = '';

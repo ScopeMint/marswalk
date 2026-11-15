@@ -143,7 +143,9 @@ function dijkstraWalkback(elevArr, slopeArr, roughArr, aoi, habitat, slopeLimit,
       const newDist = dist[curIdx] + t;
       if (newDist < dist[nIdx]) {
         dist[nIdx] = newDist;
-        heap.push(newDist, nIdx);
+        // Push the stored Float32 value, not newDist — pushing the more precise newDist
+        // made the stale-entry check skip ~half all cells, so routes often failed.
+        heap.push(dist[nIdx], nIdx);
       }
     }
   }
@@ -318,7 +320,7 @@ self.onmessage = function(e) {
 
     // Recompute walkback if parameters changed
     const paramsChanged = !_walkbackDist ||
-      !_lastHabitat ||
+      !_lastAoi ||
       _lastHabitat.row !== habitat.row || _lastHabitat.col !== habitat.col ||
       _lastSlopeLimit !== slopeLimit    || _lastSpeed !== speedKmh;
 
