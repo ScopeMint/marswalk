@@ -144,6 +144,15 @@ def main():
             sol = int(sd[3:8])
             if sol < next_sol or sol not in ls_of:
                 continue
+            # Prefer a sol that is already in the cache anywhere in this 25-sol window (fast re-runs).
+            cached = sorted(int(f[:5]) for f in os.listdir(CACHE_DIR) if f.endswith('.json'))
+            in_window = [c for c in cached if sol <= c < next_sol + SOL_STEP and c in ls_of]
+            if in_window and in_window[0] != sol:
+                c = in_window[0]
+                if c not in [int(d[3:8]) for d in sol_dirs]:
+                    in_window = []
+                else:
+                    sd, sol = f'SOL{c:05d}/', c
             try:
                 sol, med = process_sol(rng, sd)
             except Exception as err:
