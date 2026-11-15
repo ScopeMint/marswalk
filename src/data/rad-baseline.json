@@ -1,14 +1,17 @@
 {
   "doseRateMuGyPerDay": 233,
   "uncertaintyMuGyPerDay": 12,
-  "unit": "\u03bcGy/day (micro-gray per day)",
+  "unit": "μGy/day (micro-gray per day)",
   "type": "Surface absorbed dose, galactic cosmic rays",
   "instrument": "RAD (Radiation Assessment Detector)",
   "mission": "MSL/Curiosity",
   "location": "Gale Crater, Mars surface",
-  "measurementPeriod": "Sol 15\u2013350 (August 2012 \u2013 June 2013)",
+  "measurementPeriod": "Sol 15–350 (August 2012 – June 2013)",
   "doi": "10.1126/science.1244797",
   "citation": "Hassler et al. (2014), Science 343(6169)",
   "screenNote": "Measured on the rover at Gale Crater surface. NOT inside a spacesuit. Solar storms and suit shielding not modeled. This is a planning baseline only.",
-  "evaEstimateFormula": "EVA dose estimate = doseRateMuGyPerDay \u00d7 (EVA_hours / 24)"
+  "evaEstimateFormula": "EVA dose estimate = doseRateMuGyPerDay × (EVA_hours / 24)",
+  "solarStormMultiplier": 10,
+  "solarStormNote": "Moderate solar particle event (SPE) scenario. RAD/Curiosity measured SPE events delivering 1–8 mGy in a single day (4–34× baseline). We use 10× as a conservative planning scenario. Hassler et al. (2014), Science 343, Supplementary Table S2.",
+  "solarStormCitation": "Hassler et al. (2014), Science 343(6169), doi:10.1126/science.1244797"
 }

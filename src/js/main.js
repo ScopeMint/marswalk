@@ -22,25 +22,37 @@ async function initApp() {
     initPov()       // pov-images.json → STATE.povImages
   ]);
 
-  // 3. Terrain overlays — both need aoi.json bounds, so must run AFTER loadGrids()
-  //    hillshade first (bottom), then slope overlay on top
+  // 3. Terrain overlays — all need aoi.json bounds, so must run AFTER loadGrids()
+  //    hillshade first (bottom), then slope, then LOS and radiation on top
   if (typeof addHillshadeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addHillshadeOverlay(STATE.map);
   }
   if (typeof addSlopeOverlay === 'function' && STATE.map && STATE.grids.loaded) {
     addSlopeOverlay(STATE.map);
   }
+  if (typeof addLosOverlay === 'function' && STATE.map && STATE.grids.loaded) {
+    addLosOverlay(STATE.map);
+  }
+  if (typeof addRadOverlay === 'function' && STATE.map && STATE.grids.loaded) {
+    addRadOverlay(STATE.map);
+  }
 
   // 4. Needs grids: place habitat and start the walk-back map
   initDefaultHabitat();
 
-  // 5. Draw temperature chart now that REMS data is loaded
+  // 5. Show initial radiation badge (before any route is computed)
+  if (typeof computeRadiation === 'function' && STATE.radBaseline) {
+    const initRad = computeRadiation(STATE.evaHours);
+    if (initRad && typeof _updateRadBadge === 'function') _updateRadBadge(initRad);
+  }
+
+  // 7. Draw temperature chart now that REMS data is loaded
   if (typeof drawTempChart === 'function') {
     // Slight delay so the canvas has rendered to its full CSS size
     setTimeout(() => drawTempChart('temp-canvas'), 100);
   }
 
-  // 6. Show placeholder text in profile canvas (no route yet)
+  // 8. Show placeholder text in profile canvas (no route yet)
   if (typeof clearProfile === 'function') {
     setTimeout(() => clearProfile('profile-canvas'), 100);
   }

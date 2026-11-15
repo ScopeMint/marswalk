@@ -106,6 +106,15 @@
           <div class="ctrl-hint">Sets the temperature window in the chart below</div>
         </div>
 
+        <div class="control-row storm-row" id="solar-storm-row">
+          <label class="ctrl-toggle-label" for="solar-storm-toggle">
+            <input type="checkbox" id="solar-storm-toggle" aria-label="Solar storm alert mode">
+            <span class="toggle-track" aria-hidden="true"></span>
+            ☀ Solar storm alert
+          </label>
+          <div class="ctrl-hint storm-hint">Shows radiation at 10× baseline (moderate SPE scenario — Hassler et al. 2014)</div>
+        </div>
+
       </div>
 
       <div class="panel-heading" style="margin-top:12px;">Mars Locations</div>
@@ -155,6 +164,13 @@
       <!-- Hover tooltip (elevation + slope) -->
       <div id="hover-tooltip" class="hover-tooltip"
            role="tooltip" style="display:none;"></div>
+
+      <!-- Radiation badge — always visible once data loads -->
+      <div id="rad-badge" class="rad-badge" aria-label="Radiation dose estimate" style="display:none;">
+        <span class="rad-badge-icon">☢</span>
+        <span id="rad-badge-val">— μGy</span>
+        <span class="rad-badge-label">for this EVA</span>
+      </div>
 
       <!-- Floating summary card (top-right on map) -->
       <div id="summary-card" class="summary-card"

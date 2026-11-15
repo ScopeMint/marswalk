@@ -6,8 +6,9 @@
    Worker receives transferable ArrayBuffers (no copy). */
 
 let _routeWorker = null;
-let _routeLine   = null;    // Leaflet polyline currently on the map
+let _routeLine     = null;  // Leaflet polyline currently on the map
 let _habitatMarker = null;  // Leaflet marker for the habitat
+let _ponrMarker    = null;  // Leaflet marker for the point of no return
 
 /* Initializes the Web Worker and sets up the message handler. */
 function initRouteWorker() {
@@ -125,6 +126,10 @@ function onWorkerMessage(e) {
     drawRouteLine(msg.cells);
     if (typeof updateSummaryCard === 'function') updateSummaryCard();
     if (typeof drawProfile       === 'function') drawProfile('profile-canvas', msg.profile);
+    if (typeof computePointOfNoReturn === 'function') {
+      const ponrIdx = computePointOfNoReturn();
+      updatePonrMarker(ponrIdx);
+    }
     console.log(`[route] route: ${(msg.distanceMeters/1000).toFixed(2)} km in ${(msg.timeSeconds/60).toFixed(0)} min`);
   }
 
@@ -166,6 +171,66 @@ function clearRouteLine() {
   if (_routeLine && STATE.map) {
     STATE.map.removeLayer(_routeLine);
     _routeLine = null;
+  }
+  clearPonrMarker();
+}
+
+/* Computes the last index along STATE.route.cells where the astronaut can still turn back
+   within EVA time (including work time at target and reserve). Returns the index or null. */
+function computePointOfNoReturn() {
+  if (!STATE.route || STATE.route.status !== 'ok') return null;
+  if (!STATE.walkback || STATE.walkback.status !== 'ready' || !STATE.walkback.data) return null;
+  const cells   = STATE.route.cells;
+  if (!cells || cells.length < 2) return null;
+  const W       = STATE.grids.aoi ? STATE.grids.aoi.width : STATE.grids.width;
+  const cell_m  = STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : 20;
+  const speedMs = STATE.speedKmh * 1000 / 3600;
+  const evaLimit = STATE.evaHours * 3600 * (1 - CONFIG.eva.reserveFraction);
+  const workSec  = CONFIG.eva.workMinutes * 60;
+
+  let ponrIndex = 0;
+  let cumTimeSec = 0;
+  for (let i = 1; i < cells.length; i++) {
+    const prev = cells[i - 1], cur = cells[i];
+    const isDiag = prev.row !== cur.row && prev.col !== cur.col;
+    cumTimeSec += (isDiag ? cell_m * Math.SQRT2 : cell_m) / speedMs;
+
+    const idx = cur.row * W + cur.col;
+    const walkbackSec = STATE.walkback.data[idx];
+    if (!isFinite(walkbackSec) || walkbackSec <= 0) continue;
+
+    if (cumTimeSec + workSec + walkbackSec <= evaLimit) {
+      ponrIndex = i;
+    } else {
+      break;
+    }
+  }
+  return ponrIndex;
+}
+
+/* Places an amber "↩ Turn back" marker at the PONR index on the route. */
+function updatePonrMarker(ponrIndex) {
+  clearPonrMarker();
+  if (ponrIndex === null || !STATE.route.cells) return;
+  const cell = STATE.route.cells[ponrIndex];
+  if (!cell) return;
+  const pt = cellToLatLon(cell.row, cell.col);
+  _ponrMarker = L.marker([pt.lat, pt.lon], {
+    icon: L.divIcon({
+      className: 'ponr-icon',
+      html: '<div class="ponr-pin">↩ Turn back</div>',
+      iconSize: [80, 24],
+      iconAnchor: [40, 12]
+    }),
+    zIndexOffset: 600,
+    interactive: false
+  }).addTo(STATE.map);
+}
+
+function clearPonrMarker() {
+  if (_ponrMarker && STATE.map) {
+    STATE.map.removeLayer(_ponrMarker);
+    _ponrMarker = null;
   }
 }
 

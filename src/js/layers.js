@@ -44,6 +44,24 @@ const LAYER_CATALOG = [
     source: 'See docs/SOURCES.md for elevation data source'
   },
   {
+    id: 'los',
+    name: 'Communication Zones (Line-of-Sight)',
+    description: 'Amber/red = terrain blocks radio line-of-sight to the EVA Base from that cell. Transparent = clear signal path. Computed from elevation grid using Bresenham\'s line algorithm. [Synthetic terrain — verify with real DTM]',
+    mission: 'Computed from elevation data',
+    instrument: 'Elevation grid + LOS algorithm',
+    resolution: '20 m/cell [our assumption]',
+    source: 'Our calculation — see docs/SOURCES.md. Terrain is synthetic for development.'
+  },
+  {
+    id: 'rad',
+    name: 'Radiation Zones (Approximate)',
+    description: 'Green = near baseline dose (233 μGy/day, Hassler et al. 2014); red = slightly elevated dose at higher elevation (thinner atmosphere = less shielding). Model: +1.5% per 100m elevation [OUR ASSUMPTION]. Not a forecast — planning estimate only.',
+    mission: 'MSL/Curiosity RAD + elevation model',
+    instrument: 'RAD + DTM-derived altitude model',
+    resolution: '20 m/cell [our assumption]',
+    source: 'Base dose: Hassler et al. (2014), Science 343(6169). Elevation scaling: OUR ASSUMPTION.'
+  },
+  {
     id: 'walkback',
     name: 'Walk-back Time',
     description: 'Minutes to walk back to the habitat from any point, using the slope-aware speed model.',
@@ -115,6 +133,49 @@ function addSlopeOverlay(map) {
   }
   STATE.tileLayers.slope = overlay;
   console.log('[layers] slope overlay added');
+}
+
+/* Adds the LOS (line-of-sight / communication shadow) PNG overlay.
+   Amber/red cells = terrain blocks radio signal to habitat; transparent = clear signal.
+   Must run AFTER loadGrids() so aoi.json bounds are available. */
+function addLosOverlay(map) {
+  if (!STATE.grids || !STATE.grids.aoi) {
+    console.warn('[layers] addLosOverlay: grids not loaded yet');
+    return;
+  }
+  const aoi    = STATE.grids.aoi;
+  const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+
+  const overlay = L.imageOverlay('./data/los-overlay.png', bounds, {
+    opacity:     STATE.layers.los.opacity,
+    interactive: false
+  });
+
+  if (STATE.layers.los.visible) overlay.addTo(map);
+  STATE.tileLayers.los = overlay;
+  console.log('[layers] LOS overlay added');
+}
+
+/* Adds the radiation zones PNG overlay.
+   Green = baseline dose; red = elevated dose (higher elevation = slightly more radiation).
+   Approximate model [OUR ASSUMPTION: 1.5% per 100m elevation].
+   Must run AFTER loadGrids() so aoi.json bounds are available. */
+function addRadOverlay(map) {
+  if (!STATE.grids || !STATE.grids.aoi) {
+    console.warn('[layers] addRadOverlay: grids not loaded yet');
+    return;
+  }
+  const aoi    = STATE.grids.aoi;
+  const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
+
+  const overlay = L.imageOverlay('./data/rad-overlay.png', bounds, {
+    opacity:     STATE.layers.rad.opacity,
+    interactive: false
+  });
+
+  if (STATE.layers.rad.visible) overlay.addTo(map);
+  STATE.tileLayers.rad = overlay;
+  console.log('[layers] radiation overlay added');
 }
 
 /* Adds or removes the THEMIS day tile layer. */

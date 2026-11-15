@@ -9,7 +9,9 @@ const STATE = {
   tileLayers: {
     opm:         null,
     hillshade:   null,   // elevation-colour + hillshade shadows (hillshade.png)
-    slope:       null,   // slope-overlay.png (kept in STATE.tileLayers, not tile layer)
+    slope:       null,   // slope-overlay.png
+    los:         null,   // line-of-sight communication shadow overlay
+    rad:         null,   // relative radiation level overlay
     themisDay:   null,
     themisNight: null
   },
@@ -19,6 +21,8 @@ const STATE = {
     opm:        { visible: true,  opacity: 1.0 },
     hillshade:  { visible: true,  opacity: 0.70 },  // terrain shading — on by default
     slope:      { visible: true,  opacity: 0.45 },  // slope classification over hillshade
+    los:        { visible: false, opacity: 0.75 },  // communication shadow zones
+    rad:        { visible: false, opacity: 0.65 },  // relative radiation zones
     walkback:   { visible: false, opacity: 0.70 },
     themisDay:  { visible: false, opacity: 0.70 },
     themisNight:{ visible: false, opacity: 0.70 },
@@ -29,10 +33,11 @@ const STATE = {
   habitat:       null,  // { lat, lon } — set when user places habitat or on first load
   target:        null,  // { lat, lon, id } — set when user picks a target card
 
-  slopeLimitDeg: 15,    // degrees — from CONFIG.slope.defaultLimitDeg
-  evaHours:       6,    // hours — from CONFIG.eva.defaultHours
-  speedKmh:       3,    // km/h — from CONFIG.walk.normalKmh
-  evaStartHour:   8,    // local Mars time (0-24)
+  slopeLimitDeg:  15,    // degrees — from CONFIG.slope.defaultLimitDeg
+  evaHours:        6,    // hours — from CONFIG.eva.defaultHours
+  speedKmh:        3,    // km/h — from CONFIG.walk.normalKmh
+  evaStartHour:    8,    // local Mars time (0-24)
+  solarStormMode: false  // when true, radiation estimate uses SPE multiplier from rad-baseline.json
 
   /* Loaded binary grid data (Float32Arrays) */
   grids: {

@@ -30,16 +30,19 @@ async function loadRemsTemps() {
 }
 
 /* Computes the radiation dose estimate for a given EVA duration.
-   Returns { doseEstimateMuGy, source, note } or null if data not loaded.
-   Formula: baseline_per_day * (evaHoursUsed / 24). Labeled "baseline estimate". */
-function computeRadiation(evaHoursUsed) {
+   stormMode defaults to STATE.solarStormMode. When true, applies the SPE multiplier from the data file.
+   Returns { doseEstimateMuGy, stormMode, source, doi, note } or null if data not loaded. */
+function computeRadiation(evaHoursUsed, stormMode) {
   if (!STATE.radBaseline) return null;
-  const dose = STATE.radBaseline.doseRateMuGyPerDay * (evaHoursUsed / 24);
+  const inStorm = (stormMode !== undefined) ? stormMode : STATE.solarStormMode;
+  const multiplier = inStorm ? (STATE.radBaseline.solarStormMultiplier || 10) : 1;
+  const dose = STATE.radBaseline.doseRateMuGyPerDay * multiplier * (evaHoursUsed / 24);
   return {
-    doseEstimateMuGy: Math.round(dose * 10) / 10,  // round to 1 decimal
-    source:   STATE.radBaseline.citation,
-    doi:      STATE.radBaseline.doi,
-    note:     STATE.radBaseline.screenNote
+    doseEstimateMuGy: Math.round(dose * 10) / 10,
+    stormMode: inStorm,
+    source:    inStorm ? STATE.radBaseline.solarStormCitation : STATE.radBaseline.citation,
+    doi:       STATE.radBaseline.doi,
+    note:      inStorm ? STATE.radBaseline.solarStormNote : STATE.radBaseline.screenNote
   };
 }
 
@@ -118,12 +121,17 @@ function runSafetyChecklist(route, evaParams) {
   // 4. Radiation estimate (always info — no pass/fail without a cited EVA dose limit)
   const rad = computeRadiation(evaHours);
   if (rad) {
+    const radLabel = rad.stormMode ? '☀ Radiation (STORM scenario)' : 'Radiation (baseline estimate)';
+    const radDetail = rad.stormMode
+      ? `⚠ STORM: ~${rad.doseEstimateMuGy} μGy for ${evaHours} h EVA (${STATE.radBaseline.solarStormMultiplier}× baseline)`
+      : `~${rad.doseEstimateMuGy} μGy for ${evaHours} h EVA`;
     items.push({
-      label:  'Radiation (baseline estimate)',
-      status: 'info',
-      detail: `~${rad.doseEstimateMuGy} μGy for ${evaHours} h EVA`,
-      source: rad.source,
-      note:   rad.note
+      label:     radLabel,
+      status:    rad.stormMode ? 'storm' : 'info',
+      detail:    radDetail,
+      source:    rad.source,
+      note:      rad.note,
+      stormMode: rad.stormMode
     });
   } else {
     items.push({ label: 'Radiation', status: 'info', detail: 'Data not loaded — refresh.' });

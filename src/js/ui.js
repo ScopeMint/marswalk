@@ -88,21 +88,46 @@ function updateSummaryCard() {
   barRow.appendChild(barVal);
   card.appendChild(barRow);
 
+  // PONR row (computed from walkback map + route)
+  if (typeof computePointOfNoReturn === 'function' && STATE.walkback && STATE.walkback.status === 'ready') {
+    const ponrIdx = computePointOfNoReturn();
+    if (ponrIdx !== null && route.cells && route.cells.length > ponrIdx) {
+      const ponrCell = route.cells[ponrIdx];
+      const ponrDistKm = route.profile && route.profile[ponrIdx]
+        ? (route.profile[ponrIdx].distanceMeters / 1000).toFixed(2)
+        : ((ponrIdx / route.cells.length) * (route.distanceMeters / 1000)).toFixed(2);
+      const ponrRow = document.createElement('div');
+      ponrRow.className = 'sum-row';
+      const ponrLabel = document.createElement('span');
+      ponrLabel.className = 'sum-label';
+      ponrLabel.textContent = '↩ Turn-back point';
+      const ponrVal = document.createElement('span');
+      ponrVal.className = 'sum-val sum-caution';
+      ponrVal.textContent = ponrDistKm + ' km from base';
+      ponrVal.title = 'Past this point you cannot complete the EVA within your time budget (including work time and 25% reserve). The amber flag on the map marks this position.';
+      ponrRow.appendChild(ponrLabel);
+      ponrRow.appendChild(ponrVal);
+      card.appendChild(ponrRow);
+    }
+  }
+
   // Radiation estimate
   const rad = computeRadiation(evaHours);
   if (rad) {
     const radRow = document.createElement('div');
-    radRow.className = 'sum-row';
+    radRow.className = rad.stormMode ? 'sum-row sum-storm-row' : 'sum-row';
     const radLabel = document.createElement('span');
     radLabel.className = 'sum-label';
-    radLabel.textContent = 'Radiation est.';
+    radLabel.textContent = rad.stormMode ? '☀ Radiation (STORM)' : 'Radiation est.';
     const radVal = document.createElement('span');
-    radVal.className = 'sum-val sum-sourced';
+    radVal.className = rad.stormMode ? 'sum-val sum-danger' : 'sum-val sum-sourced';
     radVal.textContent = rad.doseEstimateMuGy + ' μGy';
     radVal.title = rad.note + '\nSource: ' + rad.source;
     radRow.appendChild(radLabel);
     radRow.appendChild(radVal);
     card.appendChild(radRow);
+    // Update the persistent badge
+    _updateRadBadge(rad);
   }
 
   // Temperature range
@@ -139,7 +164,7 @@ function updateSummaryCard() {
   checklist.forEach(item => {
     const el = document.createElement('div');
     el.className = 'check-item ' + item.status;
-    const icon = { pass: '✓', caution: '⚠', fail: '✕', info: 'ℹ' }[item.status] || '·';
+    const icon = { pass: '✓', caution: '⚠', fail: '✕', info: 'ℹ', storm: '☀' }[item.status] || '·';
     el.textContent = icon + ' ' + item.label;
     if (item.detail) el.title = item.detail + (item.source ? '\nSource: ' + item.source : '');
     card.appendChild(el);
@@ -159,6 +184,17 @@ function updateSummaryCard() {
   }
 }
 
+/* Updates the persistent radiation badge on the map with the latest dose estimate. */
+function _updateRadBadge(rad) {
+  const badge = document.getElementById('rad-badge');
+  const val   = document.getElementById('rad-badge-val');
+  if (!badge || !val) return;
+  val.textContent = rad.doseEstimateMuGy + ' μGy';
+  badge.style.display = 'flex';
+  badge.classList.toggle('storm', !!rad.stormMode);
+  badge.title = rad.note + '\nSource: ' + rad.source;
+}
+
 /* ── Layer panel ──────────────────────────────────────────────────────────── */
 
 /* Builds the right panel layer controls and legend.
@@ -169,11 +205,13 @@ function buildLayerPanel() {
   if (!panel) return;
 
   const layerDefs = [
-    { id: 'opm',       label: 'Imagery (OPM)',       defaultOn: true,  defaultOpacity: 1.00 },
-    { id: 'hillshade', label: 'Terrain shading',     defaultOn: true,  defaultOpacity: 0.70 },
-    { id: 'slope',     label: 'Slope classes',       defaultOn: true,  defaultOpacity: 0.45 },
-    { id: 'walkback',  label: 'Walk-back time',      defaultOn: false, defaultOpacity: 0.70 },
-    { id: 'themisDay', label: 'THEMIS Day IR',        defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'opm',       label: 'Imagery (OPM)',           defaultOn: true,  defaultOpacity: 1.00 },
+    { id: 'hillshade', label: 'Terrain shading',         defaultOn: true,  defaultOpacity: 0.70 },
+    { id: 'slope',     label: 'Slope classes',           defaultOn: true,  defaultOpacity: 0.45 },
+    { id: 'los',       label: 'Communication zones',     defaultOn: false, defaultOpacity: 0.75 },
+    { id: 'rad',       label: 'Radiation zones',         defaultOn: false, defaultOpacity: 0.65 },
+    { id: 'walkback',  label: 'Walk-back time',          defaultOn: false, defaultOpacity: 0.70 },
+    { id: 'themisDay', label: 'THEMIS Day IR',           defaultOn: false, defaultOpacity: 0.70 },
   ];
 
   panel.innerHTML = '';
@@ -646,6 +684,11 @@ function _initEvaControls() {
     evaSlider.addEventListener('input', () => {
       STATE.evaHours = parseFloat(evaSlider.value);
       if (evaVal) evaVal.textContent = STATE.evaHours;
+      // Update rad badge even if no route is loaded yet
+      if (typeof computeRadiation === 'function') {
+        const r = computeRadiation(STATE.evaHours);
+        if (r) _updateRadBadge(r);
+      }
       updateSummaryCard();
       if (typeof drawTempChart === 'function') drawTempChart('temp-canvas');
     });
@@ -675,6 +718,17 @@ function _initEvaControls() {
       if (startVal) startVal.textContent = h + ':00';
       updateSummaryCard();
       if (typeof drawTempChart === 'function') drawTempChart('temp-canvas');
+    });
+  }
+
+  // Solar storm toggle
+  const stormToggle = document.getElementById('solar-storm-toggle');
+  if (stormToggle) {
+    stormToggle.addEventListener('change', () => {
+      STATE.solarStormMode = stormToggle.checked;
+      const stormRow = document.getElementById('solar-storm-row');
+      if (stormRow) stormRow.classList.toggle('storm-active', STATE.solarStormMode);
+      updateSummaryCard();
     });
   }
 }

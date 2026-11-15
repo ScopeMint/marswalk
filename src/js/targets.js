@@ -56,10 +56,18 @@ function renderTargetCards() {
   }
 
   container.innerHTML = STATE.targets.map(feature => {
-    const { index, name, shortName, kind, why, source, selectionNote } = feature.properties;
+    const { index, name, shortName, kind, why, detail, findings, source, selectionNote } = feature.properties;
     const [lon, lat] = feature.geometry.coordinates;
     const latStr = Math.abs(lat).toFixed(2) + (lat < 0 ? '°S' : '°N');
     const lonStr = lon.toFixed(2) + '°E';
+
+    const findingsBlock = findings ? `<div class="target-findings">${findings}</div>` : '';
+    const detailBlock = (detail || findings) ? `
+      <details class="target-detail-block">
+        <summary class="target-detail-toggle">What to look for ▾</summary>
+        <div class="target-detail-text">${detail || ''}</div>
+        ${findingsBlock}
+      </details>` : '';
 
     return `<div class="target-card" data-id="${feature.id}">
       <div class="target-card-header">
@@ -68,6 +76,7 @@ function renderTargetCards() {
       </div>
       <div class="target-card-kind">${kind}</div>
       <div class="target-card-why">${why}</div>
+      ${detailBlock}
       <div class="target-card-coords">${latStr}  ${lonStr}</div>
       <div class="target-card-source">Source: ${source}</div>
       <div class="target-card-note">${selectionNote}</div>

@@ -51,3 +51,17 @@ Date/time | File or part | What AI did | Who checked it
 2026-11-14 | src/js/state.js, layers.js, ui.js | Claude Code added hillshade terrain visualization layer (elevation colour + shadow shading) to the layer stack | team to verify renders correctly
 2026-11-14 | src/js/route.js, css/styles.css | Claude Code changed habitat marker from "H" to "EVA Base" with two-line icon and tooltip | team to verify on map
 2026-11-14 | src/js/map.js, css/styles.css | Claude Code added geographic terrain labels (Murray Formation, Crater Floor, Mt. Sharp slope) as map overlays | team to verify positions are accurate
+2026-11-14 | src/data/targets.geojson | Claude Code added findings and detail fields to all 5 science targets based on published Curiosity papers (Rapin 2021, Bristow 2021, Fraeman 2020, Edgar 2020, NASA/JPL 2023) | team to verify citations against papers
+2026-11-14 | src/js/targets.js | Claude Code added expandable "What to look for" section to target cards (findings + detail fields) | team to verify display in browser
+2026-11-14 | src/data/rad-baseline.json | Claude Code added solar storm multiplier (10×) and citation from Hassler et al. 2014 Supplementary Table S2 | team to verify source
+2026-11-14 | src/js/state.js | Claude Code added solarStormMode, los layer, rad layer to STATE | team to review
+2026-11-14 | src/js/safety.js | Claude Code updated computeRadiation() to use storm multiplier from rad-baseline.json | team to verify storm mode numbers
+2026-11-14 | src/js/route.js | Claude Code added computePointOfNoReturn() and updatePonrMarker() — amber "↩ Turn back" marker on the route | team to test on a computed route
+2026-11-14 | src/index.html | Claude Code added solar storm toggle and radiation badge (#rad-badge) to map area | team to test UI
+2026-11-14 | src/js/ui.js | Claude Code added PONR row, storm mode UI, radiation badge updater, new layer panel entries for LOS and radiation | team to review
+2026-11-14 | scripts/generate_los_overlay.py | Claude Code wrote LOS script: Bresenham line algorithm from habitat cell to every cell, amber/red where terrain blocks signal | team to verify algorithm
+2026-11-14 | scripts/generate_rad_overlay.py | Claude Code wrote radiation overlay script: elevation-based relative dose, 1.5% per 100m [OUR ASSUMPTION] | team to review assumption
+2026-11-14 | src/data/los-overlay.png | Claude Code generated via generate_los_overlay.py (synthetic terrain) | team to verify visually
+2026-11-14 | src/data/rad-overlay.png | Claude Code generated via generate_rad_overlay.py (synthetic terrain) | team to verify visually
+2026-11-14 | src/js/layers.js | Claude Code added addLosOverlay(), addRadOverlay(), catalog entries for both new layers | team to verify overlays display correctly
+2026-11-14 | src/css/styles.css | Claude Code added CSS for ponr-pin, target-detail-block, storm-row toggle, rad-badge | team to verify dark theme rendering
