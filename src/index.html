@@ -100,6 +100,13 @@
     <button id="btn-reload"      aria-label="Reload example mission">Reload example</button>
   </header>
 
+  <!-- Small-screen notice (< 900 px wide) -->
+  <div class="small-screen-notice" id="small-screen-notice" role="status">
+    <strong>Best on a laptop</strong>
+    <p>MarsWalk is designed for 1100 px or wider. You can still try it, but some panels may be hidden.</p>
+    <button id="btn-small-screen-dismiss" aria-label="Dismiss and continue anyway">Continue anyway</button>
+  </div>
+
   <!-- Search dropdown attaches to <body> at runtime (initSearch moves it) -->
   <div id="search-dropdown" role="listbox" aria-label="Location results"></div>
 
@@ -114,7 +121,7 @@
         Study boxwork ridges on Curiosity's real 2025 route, Mount Sharp, Gale Crater
       </div>
 
-      <div class="panel-heading" style="margin-top:12px;">
+      <div class="panel-heading">
         EVA Controls
         <span class="assumption-tag">[our assumptions]</span>
       </div>
@@ -177,12 +184,12 @@
 
       </div>
 
-      <div class="panel-heading" style="margin-top:12px;">Science Targets</div>
+      <div class="panel-heading">Science Targets</div>
       <div id="science-targets-list">
         <p class="placeholder-text">Loading targets…</p>
       </div>
 
-      <div class="panel-heading" style="margin-top:12px;">Mars Locations</div>
+      <div class="panel-heading">Mars Locations</div>
 
       <!-- Library search bar (moved from top bar) -->
       <div id="lib-search-wrap" class="lib-search-wrap" role="search">

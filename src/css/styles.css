@@ -228,6 +228,7 @@ button:focus-visible, .btn:focus-visible {
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--gap);
+  padding-bottom: 32px;   /* ensure last control isn't flush with bottom */
 }
 
 /* ── Map container ── */
@@ -286,11 +287,53 @@ button:focus-visible, .btn:focus-visible {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
 }
 
+/* ── Panel heading spacing — no inline style="margin-top" needed ── */
+.panel-heading + .panel-heading,
+.panel-heading + div + .panel-heading,
+.panel-heading + #eva-controls + .panel-heading,
+#science-targets-list + .panel-heading,
+#eva-controls + .panel-heading {
+  margin-top: 12px;
+}
+
+/* ── Layer opacity: show only when layer is on ── */
+.layer-opacity-row { display: none; }
+.layer-toggle-wrap.active .layer-opacity-row { display: flex; }
+
+/* ── Small-screen notice ── */
+.small-screen-notice {
+  display: none;   /* shown by media query below */
+  position: fixed; inset: 0; z-index: 9000;
+  background: var(--bg);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+}
+.small-screen-notice p { max-width: 320px; color: var(--muted); line-height: 1.6; }
+.small-screen-notice strong { display: block; color: var(--text); font-size: 18px; margin-bottom: 4px; }
+#btn-small-screen-dismiss {
+  margin-top: 8px;
+  padding: 8px 20px;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13px;
+}
+#btn-small-screen-dismiss:hover { color: var(--text); border-color: var(--muted); }
+@media (max-width: 899px) { .small-screen-notice { display: flex; } }
+
 /* ── Leaflet dark theme overrides ── */
 .leaflet-control-attribution {
-  background: rgba(15, 17, 21, 0.85) !important;
+  background: rgba(16, 14, 13, 0.88) !important;
   color: var(--muted) !important;
-  font-size: 11px !important;
+  font-size: 9px !important;
+  line-height: 1.3 !important;
+  max-width: 340px;
 }
 
 .leaflet-control-attribution a {
@@ -1513,11 +1556,13 @@ button:focus-visible, .btn:focus-visible {
 }
 
 
-/* ── Radiation badge ── */
+/* ── Radiation badge — bottom-right to avoid Leaflet zoom controls (top-left) ── */
 #rad-badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  bottom: 68px;
+  right: 12px;
+  top: auto;
+  left: auto;
   z-index: 450;
   display: flex;
   align-items: center;
