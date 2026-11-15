@@ -205,40 +205,6 @@ function addRadOverlay(map) {
   console.log('[layers] radiation overlay added');
 }
 
-/* Adds or removes the THEMIS day tile layer. */
-function addThermisDay(map) {
-  if (STATE.tileLayers.themisDay) return;  // already added
-  const layer = L.tileLayer(CONFIG.tileLayers.themisDay.urlTemplate, {
-    attribution: CONFIG.tileLayers.themisDay.attribution,
-    minZoom:     CONFIG.tileLayers.themisDay.minZoom,
-    maxZoom:     CONFIG.tileLayers.themisDay.maxZoom,
-    tms:         CONFIG.tileLayers.themisDay.tms,
-    opacity:     STATE.layers.themisDay ? STATE.layers.themisDay.opacity : 0.7,
-    noWrap:      true,
-    bounds:      [[-90, -180], [90, 180]],
-    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-  });
-  STATE.tileLayers.themisDay = layer;
-  if (STATE.layers.themisDay && STATE.layers.themisDay.visible) layer.addTo(map);
-}
-
-/* Adds the THEMIS night tile layer. */
-function addThermisNight(map) {
-  if (STATE.tileLayers.themisNight) return;
-  const layer = L.tileLayer(CONFIG.tileLayers.themisNight.urlTemplate, {
-    attribution: CONFIG.tileLayers.themisNight.attribution,
-    minZoom:     CONFIG.tileLayers.themisNight.minZoom,
-    maxZoom:     CONFIG.tileLayers.themisNight.maxZoom,
-    tms:         CONFIG.tileLayers.themisNight.tms,
-    opacity:     STATE.layers.themisNight ? STATE.layers.themisNight.opacity : 0.7,
-    noWrap:      true,
-    bounds:      [[-90, -180], [90, 180]],
-    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-  });
-  STATE.tileLayers.themisNight = layer;
-  if (STATE.layers.themisNight && STATE.layers.themisNight.visible) layer.addTo(map);
-}
-
 /* Sets the opacity of a named layer. layerId matches STATE.tileLayers keys. */
 function updateLayerOpacity(layerId, opacity) {
   const layer = STATE.tileLayers[layerId];

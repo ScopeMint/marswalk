@@ -105,7 +105,9 @@ function updateSummaryCard() {
       const ponrCell = route.cells[ponrIdx];
       // ponrIdx indexes the thinned display path (route.cells), not route.profile — use the fraction
       const wholeRouteSafe = ponrIdx >= route.cells.length - 1;
-      const ponrDistKm = ((ponrIdx / Math.max(1, route.cells.length - 1)) * (route.distanceMeters / 1000)).toFixed(2);
+      const ponrDistKm = (route.cellDistanceMeters && route.cellDistanceMeters[ponrIdx] !== undefined
+        ? route.cellDistanceMeters[ponrIdx] / 1000
+        : (ponrIdx / Math.max(1, route.cells.length - 1)) * (route.distanceMeters / 1000)).toFixed(2);
       const ponrRow = document.createElement('div');
       ponrRow.className = 'sum-row';
       const ponrLabel = document.createElement('span');

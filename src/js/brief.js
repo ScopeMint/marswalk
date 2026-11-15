@@ -67,7 +67,10 @@ function buildBrief() {
   const evaMin = STATE.evaHours * 60;
   const ponrIdx = typeof computePointOfNoReturn === 'function' ? computePointOfNoReturn() : null;
   const wholeSafe = ponrIdx !== null && ponrIdx >= route.cells.length - 1;
-  const ponrPet = ponrIdx === null ? null : walkStart + (ponrIdx / Math.max(1, route.cells.length - 1)) * outMin;
+  const ponrPet = ponrIdx === null ? null
+    : (route.cellTimeSeconds && route.cellTimeSeconds[ponrIdx] !== undefined)
+      ? walkStart + route.cellTimeSeconds[ponrIdx] / 60
+      : walkStart + (ponrIdx / Math.max(1, route.cells.length - 1)) * outMin;
   const rad = typeof computeRadiation === 'function' ? computeRadiation(done / 60) : null;
 
   const rows = [

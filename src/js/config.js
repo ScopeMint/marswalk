@@ -43,33 +43,16 @@ const CONFIG = {
       attribution: 'Tiles: <a href="https://www.openplanetary.org/opm">OpenPlanetaryMap</a> | Data: NASA Viking MDIM 2.1, MOLA (NASA/USGS/CARTO)',
       minZoom: 1, maxZoom: 18, tms: false,
       mission: 'Viking + MGS', instrument: 'MDIM + MOLA', resolution: '~232 m/px global'
-    },
-    themisDay: {
-      id:          'themisDay',
-      name:        'THEMIS Day IR (thermal)',
-      /* Mars Trek WMTS URL — may need updating if Trek server comes back online.
-         Tested Nov 14 2026: Trek tile server returning 404 for all layer names tried.
-         Keeping URL here so it can be re-enabled when Trek is accessible. */
-      urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-Day-IR_mosaic_global_100m_v12/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/ASU — Mars Odyssey THEMIS via Mars Trek',
-      minZoom: 1, maxZoom: 18, tms: false,
-      mission: 'Mars Odyssey', instrument: 'THEMIS', resolution: '~100 m/px'
-    },
-    themisNight: {
-      id:          'themisNight',
-      name:        'THEMIS Night IR (thermal)',
-      urlTemplate: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_MO_THEMIS-Night-IR_mosaic_global_100m_v14/default/default028mm/{z}/{y}/{x}.jpg',
-      attribution: 'NASA/JPL-Caltech/ASU — Mars Odyssey THEMIS via Mars Trek',
-      minZoom: 1, maxZoom: 18, tms: false,
-      mission: 'Mars Odyssey', instrument: 'THEMIS', resolution: '~100 m/px'
     }
+    /* THEMIS day/night IR is served as local overlays cut by scripts/09_get_themis.py
+       (see site-layers.js); the old Mars Trek tile URLs returned 404 and were removed. */
   },
 
   /* Grid: elevation, slope, roughness binary files in data/.
-     20 m cells = 300x300 = 90,000 cells. Fast enough for A* in a Web Worker.
-     OUR ASSUMPTION: 20 m cells. Upgrade to 10 m only if route computes in < 200 ms. */
+     10 m cells = 400x400 = 160,000 cells over the 4 km study area (elevation averaged from the 1 m
+     HiRISE DTM). The real size comes from data/aoi.json; this is only a fallback. [OUR ASSUMPTION] */
   grid: {
-    cellSizeMeters: 20   // [OUR ASSUMPTION]
+    cellSizeMeters: 10   // [OUR ASSUMPTION]
   },
 
   /* Walking speed presets (flat ground, no suit, no gear).
@@ -134,9 +117,12 @@ const CONFIG = {
   },
 
   /* Slope speed penalty model (uphill/downhill adjustment).
-     OUR ASSUMPTION: linear from 100% at 0° to 40% at the slope limit (uphill).
-     Downhill: half the penalty of uphill. */
+     OUR ASSUMPTION: uphill speed falls linearly from 100% at 0° to 40% at a FIXED 25° reference slope.
+     The reference does NOT move with the slope-limit slider: the slider only decides which cells are
+     blocked, so a 10° hill always takes the same time. Downhill: half the penalty of uphill.
+     route-worker.js keeps its own copy of these numbers (workers cannot read CONFIG) - keep in sync. */
   speedModel: {
+    referenceSlopeDeg:  25,    // [OUR ASSUMPTION] = slider maximum
     uphillMinFraction:  0.40,  // [OUR ASSUMPTION]
     downhillPenaltyFactor: 0.5 // [OUR ASSUMPTION]
   },

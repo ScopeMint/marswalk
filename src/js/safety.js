@@ -147,8 +147,8 @@ function runSafetyChecklist(route, evaParams) {
 
   // 6. Amber warnings (caution-class)
   const straightLineM = Math.sqrt(
-    Math.pow((route.cells[route.cells.length-1].row - route.cells[0].row) * (STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : 20), 2) +
-    Math.pow((route.cells[route.cells.length-1].col - route.cells[0].col) * (STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : 20), 2)
+    Math.pow((route.cells[route.cells.length-1].row - route.cells[0].row) * (STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : CONFIG.grid.cellSizeMeters), 2) +
+    Math.pow((route.cells[route.cells.length-1].col - route.cells[0].col) * (STATE.grids.aoi ? STATE.grids.aoi.cellSizeMeters : CONFIG.grid.cellSizeMeters), 2)
   );
   if (straightLineM > 0 && distanceMeters > 1.5 * straightLineM) {
     items.push({
