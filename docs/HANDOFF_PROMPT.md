@@ -6,27 +6,25 @@ Copy everything below the line into your AI assistant, with the repo folder open
 
 You are continuing **MarsWalk**, our NASA Space Apps 2026 entry for the challenge "Interplanetary Survival Guide: Martian Map". Goal: win global first place. Deadline: Sunday Nov 15 2026, submit by 6 PM local (hard deadline 11:59 PM).
 
-READ FIRST: `CLAUDE.md` (rules), `docs/AI_USE.md` (log every file you touch there), `docs/SOURCES.md` (cite every source).
+READ FIRST: `CLAUDE.md` (rules), `README.md` (what the app is), `docs/AI_USE.md` (log EVERY file you touch there), `docs/SOURCES.md` (cite every source), `docs/SUBMISSION_FORM_DRAFT.md` (form text, already written).
 
-## What exists (all in `src/`, static site + installable PWA, plain JS + Leaflet 1.9.4, no build step)
-- Study area: 4 km x 4 km on Curiosity's REAL 2025-26 boxwork route, Mount Sharp, Gale Crater (center 4.808 S, 137.372 E). Habitat at 4.82276 S, 137.36447 E.
-- Data (scripts/08_build_real_site.py, 09_get_themis.py): HiRISE 1 m DTM -> 10 m grids (`elevation.bin`, `slope.bin`, `roughness.bin` = 1 m rock & ridge relief), HiRISE 25 cm tiles in `src/tiles/hirise/{z}/{x}/{y}.jpg`, THEMIS day/night PNGs, Curiosity traverse (`curiosity-traverse.geojson`), 5 targets (`targets.geojson`) at real rover positions + 1 unvisited boxwork field, real Curiosity photos (`data/pov/`).
-- Validation: our DTM matches Curiosity's own elevations at 227 waypoints, 2.4 m RMS after a 12.8 m datum offset (computed live in `site-layers.js`, shown in About).
-- Route: Dijkstra/A* in `route-worker.js` (slope limit, uphill/downhill speed, roughness penalty), walk-back map, point of no return.
-- Visor HUD + walk replay: `hud.js`, `hud.css` (full-screen map mode).
-- Mars clock: `marsclock.js` (Mars24 algorithm: sol, LMST, Ls, sun elevation) — check it is wired in `index.html` + `main.js`.
-- Safety: radiation (RAD, Hassler 2014), temperature (REMS), checklist, solar-storm mode.
+## What exists (all in `src/`; static site + installable offline PWA; plain JS globals + Leaflet 1.9.4; three.js r160 lazy-loaded; no build step)
+- Real site: 4 km box on Curiosity's 2025-26 boxwork route (center 4.808 S, 137.372 E). Habitat 4.82276 S, 137.36447 E.
+- Data pipeline `scripts/08..11`: HiRISE 1 m DTM -> 10 m grids (elevation/slope/roughness .bin), HiRISE 25 cm tiles `src/tiles/hirise/`, THEMIS PNGs, Curiosity traverse geojson, 5 targets at real rover positions, real Curiosity photos, 3D texture.
+- Validation (live, `site-layers.js`): DTM vs 227 Curiosity waypoints = 2.4 m RMS after 12.8 m offset.
+- Modules: `route.js`/`route-worker.js` (Dijkstra/A*), `site-layers.js` (HiRISE/THEMIS/relief/traverse/walk-back), `consumables.js` (Pandolf 1977 + Mars gravity, O2/CO2/water), `hazards.js` (radio shadow, rocky, near-limit ranges), `brief.js` (printable EVA cue card), `hud.js` (visor HUD replay), `marsclock.js` (Mars24, tests in `tests/`), `terrain3d.js` (3D fly-through), `tour.js` (captioned guided tour + sun chart), `interact.js` (move base, any-point target, no-go zones), `app.js` + `sw.js` + `manifest.webmanifest` (PWA, offline pack, boot screen).
+- Teammate Neel removed the solar-storm feature on purpose; do not re-add.
 
-## Rules you must follow
-- Never invent numbers. Sourced numbers cite the paper/URL; our own guesses are labelled "OUR ASSUMPTION" on screen and in `config.js`.
-- No NASA logos, no AI-generated images.
-- Relative paths only (GitHub Pages serves the repo root; root `index.html` redirects to `src/index.html`).
-- Commit small, `git pull --rebase` before every push, never force-push. Teammate Neel also pushes to main.
-- Do not add "Co-Authored-By" AI lines to commits.
+## Rules
+- Never invent numbers. Cite sources; label guesses "OUR ASSUMPTION" (on screen + `config.js`).
+- No NASA logos, no AI-generated images. Relative paths only.
+- `git pull --rebase` before every push, small commits, never force-push. No AI "Co-Authored-By" lines.
+- After changing files listed in `src/sw.js` SHELL_FILES, bump `CACHE_VERSION`.
+- Test in Chrome with DevTools console open: no red errors; run `node tests/marsclock.test.js`.
 
-## Remaining TODO (highest value first) — check `git log` for what is already done
-1. Enable GitHub Pages (repo Settings -> Pages -> main / root) if not on; test https://scopemint.github.io/marswalk/ in a private window.
-2. Test the full app in Chrome: no console errors; every target routes; HUD plays; PWA installs; works offline after first load.
-3. Demo: 30 s video with English subtitles (see docs/DEMO_SCRIPT.md), 5 screenshots.
-4. Fill docs/SUBMISSION_FORM_DRAFT.md with the new real-data story (HiRISE 1 m, real rover positions, validation number, offline app, HUD, Mars clock, consumables model).
-5. Polish: README with screenshots, What/Why/How-to-run, credits.
+## Remaining TODO (highest value first)
+1. **GitHub Pages**: needs an org/repo ADMIN (our account only has write). Settings -> Pages -> Deploy from branch -> main / (root) -> Save. Then test https://scopemint.github.io/marswalk/ in a private window, install the app, toggle airplane mode, reload: it must still work.
+2. **Demo video (30 s, English subtitles)**: screen-record the in-app "▶ Tour" (captions = subtitles), trim to 30 s; upload unlisted to YouTube; put link in the form.
+3. **5 screenshots**: tour caption over map, route card with suit & hazards, EVA cue card, visor HUD, 3D fly-through.
+4. Fill the form from `docs/SUBMISSION_FORM_DRAFT.md`; submit; download certificate.
+5. Nice-to-have: multi-stop traverse (Base -> several targets -> Base), tablet layout polish (<1100 px), light print test of the cue card.
