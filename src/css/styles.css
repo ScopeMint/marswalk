@@ -438,15 +438,6 @@ body {
   display: block;
 }
 
-.bottom-footer-text {
-  font-size: 10px;
-  color: var(--muted);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  white-space: nowrap;
-  padding: 4px 0;
-  opacity: 0.6;
-}
 
 /* ── Loading / error banners (over the map) ── */
 .loading-banner {
