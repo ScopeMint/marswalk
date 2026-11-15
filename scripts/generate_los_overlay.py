@@ -76,7 +76,8 @@ def line_cells(r0, c0, r1, c1):
 
 los_blocked = np.zeros((H, W), dtype=np.uint8)  # 0=clear, 1=shadow, 2=deep shadow
 
-ANTENNA_HEIGHT = 2.0   # meters (height of astronaut comm antenna above ground)
+ANTENNA_HEIGHT = 2.0   # meters (height of astronaut suit antenna above ground) [OUR ASSUMPTION]
+HAB_MAST_HEIGHT = 10.0 # meters (radio mast on the habitat) [OUR ASSUMPTION]
 
 for r in range(H):
     for c in range(W):
@@ -89,7 +90,8 @@ for r in range(H):
         max_excess = 0.0
         for i, (cr, cc) in enumerate(cells):
             t = (i + 1) / n_steps
-            interp_height = hab_elev + ANTENNA_HEIGHT + t * (tgt_elev - hab_elev + ANTENNA_HEIGHT)
+            start_h = hab_elev + HAB_MAST_HEIGHT
+            interp_height = start_h + t * ((tgt_elev + ANTENNA_HEIGHT) - start_h)
             terrain_height = elevation[cr, cc]
             excess = terrain_height - interp_height
             if excess > 0:

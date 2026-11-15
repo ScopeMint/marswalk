@@ -184,3 +184,30 @@ IDEAS / PAPERS / INSPIRATION
 
 JPL Mars Trek (inspiration and tile source): https://trek.nasa.gov/mars/
 USGS Planetary Geologic Mapping Program (context): https://www.usgs.gov/centers/astrogeology-science-center/science/planetary-geologic-mapping
+
+[CONFIRMED] HiRISE DTM DTEEC_019698_1750_019988_1750_U01 — elevation (1 m/px), slope, relief (study area since Nov 14 evening)
+  URL: https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_019698_1750_019988_1750_U01
+  COG: https://astrogeo-ard.s3-us-west-2.amazonaws.com/mars/mro/hirise/controlled/dtm/ESP_019698_1750_ESP_019988_1750/
+  Producer: HiRISE team, University of Arizona (McEwen et al. 2007, JGR 112, E05S02, doi:10.1029/2005JE002605). License: CC0 (USGS Astrogeology ARD)
+  Check: matches Curiosity-reported elevations at 227 waypoints within 2.4 m RMS after a 12.8 m datum offset
+
+[CONFIRMED] HiRISE orthoimage ESP_019988_1750_RED_A_01_ORTHO (0.25 m/px) — map tiles src/tiles/hirise
+  Same STAC item / folder as above. Credit: NASA/JPL/University of Arizona. License: CC0 (USGS ARD)
+
+[CONFIRMED] Curiosity traverse + waypoints (NASA/JPL-Caltech MMGIS) — rover path, target positions, latest position (sol 5073)
+  https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_traverse.json , MSL_waypoints.json
+
+[CONFIRMED] Curiosity raw images (NASA/JPL-Caltech, Mastcam: NASA/JPL-Caltech/MSSS) — POV photos, see src/data/pov-images.json for image IDs and links
+  https://mars.nasa.gov/msl/multimedia/raw-images/
+
+[CONFIRMED] THEMIS Day/Night IR Controlled Mosaics 100 m v2 (Oct 2018) via NASA Mars Trek — thermal overlays
+  https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/{z}/{row}/{col}.png
+  Credit: NASA/JPL-Caltech/Arizona State University. Edwards et al. (2011), JGR 116, E10008, doi:10.1029/2010JE003755
+
+[CONFIRMED] Science target context
+  NASA/JPL news, "NASA's Curiosity Mars Rover Starts Unpacking Boxwork Formations" (June 2025): https://www.jpl.nasa.gov/news/nasas-curiosity-mars-rover-starts-unpacking-boxwork-formations/
+  Curiosity blog sols 4709-4715: https://science.nasa.gov/blog/curiosity-blog-sols-4709-4715-drilling-high-and-low-in-the-boxwork-unit
+  Curiosity blog sols 4716-4722: https://science.nasa.gov/blog/curiosity-blog-sols-4716-4722-drilling-success-at-nevado-sajama/
+  Siebach, K. L. & Grotzinger, J. P. (2014), Volumetric estimates of ancient water on Mount Sharp based on boxwork deposits, JGR Planets 119, doi:10.1002/2013JE004508
+
+[CONFIRMED] USGS Astrogeology STAC API (data discovery): https://stac.astrogeology.usgs.gov/api/

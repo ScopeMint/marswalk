@@ -1,100 +1,135 @@
 {
   "type": "FeatureCollection",
   "metadata": {
-    "site": "Gale Crater / Mount Sharp, Mars — 6 km study area centered 5.10°S, 137.75°E",
-    "selectionNote": "Our selection based on published Curiosity mission traverse data and science reports. Coordinates are representative positions inside the 6 km planning area; the named geological units are real features studied by Curiosity nearby. Labeled 'our selection' throughout the app.",
-    "coordinateSystem": "IAU2000 areocentric latitude, east positive longitude",
-    "studyAreaBounds": "W 137.699°E  E 137.801°E  S 5.151°S  N 5.049°S"
+    "site": "Boxwork unit, Mount Sharp (Aeolis Mons), Gale Crater, Mars. 4 km study area centered 4.808 S, 137.372 E.",
+    "selectionNote": "Targets 1-3 are placed at Curiosity's real end-of-drive position on the sol it worked there (NASA/JPL MMGIS waypoints). Target 4 is the rover's latest reported position. Target 5 is our own selection from HiRISE 1 m terrain: a ridge field the rover did not visit.",
+    "coordinateSystem": "Planetocentric latitude, east-positive longitude (IAU Mars 2015 sphere)",
+    "waypointSource": "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json"
   },
   "features": [
     {
       "type": "Feature",
       "id": "target-1",
-      "geometry": { "type": "Point", "coordinates": [137.750, -5.080] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          137.382987,
+          -4.800407
+        ]
+      },
       "properties": {
         "index": 1,
-        "name": "Murray Buttes Boxwork",
-        "shortName": "Boxwork Ridge",
-        "kind": "Boxwork formation",
-        "why": "Eroded boxwork ridges in sulfate/mudstone layers — the primary science goal of this Marswalk.",
-        "detail": "Curiosity documented boxwork formations at Murray Buttes: erosion-resistant veins form ridge networks as surrounding mudstone weathers away. These record the chemistry of ancient groundwater that likely supported a habitable environment. Rapin et al. (2021) identified similar sulfate-bearing boxwork ridges as evidence of cyclical wet/dry periods.",
-        "findings": "Sulfate-rich veins (calcium sulfate / gypsum), dark mudstone matrix, erosion-resistant ridge networks. Sample targets: fresh vein cross-sections for groundwater chemistry; mudstone flakes for organic compound analysis. Look for color contrasts between pale veins and dark host rock.",
-        "source": "Rapin et al. (2021), Astrobiology, doi:10.1089/ast.2020.2362",
-        "selectionNote": "Our selection — representative position inside study area",
-        "povPhotoId": "pov-1",
-        "distanceFromHabitatKm": null
+        "targetId": "target-1",
+        "name": "Altadena Drill Site",
+        "shortName": "Altadena",
+        "kind": "Drilled bedrock at the edge of the boxwork",
+        "why": "Curiosity's first drill sample in the boxwork region (June 2025). Bedrock here differs in composition from other Mount Sharp layers.",
+        "detail": "On sol 4571 Curiosity stood here and drilled the rock nicknamed \"Altadena\". JPL reports that the bedrock between the boxwork ridges has a different composition from other Mount Sharp layers and contains calcium sulfate veins, which had not been seen in this sulfate-rich layer before. A human geologist could sample many veins quickly and compare fresh and weathered surfaces.",
+        "findings": "Look for: pale calcium-sulfate veins cutting darker bedrock; the drill hole itself (about 1.6 cm wide); fractured slabs and loose angular rocks (see photo).",
+        "source": "NASA/JPL news, \"NASA's Curiosity Mars Rover Starts Unpacking Boxwork Formations\" (June 2025); rover position: MMGIS waypoint, sol 4571",
+        "sol": 4571,
+        "selectionNote": "Real rover position on the drill sol (NASA/JPL MMGIS)",
+        "povPhotoId": "pov-2"
       }
     },
     {
       "type": "Feature",
       "id": "target-2",
-      "geometry": { "type": "Point", "coordinates": [137.722, -5.112] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          137.381004,
+          -4.808008
+        ]
+      },
       "properties": {
         "index": 2,
-        "name": "Glen Torridon Clay Unit",
-        "shortName": "Clay Outcrop",
-        "kind": "Clay mineral outcrop",
-        "why": "Strongest evidence of a long-lived ancient lake. Clay minerals form only when water persists for thousands of years.",
-        "detail": "Glen Torridon hosts the largest clay mineral deposits found by Curiosity. Bristow et al. (2021) showed iron-magnesium smectite clays require prolonged water contact to form — strong evidence the ancient lake in Gale Crater persisted for geologically significant time. A human geologist could sample fresh outcrop faces inaccessible to the rover arm.",
-        "findings": "Iron-magnesium smectite clays (grey-green outcrops), fine-grained mudstone layers, possible organic-rich laminations. Sample targets: fresh outcrop faces not weathered by UV; clay-rich nodules; bedding contacts between clay and sulfate layers. The grey-green color distinguishes clay from surrounding reddish terrain.",
-        "source": "Bristow et al. (2021), Science Advances, doi:10.1126/sciadv.abh3023",
-        "selectionNote": "Our selection — representative position inside study area",
-        "povPhotoId": "pov-2",
-        "distanceFromHabitatKm": null
+        "targetId": "target-2",
+        "name": "Monte Grande Hollow & Nevado Sajama Ridge",
+        "shortName": "Ridge-hollow pair",
+        "kind": "Boxwork ridge and hollow, both drilled",
+        "why": "The key boxwork test: Curiosity drilled a hollow (Valle de la Luna) and the ridge beside it (Nevado Sajama), about 10 m apart and 2 m different in height.",
+        "detail": "Boxwork ridges are thought to be fractures that groundwater filled with mineral cement; wind then eroded the softer rock around them. Comparing ridge and hollow chemistry tests that idea. Curiosity needed several weeks (sols ~4695-4718) to find drillable bedrock in a sand-covered hollow. An astronaut with a shovel and a hand lens could do the same comparison in an afternoon.",
+        "findings": "Look for: cemented ridge blocks standing above sand-floored hollows; fractures and vein fill along ridge crests; whether ridge rock is harder or lighter-toned than hollow rock.",
+        "source": "NASA Curiosity blog, Sols 4709-4715 \"Drilling high and low in the boxwork unit\" and Sols 4716-4722 \"Drilling success at Nevado Sajama\" (Nov 2025); Siebach & Grotzinger (2014), JGR Planets 119, doi:10.1002/2013JE004508",
+        "sol": 4711,
+        "selectionNote": "Real rover position during the ridge drill campaign (NASA/JPL MMGIS)",
+        "povPhotoId": "pov-3"
       }
     },
     {
       "type": "Feature",
       "id": "target-3",
-      "geometry": { "type": "Point", "coordinates": [137.780, -5.072] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          137.384045,
+          -4.798793
+        ]
+      },
       "properties": {
         "index": 3,
-        "name": "Vera Rubin Ridge",
-        "shortName": "Hematite Ridge",
-        "kind": "Hematite-bearing ridge",
-        "why": "Hematite-rich layer formed in ancient standing water. The ridge is a natural waypoint and navigation landmark.",
-        "detail": "Vera Rubin Ridge is an iron-oxide (hematite) bearing unit that forms a prominent east-west ridge. Fraeman et al. (2020) showed the hematite formed in acidic to neutral standing water. Its hardness made it resistant to erosion, creating a natural path along the ridge with panoramic views of the crater floor below.",
-        "findings": "Grey hematite (iron oxide) nodules and coatings, iron-enriched bedrock layers, possible jarosite (iron sulfate). The reddish-grey rock has a dull metallic luster. Sample targets: hematite-coated pebbles; bedrock at the ridge crest showing iron enrichment banding; contact zone where hematite layer meets underlying mudstone.",
-        "source": "Fraeman et al. (2020), JGR Planets, doi:10.1029/2019JE006306",
-        "selectionNote": "Our selection — representative position inside study area",
-        "povPhotoId": "pov-3",
-        "distanceFromHabitatKm": null
+        "targetId": "target-3",
+        "name": "Boxwork Entry Overlook",
+        "shortName": "Boxwork entry",
+        "kind": "First close-up of the boxwork ridges",
+        "why": "Where Curiosity first saw the boxwork up close (May 2025). Good survey point to choose which ridges to sample.",
+        "detail": "Around sol 4548 the rover took a 291-image mosaic of crisscrossing low ridges, some only a few centimetres tall. These ridges had only been seen from orbit before. JPL notes that boxwork patterns have not been spotted anywhere else on the mountain, so this is a one-of-a-kind field site.",
+        "findings": "Look for: low curb-like ridges crossing in a box pattern; fractured bedrock; loose rocks that could trip a suited walker.",
+        "source": "NASA/JPL news (June 2025); rover position: MMGIS waypoint, sol 4548",
+        "sol": 4548,
+        "selectionNote": "Real rover position on the survey sol (NASA/JPL MMGIS)",
+        "povPhotoId": "pov-1"
       }
     },
     {
       "type": "Feature",
       "id": "target-4",
-      "geometry": { "type": "Point", "coordinates": [137.780, -5.138] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          137.388886,
+          -4.826023
+        ]
+      },
       "properties": {
         "index": 4,
-        "name": "Gediz Vallis Channel",
-        "shortName": "Water Channel",
-        "kind": "Fluvial channel feature",
-        "why": "Possible water-carved channel on the flank of Mount Sharp. Could reveal the most recent wet period on Mars.",
-        "detail": "Gediz Vallis is an erosional channel cutting through the sulfate unit of Mount Sharp. NASA (2023) reported that Curiosity found evidence the channel was carved by liquid water relatively recently in Mars history, potentially billions of years after the ancient lake dried up. A human explorer could investigate channel walls and floor deposits unreachable by the rover.",
-        "findings": "Rounded pebbles and cobbles (transported by water), layered sulfate deposits on channel walls, possible salt crusts at the base. Sample targets: rounded vs. angular clasts to confirm water transport; fine-grained lag deposit on the channel floor; fresh cross-sections of the channel wall stratigraphy. Rounded rocks = water-tumbled evidence.",
-        "source": "NASA/JPL press release, 2023; MSL Science Team",
-        "selectionNote": "Our selection — representative position inside study area",
-        "povPhotoId": "pov-4",
-        "distanceFromHabitatKm": null
+        "targetId": "target-4",
+        "name": "Rendezvous with Curiosity",
+        "shortName": "Curiosity today",
+        "kind": "Rover's latest reported position (sol 5073)",
+        "why": "Meet the rover: inspect wheel wear, clean dust from instruments, or hand-pick the next drill target together. Humans and robots working as one team.",
+        "detail": "This is the most recent end-of-drive position NASA/JPL has published for Curiosity (sol 5073, about 38.6 km driven since landing). Its weather (REMS) and radiation (RAD) sensors measure the conditions used in this planner. The marker updates whenever the data script is re-run.",
+        "findings": "Look for: bright bedrock plates and dark sand ripples (see photo); the rover's wheel tracks; buttes of upper Mount Sharp on the horizon.",
+        "source": "NASA/JPL MMGIS waypoints (sol 5073, fetched Nov 14 2026)",
+        "sol": 5073,
+        "selectionNote": "Real rover position (NASA/JPL MMGIS)",
+        "povPhotoId": "pov-5"
       }
     },
     {
       "type": "Feature",
       "id": "target-5",
-      "geometry": { "type": "Point", "coordinates": [137.712, -5.062] },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          137.3667,
+          -4.8156
+        ]
+      },
       "properties": {
         "index": 5,
-        "name": "Greenheugh Pediment",
-        "shortName": "Sandstone Cap",
-        "kind": "Eroded pediment",
-        "why": "Erosion-resistant sandstone cap preserving a climate transition layer — evidence of a drier Mars era following the ancient lake.",
-        "detail": "Greenheugh Pediment is a broad, gently-sloping erosional surface capped by coarse sandstone. Edgar et al. (2020) showed it records a major climate transition: sandstone deposited by wind (aeolian) overlies older lake-deposited mudstone, marking the moment the persistent lake dried. A human explorer at this boundary could collect samples at the contact zone.",
-        "findings": "Coarse cross-bedded sandstone (wind-deposited), sharp contact with underlying fine mudstone, possible lag boulders armoring the pediment surface. Sample targets: the exact mudstone-to-sandstone contact layer (the climate transition); coarse grains for aeolian grain-size analysis; any cementation minerals at the contact. The contact is visually distinct: rough coarse cap over smooth fine layers.",
-        "source": "Edgar et al. (2020), JGR Planets, doi:10.1029/2020JE006527",
-        "selectionNote": "Our selection — representative position inside study area",
-        "povPhotoId": null,
-        "distanceFromHabitatKm": null
+        "targetId": "target-5",
+        "name": "Uncharted Ridge Field",
+        "shortName": "Uncharted ridges",
+        "kind": "New science: boxwork ridges no rover has visited",
+        "why": "A polygonal ridge network, like the one Curiosity drilled at Monte Grande, that no rover has visited. About 0.8 km west of Curiosity's path and only ~450 m from base.",
+        "detail": "We spotted this field in the HiRISE 25 cm image: the same box-shaped ridge pattern as at Monte Grande. Curiosity's route passed to the east. If these ridges have the same cement as the drilled ones, the ancient groundwater system was wider than the rover has shown. An astronaut can map and sample it in one short EVA.",
+        "findings": "Look for: ridge spacing and height compared with Monte Grande; vein colour on ridge crests; sand-filled hollows. Collect hand samples from 3 ridges and 1 hollow.",
+        "source": "Our selection from HiRISE image ESP_019988_1750 (0.25 m/px) and DTM DTEEC_019698_1750_019988_1750_U01; not visited by Curiosity",
+        "sol": null,
+        "selectionNote": "Our selection (HiRISE 1 m terrain analysis)",
+        "povPhotoId": null
       }
     }
   ]
