@@ -144,17 +144,31 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
-  // Wire +/- buttons to show the locked message (the handlers below block the zoom itself)
-  setTimeout(() => {
-    const zIn  = document.querySelector('.leaflet-control-zoom-in');
-    const zOut = document.querySelector('.leaflet-control-zoom-out');
-    const _msg = () => {
-      if (STATE.selectedTarget && typeof showMapMessage === 'function')
-        showMapMessage('Stop the current route first to change the zoom level.');
-    };
-    if (zIn)  zIn.addEventListener('click',  _msg);
-    if (zOut) zOut.addEventListener('click', _msg);
-  }, 500);
+  // ── Zoom lock while route is active ─────────────────────────────────────────
+  // Three layers so nothing slips through:
+  // 1. Override map.zoomIn / map.zoomOut (zoom control buttons call these directly)
+  // 2. zoomend snap-back (catches scroll wheel, touch, keyboard, anything else)
+  // 3. scrollWheelZoom/touch/keyboard.disable() in lockMapZoom() as first-pass block
+
+  const _showZoomBlockMsg = () => {
+    if (typeof showMapMessage === 'function')
+      showMapMessage('Stop the current route first to change the zoom level.');
+  };
+
+  const _origZoomIn  = map.zoomIn.bind(map);
+  const _origZoomOut = map.zoomOut.bind(map);
+  map.zoomIn  = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomIn(...a);  };
+  map.zoomOut = (...a) => { if (_routeZoomLock !== null) { _showZoomBlockMsg(); return map; } return _origZoomOut(...a); };
+
+  let _snapBusy = false;
+  map.on('zoomend', () => {
+    if (_snapBusy) { _snapBusy = false; return; }
+    if (_routeZoomLock !== null && Math.round(map.getZoom()) !== _routeZoomLock) {
+      _snapBusy = true;
+      map.setZoom(_routeZoomLock, { animate: false });
+      _showZoomBlockMsg();
+    }
+  });
 
   // Wire the "Return to study area" button
   const galeBtn = document.getElementById('btn-goto-gale');
@@ -199,12 +213,14 @@ function initMap() {
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }
 
-/* Disables ALL Leaflet zoom interactions while a route is active.
-   More reliable than setMinZoom/setMaxZoom because it cuts off the handlers
-   before Leaflet even tries to calculate a new zoom level. */
+/* Shared lock state — read by initMap()'s zoomend listener and by lock/unlock below. */
+let _routeZoomLock = null;   // null = unlocked; integer = locked zoom level
+
+/* Locks the map zoom at the current level. Called by targets.js on route start. */
 function lockMapZoom() {
   const m = STATE.map;
   if (!m) return;
+  _routeZoomLock = Math.round(m.getZoom());
   if (m.scrollWheelZoom)  m.scrollWheelZoom.disable();
   if (m.touchZoom)        m.touchZoom.disable();
   if (m.doubleClickZoom)  m.doubleClickZoom.disable();
@@ -212,10 +228,11 @@ function lockMapZoom() {
   if (m.boxZoom)          m.boxZoom.disable();
 }
 
-/* Re-enables all zoom interactions after route is stopped. */
+/* Unlocks zoom. Called by routecard.js when route is stopped. */
 function unlockMapZoom() {
   const m = STATE.map;
   if (!m) return;
+  _routeZoomLock = null;
   if (m.scrollWheelZoom)  m.scrollWheelZoom.enable();
   if (m.touchZoom)        m.touchZoom.enable();
   if (m.doubleClickZoom)  m.doubleClickZoom.enable();
