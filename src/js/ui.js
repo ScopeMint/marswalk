@@ -460,7 +460,7 @@ function _buildAssumptionsModal() {
     { name: 'CO2 scrubber',        value: S.co2CapacityKg + ' kg', why: 'Capacity of the CO2 removal cartridge', type: A },
     { name: 'Cooling water',       value: S.feedwaterCapacityKg + ' kg', why: 'Similar to today’s ISS suit feedwater', type: A },
     { name: 'Amber warning level', value: Math.round(S.cautionFraction * 100) + '% of capacity', why: 'Same 25% margin as the EVA time rule', type: A },
-    { name: 'Walking energy model', value: 'Pandolf equation', why: 'Load-carriage walking cost, scaled to Mars gravity 3.721 m/s²', type: 'SOURCE: Pandolf, Givoni & Goldman 1977, J Appl Physiol 43' },
+    { name: 'Walking energy model', value: 'Pandolf equation', why: 'Load-carriage walking cost (an Earth equation). We scale its load and walking terms by Mars gravity 3.721 / 9.807 m/s²: that scaling is OUR ASSUMPTION', type: 'SOURCE: Pandolf, Givoni & Goldman 1977, J Appl Physiol 43' },
     { name: 'Oxygen per energy',   value: '4.825 kcal per L O₂', why: 'Converts energy used into oxygen breathed', type: 'SOURCE: Weir 1949, J Physiol 109' },
     { group: 'Measured environment' },
     { name: 'Radiation baseline',  value: rb ? `${rb.doseRateMuGyPerDay} ± ${rb.uncertaintyMuGyPerDay} μGy/day` : '210 ± 40 μGy/day', why: 'Galactic cosmic rays measured by Curiosity RAD at Gale, 2012-2013 (daily 180-225). On the rover, not inside a suit', type: 'SOURCE: Hassler et al. 2014, Science 343, 1244797' },
