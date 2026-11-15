@@ -163,6 +163,7 @@ function initMap() {
     // Once the animation lands (or the user interrupts it), reveal the overlays
     map.once('moveend', () => {
       STATE.introFlying = false;
+      document.body.classList.remove('intro-flying');
       document.dispatchEvent(new Event('marsIntroLanded'));
     });
   }, 2500);
