@@ -455,6 +455,42 @@ function _buildAboutModal() {
     box.appendChild(p);
   });
 
+  // Full reference list with clickable links (same list as docs/SOURCES.md)
+  const REFERENCES = [
+    ['HiRISE DTM DTEEC_019698_1750_019988_1750_U01 + orthoimages (USGS Astrogeology STAC, CC0)', 'https://stac.astrogeology.usgs.gov/api/collections/mro_hirise_socet_dtms/items/DTEEC_019698_1750_019988_1750_U01'],
+    ['McEwen et al. (2007), HiRISE instrument, JGR 112, E05S02', 'https://doi.org/10.1029/2005JE002605'],
+    ['Curiosity traverse + waypoints (NASA/JPL-Caltech MMGIS)', 'https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/'],
+    ['Curiosity raw images (NASA/JPL-Caltech/MSSS)', 'https://mars.nasa.gov/msl/multimedia/raw-images/'],
+    ['THEMIS Day/Night IR controlled mosaics via NASA Mars Trek', 'https://trek.nasa.gov/mars/'],
+    ['Edwards et al. (2011), THEMIS mosaics, JGR 116, E10008', 'https://doi.org/10.1029/2010JE003755'],
+    ['OpenPlanetaryMap Mars basemap (Viking MDIM 2.1 + MOLA)', 'https://www.openplanetary.org/opm'],
+    ['Hassler et al. (2014), RAD surface radiation, Science 343(6169)', 'https://doi.org/10.1126/science.1244797'],
+    ['REMS weather station (Curiosity), INTA-CSIC', 'https://cab.inta-csic.es/rems/en/'],
+    ["NASA/JPL: Curiosity starts unpacking boxwork formations (June 2025)", 'https://www.jpl.nasa.gov/news/nasas-curiosity-mars-rover-starts-unpacking-boxwork-formations/'],
+    ['Curiosity blog, sols 4641-4648: Thinking outside and inside the boxwork', 'https://science.nasa.gov/blog/curiosity-blog-sols-4641-4648-thinking-outside-and-inside-the-boxwork/'],
+    ['Curiosity blog, sols 4695-4701: Searching for answers at Monte Grande', 'https://science.nasa.gov/blog/curiosity-blog-sols-4695-4701-searching-for-answers-at-monte-grande/'],
+    ['Curiosity blog, sols 4709-4715: Drilling high and low in the boxwork unit', 'https://science.nasa.gov/blog/curiosity-blog-sols-4709-4715-drilling-high-and-low-in-the-boxwork-unit'],
+    ['Curiosity blog, sols 4716-4722: Drilling success at Nevado Sajama', 'https://science.nasa.gov/blog/curiosity-blog-sols-4716-4722-drilling-success-at-nevado-sajama/'],
+    ['Siebach & Grotzinger (2014), boxwork water estimates, JGR Planets 119', 'https://doi.org/10.1002/2013JE004508'],
+    ['Leaflet 1.9.4 (BSD-2-Clause)', 'https://leafletjs.com'],
+    ['NASA Space Apps 2026 challenge: Interplanetary Survival Guide: Martian Map', 'https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/'],
+  ];
+  const refHeading = document.createElement('h3');
+  refHeading.className = 'modal-section-heading';
+  refHeading.textContent = 'References';
+  box.appendChild(refHeading);
+  const refList = document.createElement('ol');
+  refList.className = 'modal-section-text modal-ref-list';
+  REFERENCES.forEach(([label, url]) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.textContent = label;
+    li.appendChild(a);
+    refList.appendChild(li);
+  });
+  box.appendChild(refList);
+
   modal.appendChild(box);
   modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
   return modal;

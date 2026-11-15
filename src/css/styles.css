@@ -1484,3 +1484,5 @@ body {
 }
 .themis-overlay { image-rendering: auto; mix-blend-mode: normal; }
 .sum-val.sum-pass { color: var(--pass, #46C37B); }
+.modal-ref-list { padding-left: 20px; line-height: 1.6; }
+.modal-ref-list a { color: #3FD0C9; text-decoration: underline; word-break: break-word; }

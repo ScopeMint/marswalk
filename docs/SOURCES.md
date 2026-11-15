@@ -211,3 +211,14 @@ USGS Planetary Geologic Mapping Program (context): https://www.usgs.gov/centers/
   Siebach, K. L. & Grotzinger, J. P. (2014), Volumetric estimates of ancient water on Mount Sharp based on boxwork deposits, JGR Planets 119, doi:10.1002/2013JE004508
 
 [CONFIRMED] USGS Astrogeology STAC API (data discovery): https://stac.astrogeology.usgs.gov/api/
+
+[CONFIRMED] Extra Curiosity blog posts used for boxwork target context
+  Sols 4641-4648: https://science.nasa.gov/blog/curiosity-blog-sols-4641-4648-thinking-outside-and-inside-the-boxwork/
+  Sols 4695-4701: https://science.nasa.gov/blog/curiosity-blog-sols-4695-4701-searching-for-answers-at-monte-grande/
+
+RESEARCH / INSPIRATION (read during planning, nothing copied)
+  Space Apps Judging & Awards Guide: https://www.spaceappschallenge.org/resources/judging-awards-guide
+  Space Data Atlas, Martian Map challenge datasets: https://spacedata.swapniltamse.com/challenges/martian-map/
+  Other 2026 team repos looked at for scope comparison only:
+    https://github.com/AhsanulHoque22/Nasa-Space-Apps-Challenge-2026-Team-Protikriti
+    https://github.com/pollob-kumar/nasa-space-apps-martian-map
