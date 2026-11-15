@@ -144,21 +144,16 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
-  // While a route is active zoom is fully locked (min = max = current zoom).
-  // Show a message on any scroll or +/- button press so the user knows why.
-  const _zoomMsg = () => {
-    if (STATE.selectedTarget && typeof showMapMessage === 'function') {
-      showMapMessage('Stop the current route first to change the zoom level.');
-    }
-  };
-  map.getContainer().addEventListener('wheel', () => {
-    if (STATE.selectedTarget) _zoomMsg();
-  }, { passive: true });
+  // Wire +/- buttons to show the locked message (the handlers below block the zoom itself)
   setTimeout(() => {
     const zIn  = document.querySelector('.leaflet-control-zoom-in');
     const zOut = document.querySelector('.leaflet-control-zoom-out');
-    if (zIn)  zIn.addEventListener('click',  () => { if (STATE.selectedTarget) _zoomMsg(); });
-    if (zOut) zOut.addEventListener('click', () => { if (STATE.selectedTarget) _zoomMsg(); });
+    const _msg = () => {
+      if (STATE.selectedTarget && typeof showMapMessage === 'function')
+        showMapMessage('Stop the current route first to change the zoom level.');
+    };
+    if (zIn)  zIn.addEventListener('click',  _msg);
+    if (zOut) zOut.addEventListener('click', _msg);
   }, 500);
 
   // Wire the "Return to study area" button
@@ -202,6 +197,30 @@ function initMap() {
   addRouteLegend(map);
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
+}
+
+/* Disables ALL Leaflet zoom interactions while a route is active.
+   More reliable than setMinZoom/setMaxZoom because it cuts off the handlers
+   before Leaflet even tries to calculate a new zoom level. */
+function lockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.disable();
+  if (m.touchZoom)        m.touchZoom.disable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.disable();
+  if (m.keyboard)         m.keyboard.disable();
+  if (m.boxZoom)          m.boxZoom.disable();
+}
+
+/* Re-enables all zoom interactions after route is stopped. */
+function unlockMapZoom() {
+  const m = STATE.map;
+  if (!m) return;
+  if (m.scrollWheelZoom)  m.scrollWheelZoom.enable();
+  if (m.touchZoom)        m.touchZoom.enable();
+  if (m.doubleClickZoom)  m.doubleClickZoom.enable();
+  if (m.keyboard)         m.keyboard.enable();
+  if (m.boxZoom)          m.boxZoom.enable();
 }
 
 /* Watches the routePane SVG for new path elements (new route line) and
