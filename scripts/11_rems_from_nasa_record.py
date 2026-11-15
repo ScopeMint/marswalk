@@ -1,4 +1,7 @@
 """
+SUPERSEDED (Nov 15): do NOT run. scripts/05_prepare_rems.py now builds rems-temps.json from REAL HOURLY
+Curiosity REMS data (NASA PDS MODRDR). Running this script would overwrite it with an approximate daily shape.
+
 11_rems_from_nasa_record.py — Correct src/data/rems-temps.json using Curiosity's real daily weather record.
 
 WHY THIS EXISTS
@@ -31,6 +34,9 @@ HOW TO RUN
   python3 scripts/11_rems_from_nasa_record.py file.json  (uses a copy you already downloaded)
 """
 
+import sys
+if __name__ == "__main__" and "--force" not in sys.argv:
+    sys.exit("Superseded by scripts/05_prepare_rems.py (real hourly REMS data). Use --force only if you really mean it.")
 import json
 import sys
 import urllib.request

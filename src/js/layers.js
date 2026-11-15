@@ -98,15 +98,6 @@ const LAYER_CATALOG = [
     source: 'Our calculation. Mast and antenna heights are OUR ASSUMPTION.'
   },
   {
-    id: 'rad',
-    name: 'Radiation Zones (Approximate)',
-    description: 'Green = near baseline dose (233 μGy/day, Hassler et al. 2014); red = slightly higher dose at higher elevation (thinner air above). Model: +1.5% per 100 m elevation [OUR ASSUMPTION]. Planning estimate only.',
-    mission: 'MSL/Curiosity RAD + HiRISE elevation',
-    instrument: 'RAD + DTM-derived altitude model',
-    resolution: '10 m/cell',
-    source: 'Base dose: Hassler et al. (2014), Science 343(6169). Elevation scaling: OUR ASSUMPTION.'
-  },
-  {
     id: 'walkback',
     name: 'Walk-back Time',
     description: 'Minutes to walk back to the habitat from any point (slope-aware speed model). Green 0-15, cyan 15-30, amber 30-60, orange 60-90, red over 90 min; clear = unreachable at this slope limit.',
@@ -127,7 +118,7 @@ const LAYER_CATALOG = [
   {
     id: 'themisNight',
     name: 'THEMIS Night IR (Thermal)',
-    description: 'Night-time infrared brightness (relative). Ground that stays warm at night has high thermal inertia: bedrock or rocks, not loose sand. Good footing.',
+    description: 'Night-time infrared brightness (relative). Ground that stays warm at night has high thermal inertia: likely bedrock or rocks rather than loose sand, so probably firmer footing (an interpretation, not a measurement).',
     mission: 'Mars Odyssey',
     instrument: 'THEMIS, controlled mosaic v2',
     resolution: '~100 m/px',
@@ -201,61 +192,6 @@ function addLosOverlay(map) {
   console.log('[layers] LOS overlay added');
 }
 
-/* Adds the radiation zones PNG overlay.
-   Green = baseline dose; red = elevated dose (higher elevation = slightly more radiation).
-   Approximate model [OUR ASSUMPTION: 1.5% per 100m elevation].
-   Must run AFTER loadGrids() so aoi.json bounds are available. */
-function addRadOverlay(map) {
-  if (!STATE.grids || !STATE.grids.aoi) {
-    console.warn('[layers] addRadOverlay: grids not loaded yet');
-    return;
-  }
-  const aoi    = STATE.grids.aoi;
-  const bounds = [[aoi.south, aoi.west], [aoi.north, aoi.east]];
-
-  const overlay = L.imageOverlay('./data/rad-overlay.png', bounds, {
-    opacity:     STATE.layers.rad.opacity,
-    interactive: false
-  });
-
-  if (STATE.layers.rad.visible) overlay.addTo(map);
-  STATE.tileLayers.rad = overlay;
-  console.log('[layers] radiation overlay added');
-}
-
-/* Adds or removes the THEMIS day tile layer. */
-function addThermisDay(map) {
-  if (STATE.tileLayers.themisDay) return;  // already added
-  const layer = L.tileLayer(CONFIG.tileLayers.themisDay.urlTemplate, {
-    attribution: CONFIG.tileLayers.themisDay.attribution,
-    minZoom:     CONFIG.tileLayers.themisDay.minZoom,
-    maxZoom:     CONFIG.tileLayers.themisDay.maxZoom,
-    tms:         CONFIG.tileLayers.themisDay.tms,
-    opacity:     STATE.layers.themisDay ? STATE.layers.themisDay.opacity : 0.7,
-    noWrap:      true,
-    bounds:      [[-90, -180], [90, 180]],
-    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-  });
-  STATE.tileLayers.themisDay = layer;
-  if (STATE.layers.themisDay && STATE.layers.themisDay.visible) layer.addTo(map);
-}
-
-/* Adds the THEMIS night tile layer. */
-function addThermisNight(map) {
-  if (STATE.tileLayers.themisNight) return;
-  const layer = L.tileLayer(CONFIG.tileLayers.themisNight.urlTemplate, {
-    attribution: CONFIG.tileLayers.themisNight.attribution,
-    minZoom:     CONFIG.tileLayers.themisNight.minZoom,
-    maxZoom:     CONFIG.tileLayers.themisNight.maxZoom,
-    tms:         CONFIG.tileLayers.themisNight.tms,
-    opacity:     STATE.layers.themisNight ? STATE.layers.themisNight.opacity : 0.7,
-    noWrap:      true,
-    bounds:      [[-90, -180], [90, 180]],
-    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-  });
-  STATE.tileLayers.themisNight = layer;
-  if (STATE.layers.themisNight && STATE.layers.themisNight.visible) layer.addTo(map);
-}
 
 /* Sets the opacity of a named layer. layerId matches STATE.tileLayers keys. */
 function updateLayerOpacity(layerId, opacity) {

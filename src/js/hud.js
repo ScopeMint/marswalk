@@ -128,7 +128,16 @@ function hudRestart() {
     ? 'Route data unavailable. Replan the route.' : 'Plan a route first: pick a science target.';
   _hud.cumulative = [0];
   if (!_hud.valid) return;
-  // [OUR ASSUMPTION] Uniform speed along the display path, scaled to worker time/distance.
+  // Preferred: the worker's real slope-aware outbound time at each display cell, so the walker slows on
+  // hills exactly as the plan does and the turn-back countdown matches the summary card.
+  if (Array.isArray(route.cellTimeSeconds) && route.cellTimeSeconds.length === route.cells.length) {
+    _hud.cumulative = route.cellTimeSeconds.slice();
+    _hud.timeAxis = true;
+    hudRender();
+    return;
+  }
+  _hud.timeAxis = false;
+  // Fallback: uniform speed along the display path, scaled to worker time/distance.
   for (let i = 1; i < route.cells.length; i++) {
     const prev = route.cells[i - 1], cell = route.cells[i];
     _hud.cumulative.push(_hud.cumulative[i - 1] + Math.hypot(cell.row - prev.row, cell.col - prev.col));
@@ -202,23 +211,31 @@ function hudRender() {
   const row = cell.row + (next.row - cell.row) * blend, col = cell.col + (next.col - cell.col) * blend;
   const currentCell = { row: Math.round(row), col: Math.round(col) };
   const point = hudCoordinates(row, col), nextPoint = hudCoordinates(next.row, next.col);
+  // Distance walked so far: from the worker's per-cell distances when available, else by time fraction.
+  const cd = route.cellDistanceMeters;
+  const walkedM = Array.isArray(cd) && cd.length === route.cells.length
+    ? cd[index] + (cd[Math.min(index + 1, cd.length - 1)] - cd[index]) * blend
+    : fraction * route.distanceMeters;
+  h.walkedM = walkedM;
   const grids = STATE.grids || {}, walkback = STATE.walkback;
   const backSeconds = walkback && walkback.status === 'ready' ? hudGridValue(walkback.data, currentCell) : NaN;
-  const totalSeconds = STATE.evaHours * HUD_SECONDS_PER_HOUR, remainingSeconds = totalSeconds - elapsedSeconds;
+  // EVA time also covers airlock exit before the walk (CONFIG.eva.egressMinutes), so it is already spent at replay start.
+  const totalSeconds = STATE.evaHours * HUD_SECONDS_PER_HOUR;
+  const remainingSeconds = totalSeconds - CONFIG.eva.egressMinutes * HUD_SECONDS_PER_MINUTE - elapsedSeconds;
   const remainingFraction = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : 0;
-  const dose = typeof computeRadiation === 'function' ? computeRadiation(elapsedSeconds / HUD_SECONDS_PER_HOUR, STATE.solarStormMode) : null;
+  const dose = typeof computeRadiation === 'function' ? computeRadiation(elapsedSeconds / HUD_SECONDS_PER_HOUR) : null;
   el.heading.textContent = fraction >= 1 ? 'AT TARGET' : `${hudNumber(hudBearing(point, nextPoint), 0)}°`;
   el.target.textContent = STATE.selectedTarget && STATE.selectedTarget.properties ? STATE.selectedTarget.properties.name || '--' : '--';
   el.elapsed.textContent = hudClock(elapsedSeconds); el.remaining.textContent = hudClock(remainingSeconds);
   el.fill.style.height = `${remainingFraction * HUD_PERCENT}%`;
   el.meter.setAttribute('aria-valuenow', String(Math.round(remainingFraction * HUD_PERCENT)));
   el.percent.textContent = `${hudNumber(remainingFraction * HUD_PERCENT, 0)}%`;
-  el.distance.textContent = `${hudNumber(fraction * route.distanceMeters / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} / ${hudNumber(route.distanceMeters / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} km`;
-  el.toTarget.textContent = `${hudNumber((1 - fraction) * route.distanceMeters / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} km`;
+  el.distance.textContent = `${hudNumber(walkedM / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} / ${hudNumber(route.distanceMeters / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} km`;
+  el.toTarget.textContent = `${hudNumber(Math.max(0, route.distanceMeters - walkedM) / HUD_METERS_PER_KM, HUD_KM_DECIMALS)} km`;
   el.eta.textContent = `${hudNumber(Math.max(0, route.timeSeconds - elapsedSeconds) / HUD_SECONDS_PER_MINUTE)} min`;
   el.terrain.textContent = `${hudNumber(hudGridValue(grids.elevation, currentCell))} m / ${hudNumber(hudGridValue(grids.slope, currentCell))}°`;
   el.walkback.textContent = `${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`;
-  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN)} μGy${STATE.solarStormMode ? ' · STORM' : ''}`;
+  el.dose.textContent = `${hudNumber(dose ? dose.doseEstimateMuGy : NaN, 0)} μGy`;
   hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength);
   const done = elapsedSeconds >= hudEndSeconds();
   el.phase.textContent = done ? `Return leg: walk-back ${hudNumber(backSeconds / HUD_SECONDS_PER_MINUTE)} min`
@@ -238,7 +255,7 @@ function hudStatus(position, pathLength, elapsedSeconds) {
   const limitSeconds = pathLength > 0 ? limitPosition / pathLength * _hud.route.timeSeconds : NaN;
   let status = !known ? 'CAUTION' : wholeRouteSafe ? 'GO' : position > limitPosition ? 'TURN BACK'
     : position >= limitPosition - pathLength * HUD_CAUTION_FRACTION ? 'CAUTION' : 'GO';
-  if (elapsedSeconds >= STATE.evaHours * HUD_SECONDS_PER_HOUR) status = 'TURN BACK';
+  if (elapsedSeconds + CONFIG.eva.egressMinutes * HUD_SECONDS_PER_MINUTE >= STATE.evaHours * HUD_SECONDS_PER_HOUR) status = 'TURN BACK';
   _hud.el.status.textContent = status;
   _hud.el.status.className = `hud-status hud-${status === 'GO' ? 'go' : status === 'CAUTION' ? 'caution' : 'danger'}`;
   _hud.el.countdown.textContent = wholeRouteSafe ? 'Whole route is inside the turn-back limit' : known ? `Point of no return in ${hudNumber(Math.max(0, limitSeconds - elapsedSeconds) / HUD_SECONDS_PER_MINUTE)} min`
@@ -314,7 +331,7 @@ function hudSuitAndComm(el, fraction, elapsedSeconds, position, pathLength) {
   if (el.comm) {
     const hz = STATE.hazards;
     if (!hz) { el.comm.textContent = '--'; return; }
-    const m = fraction * (_hud.route.distanceMeters || 0);
+    const m = Number.isFinite(_hud.walkedM) ? _hud.walkedM : fraction * (_hud.route.distanceMeters || 0);
     const shadow = hz.radio.some(r => m >= r.fromM && m <= r.toM);
     el.comm.textContent = shadow ? 'RELAY (no direct line)' : 'DIRECT';
     el.comm.style.color = shadow ? '#B07CFF' : '#46C37B';

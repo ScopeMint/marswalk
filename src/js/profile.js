@@ -158,7 +158,7 @@ function clearProfile(canvasId) {
 /* ── Temperature chart ─────────────────────────────────────────────────────── */
 
 /* Draws the REMS temperature chart on the canvas with id `canvasId`.
-   Shows two seasonal curves (spring/summer and autumn/winter) with the EVA window shaded.
+   Shows the two halves of the Mars year (Ls 0-180 cooler, Ls 180-360 warmer at Gale) with the EVA window shaded.
    Reads from STATE.remsTemps, STATE.evaStartHour, STATE.evaHours. */
 function drawTempChart(canvasId) {
   const canvas = document.getElementById(canvasId);
@@ -207,7 +207,10 @@ function drawTempChart(canvasId) {
   });
 
   // EVA window shading
-  const evaStart = STATE.evaStartHour || 8;
+  // EVA start is LMST (slider); REMS hours are LTST, so shift by today's equation of time.
+  const ltstShift = (typeof currentSeason === 'function' && (STATE.remsTemps.clock || '').startsWith('LTST'))
+    ? currentSeason().ltstMinusLmstHours : 0;
+  const evaStart = (STATE.evaStartHour || 8) + ltstShift;
   const evaEnd   = Math.min(23, evaStart + (STATE.evaHours || 6));
   if (evaEnd > evaStart) {
     ctx.fillStyle = 'rgba(217,98,43,0.12)';
@@ -229,8 +232,8 @@ function drawTempChart(canvasId) {
     ctx.stroke();
   };
 
-  drawCurve(ss, 'rgba(217,98,43,0.8)');  // spring/summer — orange
-  drawCurve(aw, 'rgba(63,208,201,0.5)');  // autumn/winter — teal
+  drawCurve(ss, 'rgba(217,98,43,0.8)');  // Ls 0-180: cooler half at Gale — orange
+  drawCurve(aw, 'rgba(63,208,201,0.5)');  // Ls 180-360: warmer half at Gale — teal
 
   // X-axis: hours
   ctx.fillStyle    = '#A3A8B3';
@@ -254,7 +257,7 @@ function drawTempChart(canvasId) {
   ctx.font         = '9px system-ui';
   ctx.textAlign    = 'left';
   ctx.textBaseline = 'top';
-  ctx.fillText('EVA Temp Window · REMS (Martínez et al. 2017)', pad.left, 4);
+  ctx.fillText('Air °C · REMS · orange Ls 0-180 · teal Ls 180-360 (warmer)', pad.left, 4);
 
   if (evaEnd > evaStart) {
     ctx.fillStyle = 'rgba(217,98,43,0.8)';

@@ -91,6 +91,35 @@ async function addCuriosityTraverse(map) {
   STATE.tileLayers.traverse = group;
   STATE.curiosity = { waypoints: waypoints.length, latestSol: latest ? latest.properties.sol : null };
   _validateTerrain(waypoints);
+  _validateRoverSlopes(gj.features.filter(f => f.properties.kind === 'traverse'));
+}
+
+/* Walks along Curiosity's real drive path (sampled every ~5 m) and reads our slope grid underneath.
+   Stores { sampleCount, fractionUnderLimit, maxSlopeDeg, limitDeg } in STATE.roverSlopeCheck.
+   This is an honest check of the slope model: a rover is not an astronaut, but if our grid called the
+   rover's own path "too steep" in many places, the grid (or the limit) would be suspect. */
+function _validateRoverSlopes(traverses) {
+  if (!STATE.grids.loaded || !traverses.length) return;
+  const limit = CONFIG.slope.defaultLimitDeg, stepM = 5, mPerDeg = CONFIG.mars.radiusMeters * Math.PI / 180;
+  let n = 0, under = 0, maxDeg = 0;
+  traverses.forEach(f => {
+    const c = f.geometry.coordinates;
+    for (let i = 1; i < c.length; i++) {
+      const [lon0, lat0] = c[i - 1], [lon1, lat1] = c[i];
+      const dx = (lon1 - lon0) * mPerDeg * Math.cos(lat0 * Math.PI / 180), dy = (lat1 - lat0) * mPerDeg;
+      const k = Math.max(1, Math.ceil(Math.hypot(dx, dy) / stepM));
+      for (let j = 0; j < k; j++) {
+        const t = j / k, cell = latLonToCell(lat0 + (lat1 - lat0) * t, lon0 + (lon1 - lon0) * t);
+        if (!cell) continue;
+        const sl = getCellValue(STATE.grids.slope, cell.row, cell.col);
+        if (!isFinite(sl)) continue;
+        n++; if (sl <= limit) under++; if (sl > maxDeg) maxDeg = sl;
+      }
+    }
+  });
+  if (n < 50) return;
+  STATE.roverSlopeCheck = { sampleCount: n, fractionUnderLimit: under / n, maxSlopeDeg: maxDeg, limitDeg: limit };
+  console.log(`[site] rover path slope check: ${(100 * under / n).toFixed(1)}% under ${limit} deg, max ${maxDeg.toFixed(1)} deg (${n} samples)`);
 }
 
 /* Compares our HiRISE elevation grid with the elevation Curiosity reported at each waypoint.

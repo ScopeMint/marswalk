@@ -16,7 +16,12 @@ const CHART_PAD = { top: 10, right: 14, bottom: 34, left: 54 };   // room for ti
 const CHART_COLORS = { bg: '#0F1115', grid: '#262B35', axis: '#A3A8B3', text: '#E8E6E3', teal: '#3FD0C9',
                        orange: '#D9622B', amber: '#F2B134', blue: '#7FB4FF' };
 const CHART_STEEP_GRADE_DEG = 10;                           // route sections steeper than this are drawn amber [OUR ASSUMPTION]
-const CHART_SEASON_USED = 'northern_spring_summer';         // data key the planner's temperature check uses (ui.js) = Ls 0-180
+/* Data key for TODAY's half of the Mars year at Gale (safety.js currentSeason): Ls 0-180 -> 'northern_spring_summer',
+   Ls 180-360 -> 'northern_autumn_winter'. The planner's temperature check uses the same season. */
+const chartSeasonUsed = () => (typeof currentSeason === 'function' ? currentSeason().key : 'northern_spring_summer');
+/* REMS hours are local TRUE solar time; the chart's x-axis and EVA shading are local MEAN solar time (the slider clock). */
+const chartLtstShift = () => (typeof currentSeason === 'function' && STATE.remsTemps && String(STATE.remsTemps.clock || '').startsWith('LTST'))
+  ? currentSeason().ltstMinusLmstHours : 0;
 const _charts = {};                                         // per-chart state: { cursor, plot, data... }
 
 /* ── Shared helpers ─────────────────────────────────────────────────────── */
@@ -224,8 +229,8 @@ function chartRouteMarker(fraction) {
 /* ── 2. Outside temperature through the day ─────────────────────────────── */
 
 /* Draws Curiosity's air temperature by local hour for the two halves of the Mars year, with the spacewalk shaded.
-   Data: src/data/rems-temps.json (scripts/11_rems_from_nasa_record.py). Each curve's low and high are measured
-   averages from Curiosity's daily record; the hours in between follow a typical shape and are approximate.
+   Data: src/data/rems-temps.json (scripts/05_prepare_rems.py): median air temperature for each hour of the sol,
+   from real hourly Curiosity REMS measurements (NASA PDS, MODRDR), over many sols in each half of the Mars year.
    Gale Crater is south of the equator, so Ls 0-180 is its cooler half-year and Ls 180-360 its warmer one. */
 function drawTempChart(canvasId) {
   const state = _charts.temp;
@@ -251,25 +256,26 @@ function drawTempChart(canvasId) {
   for (let t = lo; t <= hi + 1e-6; t += yStep) yTicks.push({ value: t, label: Math.round(t) + '°', strong: Math.round(t) === 0 });
   chartEvaWindow(ctx, plot, xOf);
   chartAxes(ctx, plot, xTicks, yTicks, xOf, yOf, 'Local Mars time (hour of the day)', 'Air temp (°C)');
-  // The planner's temperature check reads the Ls 0-180 curve (CHART_SEASON_USED), so that one is drawn thicker
-  [[warm, CHART_COLORS.orange, 1.5], [cool, CHART_COLORS.blue, 2.5]].forEach(([values, color, width]) => {
+  // Today's half of the Mars year is the one the planner uses, so it is drawn thicker
+  const coolNow = chartSeasonUsed() === 'northern_spring_summer', shift = chartLtstShift();
+  [[warm, CHART_COLORS.orange, coolNow ? 1.5 : 2.5], [cool, CHART_COLORS.blue, coolNow ? 2.5 : 1.5]].forEach(([values, color, width]) => {
     ctx.strokeStyle = color; ctx.lineWidth = width; ctx.beginPath();
-    for (let h = 0; h <= 24; h++) { const y = yOf(values[h % 24]); if (h) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
+    for (let q = 0; q <= 96; q++) { const h = q / 4, y = yOf(chartHourly(values, ((h + shift) % 24 + 24) % 24)); if (q) ctx.lineTo(xOf(h), y); else ctx.moveTo(xOf(h), y); }
     ctx.stroke();
   });
   chartLegend(state, [{ color: CHART_COLORS.blue, text: coolName }, { color: CHART_COLORS.orange, text: warmName },
                       { color: 'rgba(217, 98, 43, 0.45)', text: 'Your spacewalk', shape: 'box' }]);
   if (state.cursor == null) {
     const range = typeof computeTemperatureRange === 'function'
-      ? computeTemperatureRange(STATE.evaStartHour == null ? 8 : STATE.evaStartHour, STATE.evaHours || 6, CHART_SEASON_USED) : null;
-    state.readout.textContent = range ? 'During your spacewalk: ' + range.minC + ' °C to ' + range.maxC + ' °C (cooler half-year)' : 'Move over the chart to read any hour';
+      ? computeTemperatureRange(STATE.evaStartHour == null ? 8 : STATE.evaStartHour, STATE.evaHours || 6, chartSeasonUsed()) : null;
+    state.readout.textContent = range ? 'During your EVA: ' + range.minC + ' °C to ' + range.maxC + ' °C (' + (chartSeasonUsed() === 'northern_spring_summer' ? 'cooler' : 'warmer') + ' half-year, today)' : 'Move over the chart to read any hour';
   } else {
-    const h = Math.max(0, Math.min(24, state.cursor)), k = chartHourly(cool, h), w = chartHourly(warm, h);
+    const h = Math.max(0, Math.min(24, state.cursor)), hl = ((h + chartLtstShift()) % 24 + 24) % 24, k = chartHourly(cool, hl), w = chartHourly(warm, hl);
     chartCursor(ctx, plot, xOf(h), [{ y: yOf(w), color: CHART_COLORS.orange }, { y: yOf(k), color: CHART_COLORS.blue }]);
     state.readout.textContent = chartClock(h) + ' · cooler half-year ' + Math.round(k) + ' °C · warmer half-year ' + Math.round(w) + ' °C';
   }
   state.canvas.setAttribute('aria-label', 'Air temperature at Gale Crater by hour of the Mars day for the cooler and warmer halves of the Mars year. ' +
-    'Daily low and high are measured by Curiosity REMS; hours in between are approximate. Orange shading marks your spacewalk. Use left and right arrow keys to read hours.');
+    'Each hour is the median of real Curiosity REMS measurements. Orange shading marks your EVA. Use left and right arrow keys to read hours.');
 }
 
 /* ── 3. Sun height through today ────────────────────────────────────────── */

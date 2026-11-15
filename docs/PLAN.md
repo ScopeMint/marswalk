@@ -46,7 +46,7 @@ LAYERS (aim for 5, need 3)
 ===========================================================================
 JUDGING (5 things) AND HOW WE WIN EACH
 ===========================================================================
-Influence    -> The first people on Mars will need this tool. We show a working prototype.
+Impact       -> The first people on Mars will need this tool. We show a working prototype.
                Key argument: existing tools (Mars Trek, USGS mapping) work at regional/global scale;
                no tool exists for the hyper-local ~6 km scale of a single Marswalk.
 Creativity   -> Walk-back-time map is genuinely novel. Five-mission integration at walking scale
