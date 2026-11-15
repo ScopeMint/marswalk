@@ -20,7 +20,18 @@ function addHiriseTiles(map) {
   const aoi = STATE.grids && STATE.grids.aoi;
   if (!aoi || !aoi.hiriseTiles) return;
   const t = aoi.hiriseTiles;
+  // One photo of the whole study area (2 m/px, the same HiRISE image the 3D view uses), drawn UNDER the
+  // sharp tiles. It shows the area's detail from far out (the tiles only start at zoom 12), and fills in
+  // while sharp tiles are still loading, so the area is never a blurry patch or a black square.
+  if (map.getPane('areaPhoto')) {
+    STATE.tileLayers.areaPhoto = L.imageOverlay('./data/hirise-texture.jpg', _aoiBounds(), {
+      pane: 'areaPhoto', interactive: false, opacity: STATE.layers.hirise.opacity
+    });
+    if (STATE.layers.hirise.visible) STATE.tileLayers.areaPhoto.addTo(map);
+  }
   const layer = L.tileLayer(t.urlTemplate, {
+    pane:          map.getPane('hirise') ? 'hirise' : 'tilePane',
+    keepBuffer:    4,
     minZoom:       CONFIG.hirise.minZoom,
     minNativeZoom: t.minZoom,
     maxNativeZoom: t.maxNativeZoom,

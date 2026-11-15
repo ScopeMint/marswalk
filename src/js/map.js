@@ -35,6 +35,7 @@ function makeTileLayer(layerConfig, opacity) {
     opacity:     opacity,
     noWrap:      true,  // prevent tiles repeating east/west beyond [-180, 180]
     bounds:      [[-90, -180], [90, 180]],  // clamp tile requests to Mars extent
+    keepBuffer:  4,     // keep more tiles around the view, so panning back does not reload them
     errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
   });
 }
@@ -85,7 +86,49 @@ function addCoordinateReadout(map) {
   });
 }
 
-/* Shows/hides the "outside study area" notice banner based on current map center. */
+/* The whole planet in the map's projection (Web Mercator stops at latitude 85.0511°). */
+const MAP_WORLD_BOUNDS = [[-85.0511, -180], [85.0511, 180]];
+const MAP_FAR_ZOOM = 11;      // below this zoom the 4 km study area is too small on screen to plan in
+
+/* Sets the furthest zoom-out so the planet always fills the map area: no empty border around Mars.
+   At zoom z the planet is 256 x 2^z pixels wide and tall, so it fills the area when that is at least
+   the area's longer side. Runs again whenever the map area changes size. */
+function mapFillWorld(map) {
+  const size = map.getSize();
+  if (!size.x || !size.y) return;                       // map hidden (Weather / Science page): nothing to fit
+  const fill = Math.ceil(Math.log2(Math.max(size.x, size.y) / 256) * 100) / 100;
+  map.setMinZoom(fill);
+  if (map.getZoom() < fill) map.setView(map.getCenter(), fill, { animate: false });
+}
+
+/* Marks the map as "far out" so the base, target and rover markers (which would pile into one blob over a
+   study area only a few pixels wide) are hidden, and the study-area pin is shown instead. See styles.css. */
+function mapFarClass(map) {
+  map.getContainer().classList.toggle('map-far', map.getZoom() < MAP_FAR_ZOOM);
+}
+
+/* Flies from wherever the map is to the Gale Crater study area. */
+function goToGale() {
+  if (!STATE.map) return;
+  STATE.map.flyToBounds(studyAreaBounds(), { padding: [30, 30], duration: 2.2 });
+}
+
+/* Keeps the two stored pictures in step with their layer switches: the whole-Mars picture follows
+   "Global basemap", the study-area photo follows "HiRISE imagery" (on/off and opacity). */
+function mapSyncUnderlays() {
+  const map = STATE.map;
+  if (!map) return;
+  [['global', 'opm'], ['areaPhoto', 'hirise']].forEach(([pictureId, switchId]) => {
+    const picture = STATE.tileLayers[pictureId], layer = STATE.tileLayers[switchId];
+    if (!picture || !layer) return;
+    const on = map.hasLayer(layer);
+    if (on && !map.hasLayer(picture)) picture.addTo(map);
+    if (!on && map.hasLayer(picture)) map.removeLayer(picture);
+    if (on && layer.options && picture.options.opacity !== layer.options.opacity) picture.setOpacity(layer.options.opacity);
+  });
+}
+
+/* Shows/hides the "Go to Gale Crater" bar: shown whenever the study area is not what the map is looking at. */
 function checkStudyAreaBounds() {
   const el = document.getElementById('outside-area-notice');
   if (!el || !STATE.map) return;
@@ -97,7 +140,7 @@ function checkStudyAreaBounds() {
     [CONFIG.studyArea.centerLat - pad, CONFIG.studyArea.centerLon - pad],
     [CONFIG.studyArea.centerLat + pad, CONFIG.studyArea.centerLon + pad]
   );
-  if (nearBounds.contains(center)) {
+  if (nearBounds.contains(center) && STATE.map.getZoom() >= MAP_FAR_ZOOM) {
     el.style.display = 'none';
   } else {
     el.style.display = 'flex';
@@ -122,18 +165,31 @@ function initMap() {
     zoom:    3,          // shows most of Mars with landing sites readable
     minZoom: 1,
     maxZoom: 18,
+    zoomSnap:            0.25,   // quarter zoom steps, so "planet fills the area" can be exact
     worldCopyJump:       false,
-    maxBounds:           [[-90, -185], [90, 185]],
+    maxBounds:           MAP_WORLD_BOUNDS,
     maxBoundsViscosity:  1.0,
     zoomControl:         true,
     attributionControl:  true,
     fadeAnimation:       false,  // prevents tile-fade mist
   });
 
+  // Drawing order under the markers: whole-Mars picture < basemap tiles < study-area photo < sharp HiRISE tiles
+  [['underlay', 150], ['areaPhoto', 210], ['hirise', 220]].forEach(([name, z]) => {
+    const pane = map.createPane(name); pane.style.zIndex = z; pane.style.pointerEvents = 'none';
+  });
+  // One whole-Mars picture stored in the app (scripts/13_build_global_basemap.py). It sits under the
+  // basemap tiles, so a tile that has not arrived yet shows blurry Mars instead of a black square.
+  STATE.tileLayers.global = L.imageOverlay('./data/mars-global.jpg', MAP_WORLD_BOUNDS, { pane: 'underlay', interactive: false }).addTo(map);
+
   // Add OPM base layer (always on)
   const opmLayer = makeTileLayer(CONFIG.tileLayers.opm, STATE.layers.opm ? STATE.layers.opm.opacity : 1.0);
   opmLayer.addTo(map);
   STATE.tileLayers.opm = opmLayer;
+  mapFillWorld(map);
+  map.on('resize', () => mapFillWorld(map));
+  map.on('zoomend', () => mapFarClass(map));
+  mapFarClass(map);
 
   // Study area outline + darkened exterior
   addStudyAreaOutline(map);
@@ -144,6 +200,7 @@ function initMap() {
   // Check study area bounds whenever the map finishes moving
   map.on('moveend', checkStudyAreaBounds);
 
+  // The page opens on the whole planet. This button (top of the map) takes the user to the study area.
   // ── Zoom lock while route is active ─────────────────────────────────────────
   // Three layers so nothing slips through:
   // 1. Override map.zoomIn / map.zoomOut (zoom control buttons call these directly)
@@ -172,12 +229,13 @@ function initMap() {
 
   // Wire the "Return to study area" button
   const galeBtn = document.getElementById('btn-goto-gale');
-  if (galeBtn) {
-    galeBtn.addEventListener('click', () => {
-      map.flyTo([CONFIG.studyArea.centerLat, CONFIG.studyArea.centerLon],
-                CONFIG.studyArea.defaultZoom, { duration: 1.2 });
-    });
-  }
+  if (galeBtn) galeBtn.addEventListener('click', goToGale);
+
+  // A pin for our study area that only shows on the far-out view (the base and target markers are hidden there)
+  L.marker([centerLat, centerLon], {
+    icon: L.divIcon({ className: 'area-pin', html: '<span>MarsWalk study area · Gale Crater</span>', iconSize: [0, 0] }),
+    keyboard: false, zIndexOffset: 900
+  }).on('click', goToGale).addTo(map);
 
   // "Go to Study Spot" button — triggers the slow fly-in and reveals overlays on landing
   const beginBtn = document.getElementById('btn-begin-mission');
@@ -209,6 +267,8 @@ function initMap() {
 
   STATE.map = map;
   addRouteLegend(map);
+  checkStudyAreaBounds();
+  setInterval(mapSyncUnderlays, 500);
   initRouteAnimation();
   console.log('[map] initialized at', centerLat, centerLon, 'zoom', defaultZoom, '| OPM tiles');
 }

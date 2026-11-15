@@ -62,6 +62,26 @@ MSL Curiosity REMS air temperature: MODRDR product (MSL-M-REMS-5-MODRDR-V1.0), N
 
 Viking MDIM 2.1 + MGS MOLA, via OpenPlanetaryMap
   Used for: global context basemap outside the study area. https://www.openplanetary.org/opm
+  Also stored in the app as one whole-Mars picture, src/data/mars-global.jpg: the 64 zoom-3 tiles of the
+  same basemap stitched unchanged by scripts/13_build_global_basemap.py (drawn under the live tiles).
+
+Solar storms page (src/data/space-weather.json, src/js/storms.js). All read from the source on 2026-11-15:
+  NASA/JPL (29 Sept 2017), "Large Solar Storm Sparks Global Aurora and Doubles Radiation Levels on the Martian
+    Surface": surface radiation more than double any RAD had measured; high readings lasted more than two days.
+    https://www.jpl.nasa.gov/news/large-solar-storm-sparks-global-aurora-and-doubles-radiation-levels-on-the-martian-surface/
+  Zeitlin, C. et al. (2018), Geophys. Res. Lett., doi:10.1029/2018GL077760: dose rates 2 to 3 times GCR background,
+    ~12 h at peak, 36 h decline, under 23 g/cm2 of CO2. (Abstract read; full paper not opened.)
+  NASA/JPL (10 June 2024), "NASA Watches Mars Light Up During Epic Solar Storm": 20 May 2024, X12 flare, 8,100 uGy,
+    30 chest X-rays, particles arrived in tens of minutes, cliffsides / lava tubes quote (link above).
+  NASA/JPL (15 Nov 2021), "How NASA's Curiosity Rover Is Making Mars Safer for Astronauts": 4% / 7.5% less
+    radiation at the foot of a cliff, Murray Buttes, 9-21 Sept 2016; more than a dozen storms measured.
+    https://www.jpl.nasa.gov/news/how-nasas-curiosity-rover-is-making-mars-safer-for-astronauts/
+  NASA-STD-3001 Technical Brief OCHMO-TB-020 Rev E (27 Dec 2022), "Design for Ionizing Radiation Protection":
+    600 mSv career limit, 250 mSv per solar particle event, acute effects, storm shelter (10 cm water equivalent),
+    EVA termination within 2 hours, monitoring / alerting / dosimetry requirements [V2 6099-6101].
+    https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf
+  OUR CALCULATION (labelled on screen): dose on the walk home in a 2017-type storm = 210 uGy/day x (2 to 3) x time.
+  OUR INTERPRETATION (labelled on screen): comparing "time to be back inside" with NASA's 2-hour EVA figure.
 
 MSL Curiosity REMS daily weather report (Centro de Astrobiologia, CAB/INTA-CSIC REMS team)
   Used for: Weather page cards for ground temperature, air pressure and UV category by Mars month

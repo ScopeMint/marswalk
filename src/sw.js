@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v17';
+const CACHE_VERSION = 'marswalk-v18';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -20,8 +20,8 @@ const SHELL_FILES = [
   './js/config.js', './js/state.js', './js/map.js', './js/search.js', './js/grid.js', './js/layers.js',
   './js/site-layers.js', './js/graticule.js', './js/landing-sites.js', './js/route.js', './js/route-worker.js', './js/safety.js', './js/consumables.js', './js/hazards.js', './js/interact.js', './js/traverse.js',
   './js/targets.js', './js/pov.js', './js/profile.js', './js/ui.js', './js/hud.js', './js/marsclock.js',
-  './js/brief.js', './js/tour.js', './js/terrain3d.js', './js/terrain3d-plan.js', './js/walk3d.js', './css/walk3d.css', './js/app.js', './js/charts.js', './js/routecard.js', './js/straightline.js', './js/rovercheck.js', './css/rovercheck.css', './css/charts.css', './js/tidy.js', './css/tidy.css', './js/pages.js', './css/pages.css', './js/main.js', './css/terrain3d.css',
-  './data/hirise-texture.jpg',
+  './js/brief.js', './js/tour.js', './js/terrain3d.js', './js/terrain3d-plan.js', './js/walk3d.js', './css/walk3d.css', './js/app.js', './js/charts.js', './js/routecard.js', './js/straightline.js', './js/rovercheck.js', './css/rovercheck.css', './css/charts.css', './js/tidy.js', './css/tidy.css', './js/storms.js', './js/pages.js', './css/pages.css', './data/space-weather.json', './js/main.js', './css/terrain3d.css',
+  './data/hirise-texture.jpg', './data/mars-global.jpg',
   './data/aoi.json', './data/elevation.bin', './data/slope.bin', './data/roughness.bin',
   './data/hillshade.png', './data/slope-overlay.png', './data/relief-overlay.png', './data/los-overlay.png',
   './data/themis-day.png', './data/themis-night.png',
