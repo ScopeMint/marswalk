@@ -153,28 +153,32 @@ function initMap() {
     });
   }
 
-  // Mark intro as in-flight so overlays stay hidden until we land
-  STATE.introFlying = true;
-
-  // Fly in to Gale Crater slowly — 2.5 s pause then 16 s cinematic zoom
-  setTimeout(() => {
-    map.flyTo([centerLat, centerLon], defaultZoom, { duration: 16 });
-    // Once the animation lands (or the user interrupts it), reveal the overlays
-    map.once('moveend', () => {
-      STATE.introFlying = false;
-      document.body.classList.remove('intro-flying');
-      document.dispatchEvent(new Event('marsIntroLanded'));
+  // "Go to Study Spot" button — triggers the slow fly-in and reveals overlays on landing
+  const beginBtn = document.getElementById('btn-begin-mission');
+  if (beginBtn) {
+    beginBtn.addEventListener('click', () => {
+      beginBtn.style.opacity = '0';
+      beginBtn.style.pointerEvents = 'none';
+      STATE.introFlying = true;
+      map.flyTo([centerLat, centerLon], defaultZoom, { duration: 16 });
+      map.once('moveend', () => {
+        STATE.introFlying = false;
+        document.body.classList.remove('intro-flying');
+        document.dispatchEvent(new Event('marsIntroLanded'));
+      });
     });
-  }, 2500);
+  }
 
   // routePane: the main teal route line. hazardPane sits one level above it so hazard
-  // colour segments always render on top of the route — both are above tile layers (z 200).
+  // colour segments always render on top of the route — both are above ALL image overlays
+  // (overlayPane = 400) and tile layers (tilePane = 200), and below markers (600) so
+  // the habitat / target icons always stay on top of the route.
   map.createPane('routePane');
-  map.getPane('routePane').style.zIndex = 450;
+  map.getPane('routePane').style.zIndex = 580;
   STATE.routeRenderer = L.svg({ pane: 'routePane' });
 
   map.createPane('hazardPane');
-  map.getPane('hazardPane').style.zIndex = 460;
+  map.getPane('hazardPane').style.zIndex = 590;
   STATE.hazardRenderer = L.svg({ pane: 'hazardPane' });
 
   STATE.map = map;

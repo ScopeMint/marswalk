@@ -99,12 +99,6 @@ async function initApp() {
   // Then split the screen into four pages (plan / layers / weather / summary). Only shows and hides what exists.
   if (typeof initPages === 'function') initPages();
 
-  // Auto-route the first science target so the example mission is immediately visible on load.
-  if (!STATE.selectedTarget && typeof selectTarget === 'function') {
-    // selectTarget needs the target itself, not its position in the list (a bare 0 was silently ignored)
-    setTimeout(() => { if (!STATE.selectedTarget && STATE.targets && STATE.targets[0]) selectTarget(STATE.targets[0]); }, 900);
-  }
-
   console.log('[main] MarsWalk ready');
 }
 

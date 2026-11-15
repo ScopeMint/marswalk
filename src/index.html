@@ -231,6 +231,19 @@
       <div id="map-message" class="map-message"
            role="status" aria-live="polite" style="display:none;"></div>
 
+      <!-- Intro call-to-action: shown while body.intro-flying; hidden after zoom lands -->
+      <div id="begin-mission-overlay" class="begin-mission-overlay" aria-live="polite">
+        <p class="begin-mission-label">NASA Space Apps 2026 · MarsWalk EVA Planner</p>
+        <button id="btn-begin-mission" class="btn-begin-mission" aria-label="Zoom to Gale Crater study area">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/>
+            <circle cx="12" cy="9" r="2.5"/>
+          </svg>
+          Go to Study Spot — Gale Crater
+        </button>
+      </div>
+
       <!-- Outside-study-area notice (shown when map pans away from Gale Crater) -->
       <div id="outside-area-notice" class="outside-area-notice" style="display:none;"
            role="status" aria-live="polite">
