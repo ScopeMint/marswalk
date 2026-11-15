@@ -12,12 +12,17 @@ Work from `MARSWALK_NEXT_PROMPT.md`, done on one teammate's clone. Not merged to
 - **2.6 Ranges.** Temperature shows the day-to-day range (P10-P90) on the route card, Weather page and chart band.
   Radiation shows its range (from the 180-225 uGy/day daily values) on the route card, cue card, HUD and Weather page.
 
+- **1.4 Extra REMS (part).** `scripts/13_prepare_rems_daily.py` builds `src/data/rems-daily.json` from the REMS daily
+  report (4,745 sols, grouped into 12 Mars months of 30 deg Ls). Weather page shows ground temperature, air pressure and
+  UV category for the current Mars month (`src/js/weatherextra.js`). Humidity and wind: the report has no value for any
+  sol, and the page says so. Not done from 1.4: hourly (not daily) ground temperature, and a seasonal pressure chart.
+
 ## Checked, no change needed
 - **3.1 Floating habitat.** On current main the habitat sits on a graded pad at the highest ground under it, and the
   "ROVER (illustrative)" label follows a visible rover. `walk3d.js` was not touched.
 
 ## Not done (and why)
-- 1.1 CRISM, 1.2 CTX, 1.3 dust, 1.4 extra REMS, 1.5 wind, 1.6-1.9: need dataset downloads and citation checks; not started.
+- 1.1 CRISM, 1.2 CTX, 1.3 dust, 1.5 wind (beyond the one-line note), 1.6-1.9: need dataset downloads and citation checks; not started.
 - 2.3 slope method note, 2.4 walking-speed references, 2.5 metabolic check: not started.
 - 2.7 unit tests: Node is not installed on this PC, so no test could be run. Not written.
 - 3.2-3.5, 4.x story pages, 4.5-4.6 README and form, 5.x robustness: not started.

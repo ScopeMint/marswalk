@@ -195,3 +195,4 @@ Mars Trek live THEMIS tile URLs (returned 404; replaced by cut overlays above).
 Solar-storm 10x scenario (not in the cited paper; removed).
 52-entry Mars location list with AI-written elevations and safety notes (unverified; replaced by
 the 10 landing sites above).
+- REMS daily weather report (added Nov 15): Centro de Astrobiologia (CAB/INTA-CSIC) REMS team, daily summary for Curiosity, https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json (fetched 2026-11-15, sols 1-4995). Used for src/data/rems-daily.json (ground temperature, pressure, UV category by Mars month). The feed states it is for outreach purposes; shown as context only. Instrument: Gomez-Elvira et al. (2012), Space Sci. Rev. 170, doi:10.1007/s11214-012-9921-1.

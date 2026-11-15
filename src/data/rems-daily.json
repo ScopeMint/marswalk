@@ -1,0 +1,515 @@
+{
+ "source": "REMS team daily weather report for Curiosity at Gale Crater (Centro de Astrobiologia, CAB/INTA-CSIC), the feed behind NASA's Mars weather page; instrument: Gomez-Elvira et al. 2012, Space Sci. Rev. 170",
+ "sourceUrl": "https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json",
+ "note": "Medians of the daily reports for each 30-degree Ls \"Mars month\", with the 10th and 90th percentile. The feed is an outreach product: shown as context only, not used in any route or safety calculation.",
+ "units": {
+  "pressurePa": "Pa",
+  "groundMinC": "deg C (ground, daily minimum)",
+  "groundMaxC": "deg C (ground, daily maximum)",
+  "airMinC": "deg C (air, daily minimum)",
+  "airMaxC": "deg C (air, daily maximum)",
+  "uvSols": "number of sols reported in each UV category"
+ },
+ "solRange": [
+  1,
+  4995
+ ],
+ "solsInReport": 4745,
+ "valuesDroppedOutOfRange": 0,
+ "months": [
+  {
+   "lsFrom": 0,
+   "lsTo": 30,
+   "pressurePa": {
+    "p10": 810.0,
+    "median": 842.0,
+    "p90": 874.0,
+    "n": 403
+   },
+   "groundMinC": {
+    "p10": -93.0,
+    "median": -83.0,
+    "p90": -78.0,
+    "n": 403
+   },
+   "groundMaxC": {
+    "p10": -4.0,
+    "median": 0.0,
+    "p90": 6.0,
+    "n": 403
+   },
+   "airMinC": {
+    "p10": -78.0,
+    "median": -76.0,
+    "p90": -73.0,
+    "n": 403
+   },
+   "airMaxC": {
+    "p10": -22.0,
+    "median": -15.0,
+    "p90": -11.0,
+    "n": 403
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 248,
+    "High": 154,
+    "Very_High": 0
+   }
+  },
+  {
+   "lsFrom": 30,
+   "lsTo": 60,
+   "pressurePa": {
+    "p10": 840.0,
+    "median": 871.0,
+    "p90": 900.0,
+    "n": 428
+   },
+   "groundMinC": {
+    "p10": -91.0,
+    "median": -86.0,
+    "p90": -79.0,
+    "n": 428
+   },
+   "groundMaxC": {
+    "p10": -13.0,
+    "median": -6.0,
+    "p90": 1.0,
+    "n": 428
+   },
+   "airMinC": {
+    "p10": -81.0,
+    "median": -78.0,
+    "p90": -75.0,
+    "n": 428
+   },
+   "airMaxC": {
+    "p10": -27.0,
+    "median": -23.0,
+    "p90": -19.0,
+    "n": 428
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 338,
+    "High": 89,
+    "Very_High": 0
+   }
+  },
+  {
+   "lsFrom": 60,
+   "lsTo": 90,
+   "pressurePa": {
+    "p10": 824.0,
+    "median": 859.0,
+    "p90": 894.0,
+    "n": 458
+   },
+   "groundMinC": {
+    "p10": -94.0,
+    "median": -88.0,
+    "p90": -84.0,
+    "n": 458
+   },
+   "groundMaxC": {
+    "p10": -14.0,
+    "median": -9.0,
+    "p90": -6.0,
+    "n": 458
+   },
+   "airMinC": {
+    "p10": -86.0,
+    "median": -81.0,
+    "p90": -78.0,
+    "n": 458
+   },
+   "airMaxC": {
+    "p10": -31.0,
+    "median": -28.0,
+    "p90": -23.0,
+    "n": 458
+   },
+   "uvSols": {
+    "Low": 4,
+    "Moderate": 391,
+    "High": 63,
+    "Very_High": 0
+   }
+  },
+  {
+   "lsFrom": 90,
+   "lsTo": 120,
+   "pressurePa": {
+    "p10": 748.0,
+    "median": 787.0,
+    "p90": 829.0,
+    "n": 442
+   },
+   "groundMinC": {
+    "p10": -95.0,
+    "median": -87.0,
+    "p90": -81.0,
+    "n": 441
+   },
+   "groundMaxC": {
+    "p10": -15.0,
+    "median": -8.0,
+    "p90": -1.0,
+    "n": 441
+   },
+   "airMinC": {
+    "p10": -85.0,
+    "median": -80.0,
+    "p90": -78.0,
+    "n": 442
+   },
+   "airMaxC": {
+    "p10": -29.0,
+    "median": -25.0,
+    "p90": -19.0,
+    "n": 442
+   },
+   "uvSols": {
+    "Low": 6,
+    "Moderate": 372,
+    "High": 64,
+    "Very_High": 0
+   }
+  },
+  {
+   "lsFrom": 120,
+   "lsTo": 150,
+   "pressurePa": {
+    "p10": 697.0,
+    "median": 727.0,
+    "p90": 756.0,
+    "n": 388
+   },
+   "groundMinC": {
+    "p10": -93.0,
+    "median": -83.0,
+    "p90": -77.0,
+    "n": 388
+   },
+   "groundMaxC": {
+    "p10": -8.0,
+    "median": 1.0,
+    "p90": 6.0,
+    "n": 388
+   },
+   "airMinC": {
+    "p10": -81.0,
+    "median": -77.0,
+    "p90": -74.0,
+    "n": 388
+   },
+   "airMaxC": {
+    "p10": -21.0,
+    "median": -14.0,
+    "p90": -9.0,
+    "n": 388
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 247,
+    "High": 130,
+    "Very_High": 10
+   }
+  },
+  {
+   "lsFrom": 150,
+   "lsTo": 180,
+   "pressurePa": {
+    "p10": 693.0,
+    "median": 722.0,
+    "p90": 750.0,
+    "n": 405
+   },
+   "groundMinC": {
+    "p10": -87.0,
+    "median": -80.0,
+    "p90": -74.0,
+    "n": 405
+   },
+   "groundMaxC": {
+    "p10": 2.0,
+    "median": 8.0,
+    "p90": 14.0,
+    "n": 405
+   },
+   "airMinC": {
+    "p10": -76.0,
+    "median": -73.0,
+    "p90": -70.0,
+    "n": 405
+   },
+   "airMaxC": {
+    "p10": -15.0,
+    "median": -6.0,
+    "p90": 0.0,
+    "n": 405
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 182,
+    "High": 166,
+    "Very_High": 56
+   }
+  },
+  {
+   "lsFrom": 180,
+   "lsTo": 210,
+   "pressurePa": {
+    "p10": 730.0,
+    "median": 772.0,
+    "p90": 810.0,
+    "n": 380
+   },
+   "groundMinC": {
+    "p10": -83.0,
+    "median": -76.0,
+    "p90": -67.0,
+    "n": 380
+   },
+   "groundMaxC": {
+    "p10": 5.0,
+    "median": 14.0,
+    "p90": 17.0,
+    "n": 380
+   },
+   "airMinC": {
+    "p10": -74.0,
+    "median": -71.0,
+    "p90": -66.0,
+    "n": 380
+   },
+   "airMaxC": {
+    "p10": -11.0,
+    "median": -1.0,
+    "p90": 6.0,
+    "n": 380
+   },
+   "uvSols": {
+    "Low": 33,
+    "Moderate": 73,
+    "High": 208,
+    "Very_High": 66
+   }
+  },
+  {
+   "lsFrom": 210,
+   "lsTo": 240,
+   "pressurePa": {
+    "p10": 805.0,
+    "median": 845.0,
+    "p90": 893.0,
+    "n": 373
+   },
+   "groundMinC": {
+    "p10": -83.0,
+    "median": -73.0,
+    "p90": -66.0,
+    "n": 373
+   },
+   "groundMaxC": {
+    "p10": 0.0,
+    "median": 11.0,
+    "p90": 16.0,
+    "n": 373
+   },
+   "airMinC": {
+    "p10": -71.0,
+    "median": -68.0,
+    "p90": -65.0,
+    "n": 373
+   },
+   "airMaxC": {
+    "p10": -12.0,
+    "median": 0.0,
+    "p90": 5.0,
+    "n": 373
+   },
+   "uvSols": {
+    "Low": 40,
+    "Moderate": 204,
+    "High": 92,
+    "Very_High": 37
+   }
+  },
+  {
+   "lsFrom": 240,
+   "lsTo": 270,
+   "pressurePa": {
+    "p10": 850.0,
+    "median": 888.0,
+    "p90": 919.0,
+    "n": 330
+   },
+   "groundMinC": {
+    "p10": -86.0,
+    "median": -74.0,
+    "p90": -70.0,
+    "n": 330
+   },
+   "groundMaxC": {
+    "p10": 3.0,
+    "median": 8.0,
+    "p90": 14.0,
+    "n": 330
+   },
+   "airMinC": {
+    "p10": -73.0,
+    "median": -68.0,
+    "p90": -66.0,
+    "n": 330
+   },
+   "airMaxC": {
+    "p10": -10.0,
+    "median": -2.0,
+    "p90": 1.0,
+    "n": 330
+   },
+   "uvSols": {
+    "Low": 13,
+    "Moderate": 204,
+    "High": 91,
+    "Very_High": 22
+   }
+  },
+  {
+   "lsFrom": 270,
+   "lsTo": 300,
+   "pressurePa": {
+    "p10": 824.0,
+    "median": 862.0,
+    "p90": 894.0,
+    "n": 342
+   },
+   "groundMinC": {
+    "p10": -88.0,
+    "median": -77.0,
+    "p90": -72.0,
+    "n": 342
+   },
+   "groundMaxC": {
+    "p10": 6.0,
+    "median": 11.0,
+    "p90": 14.0,
+    "n": 342
+   },
+   "airMinC": {
+    "p10": -74.0,
+    "median": -70.0,
+    "p90": -69.0,
+    "n": 342
+   },
+   "airMaxC": {
+    "p10": -7.0,
+    "median": -2.0,
+    "p90": 1.0,
+    "n": 342
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 179,
+    "High": 118,
+    "Very_High": 44
+   }
+  },
+  {
+   "lsFrom": 300,
+   "lsTo": 330,
+   "pressurePa": {
+    "p10": 793.0,
+    "median": 829.0,
+    "p90": 864.0,
+    "n": 387
+   },
+   "groundMinC": {
+    "p10": -87.0,
+    "median": -77.0,
+    "p90": -70.0,
+    "n": 386
+   },
+   "groundMaxC": {
+    "p10": 1.0,
+    "median": 8.0,
+    "p90": 14.0,
+    "n": 386
+   },
+   "airMinC": {
+    "p10": -74.0,
+    "median": -71.0,
+    "p90": -68.0,
+    "n": 386
+   },
+   "airMaxC": {
+    "p10": -11.0,
+    "median": -6.0,
+    "p90": -1.0,
+    "n": 386
+   },
+   "uvSols": {
+    "Low": 1,
+    "Moderate": 150,
+    "High": 188,
+    "Very_High": 48
+   }
+  },
+  {
+   "lsFrom": 330,
+   "lsTo": 360,
+   "pressurePa": {
+    "p10": 791.0,
+    "median": 816.0,
+    "p90": 849.0,
+    "n": 382
+   },
+   "groundMinC": {
+    "p10": -92.0,
+    "median": -81.0,
+    "p90": -75.0,
+    "n": 382
+   },
+   "groundMaxC": {
+    "p10": 0.0,
+    "median": 6.0,
+    "p90": 13.0,
+    "n": 382
+   },
+   "airMinC": {
+    "p10": -76.0,
+    "median": -73.0,
+    "p90": -71.0,
+    "n": 382
+   },
+   "airMaxC": {
+    "p10": -16.0,
+    "median": -8.0,
+    "p90": -4.0,
+    "n": 382
+   },
+   "uvSols": {
+    "Low": 0,
+    "Moderate": 224,
+    "High": 157,
+    "Very_High": 1
+   }
+  }
+ ],
+ "latest": {
+  "sol": 4995,
+  "earthDate": "2026-08-25",
+  "ls": 341.0,
+  "pressurePa": 777.0,
+  "groundMinC": -84.0,
+  "groundMaxC": 4.0,
+  "uv": "Moderate"
+ },
+ "notInReport": {
+  "humidity": true,
+  "wind": true,
+  "solsChecked": 4745
+ }
+}
