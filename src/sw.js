@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v7';
+const CACHE_VERSION = 'marswalk-v8';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -24,7 +24,7 @@ const SHELL_FILES = [
   './data/hirise-texture.jpg',
   './data/aoi.json', './data/elevation.bin', './data/slope.bin', './data/roughness.bin',
   './data/hillshade.png', './data/slope-overlay.png', './data/relief-overlay.png', './data/los-overlay.png',
-  './data/rad-overlay.png', './data/themis-day.png', './data/themis-night.png',
+  './data/themis-day.png', './data/themis-night.png',
   './data/targets.geojson', './data/curiosity-traverse.geojson', './data/pov-images.json',
   './data/rad-baseline.json', './data/rems-temps.json',
   './icons/icon-192.png', './icons/icon-512.png',
