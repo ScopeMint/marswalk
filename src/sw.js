@@ -8,7 +8,7 @@
      - Global basemap tiles (OpenPlanetaryMap): cache-first with a size cap.
    Bump CACHE_VERSION when the shell list changes. */
 
-const CACHE_VERSION = 'marswalk-v15';
+const CACHE_VERSION = 'marswalk-v16';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const TILE_CACHE  = CACHE_VERSION + '-tiles';
 const OPM_CACHE   = CACHE_VERSION + '-opm';
@@ -26,7 +26,7 @@ const SHELL_FILES = [
   './data/hillshade.png', './data/slope-overlay.png', './data/relief-overlay.png', './data/los-overlay.png',
   './data/themis-day.png', './data/themis-night.png',
   './data/targets.geojson', './data/curiosity-traverse.geojson', './data/pov-images.json',
-  './data/rad-baseline.json', './data/rems-temps.json', './data/rems-daily.json', './js/weatherextra.js',
+  './data/rad-baseline.json', './data/rems-temps.json', './data/rems-daily.json', './js/weatherextra.js', './js/story.js',
   './data/landing-sites.json',   // site photos (./data/sites/*.jpg) are cached when first viewed, not up front
   './icons/icon-192.png', './icons/icon-512.png',
   './vendor/leaflet.css', './vendor/leaflet.js', './vendor/three.module.js'

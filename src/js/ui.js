@@ -692,7 +692,8 @@ function _buildAboutModal() {
     ['Siebach & Grotzinger (2014), boxwork water estimates, JGR Planets 119', 'https://doi.org/10.1002/2013JE004508'],
     ['Leaflet 1.9.4 (BSD-2-Clause)', 'https://leafletjs.com'],
     ['three.js r160 (MIT)', 'https://threejs.org'],
-    ['Mars landing-site coordinates: List of artificial objects on Mars', 'https://en.wikipedia.org/wiki/List_of_artificial_objects_on_Mars'],
+    ['Mars landing sites: names, dates and coordinates (NASA GISS Mars24 lander list)', 'https://www.giss.nasa.gov/tools/mars24/help/landers.html'],
+    ['Viking 1/2 and Pathfinder coordinates: Kuchynka et al. (2014), Icarus 229, 340-347', 'https://doi.org/10.1016/j.icarus.2013.11.015'],
     ['NASA Space Apps 2026 challenge: Interplanetary Survival Guide: Martian Map', 'https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/'],
   ];
   const refHeading = document.createElement('h3');
