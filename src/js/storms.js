@@ -53,6 +53,7 @@ function stormsBuild() {
   cols.appendChild(events); cols.appendChild(drill); cols.appendChild(person); root.appendChild(cols);
   document.body.appendChild(root);
   _storm = { root, events, drill, person, data: null, drawn: '', warnMin: null };
+  stormsCardHook();
 
   fetch('./data/space-weather.json').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(data => { _storm.data = data; stormsStatic(); stormsRefresh(); })
@@ -229,4 +230,40 @@ function stormsRefresh(force) {
   s.dose.appendChild(stormEl('p', '', 'Staying outside for the whole of the biggest storm RAD has measured (May 2024) would have meant ' +
     e2024.doseMuGy.toLocaleString('en-US') + ' μGy, which NASA compares to 30 chest X-rays. The sooner you are under shielding, the less of a storm you receive.'));
   s.dose.appendChild(stormSource(e2024.source, e2024.url));
+}
+
+/* Adds one line to the route card (pages 1 and 5): how long it takes to be inside if a storm alert comes at
+   the worst moment of this walk. Same numbers as the drill above (stormTimeline); nothing new is calculated.
+   The walk-back map can arrive a moment after the route, so it tries again a few times. */
+function stormsCardLine(tries) {
+  const card = document.getElementById('summary-card'), body = card && card.querySelector('.rc-body');
+  if (!body || body.querySelector('.rc-storm')) return;
+  const line = stormTimeline();
+  if (!line) {
+    if (STATE.route && STATE.route.status === 'ok' && (tries || 0) < 10) setTimeout(() => stormsCardLine((tries || 0) + 1), 500);
+    return;
+  }
+  const airlock = CONFIG.eva.ingressMinutes, worst = line.peak.min + airlock;
+  const limitHours = _storm && _storm.data ? _storm.data.health.evaTerminateHours : null;
+  const box = stormEl('div', 'rc-storm' + (limitHours ? (worst <= limitHours * 60 ? ' pass' : ' fail') : ''));
+  box.appendChild(stormEl('b', '', 'Solar storm alert at the worst moment: ' + stormMinutes(worst) + ' to be inside'));
+  box.appendChild(stormEl('small', '', stormMinutes(line.peak.min) + ' walk back from ' + line.peak.km.toFixed(2) + ' km along the route + ' +
+    airlock + ' min airlock (our assumption).' +
+    (limitHours ? ' ' + (worst <= limitHours * 60 ? 'Inside' : 'Over') + ' NASA\'s ' + limitHours + '-hour figure for ending an EVA (our reading of it).' : '')));
+  const go = stormEl('button', 'rc-storm-go', 'Open the storm drill →'); go.type = 'button';
+  go.addEventListener('click', () => { if (typeof pagesShow === 'function') pagesShow('storm'); });
+  box.appendChild(go);
+  body.insertBefore(box, body.querySelector(':scope > .rc-section'));
+}
+
+/* Hooks into the route card so the storm line is added every time the card is rebuilt. Runs once. */
+function stormsCardHook() {
+  if (typeof updateSummaryCard !== 'function' || window._stormCardHooked) return;
+  window._stormCardHooked = true;
+  const original = window.updateSummaryCard;
+  window.updateSummaryCard = function () {
+    const result = original.apply(this, arguments);
+    try { stormsCardLine(); } catch (err) { console.warn('[storms]', err); }
+    return result;
+  };
 }

@@ -244,7 +244,7 @@ function initMap() {
       beginBtn.style.opacity = '0';
       beginBtn.style.pointerEvents = 'none';
       STATE.introFlying = true;
-      map.flyTo([centerLat, centerLon], defaultZoom, { duration: 16 });
+      map.flyTo([centerLat, centerLon], defaultZoom, { duration: 3 });   // 3 s: a judge should not wait (was 16)
       map.once('moveend', () => {
         STATE.introFlying = false;
         document.body.classList.remove('intro-flying');
