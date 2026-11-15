@@ -127,7 +127,8 @@ function initMap() {
     maxBoundsViscosity:  1.0,
     zoomControl:         true,
     attributionControl:  true,
-    fadeAnimation:       false,  // prevents blue/red tile-fade mist during zoom
+    fadeAnimation:       false,  // prevents tile-fade mist
+    zoomAnimation:       false,  // prevents tile GPU layer compositing over route/hazard SVGs during zoom
   });
 
   // Add OPM base layer (always on)
