@@ -27,7 +27,7 @@ const WALK_PHOTO_REPEAT_M = 2.6;        // [OUR ASSUMPTION] ground width the Mas
 const WALK_HAZE_NEAR_M = 250, WALK_HAZE_FAR_M = 2300;   // haze hides the edge of the 4 km model
 const WALK_ARRIVE_M = 35;               // show a target's rover photo within this distance
 const WALK_CORRIDOR_MARGIN_M = 140, WALK_CORRIDOR_MAX_PX = 4096;
-const WALK_SKY_HORIZON = '#d9b48c', WALK_SKY_ZENITH = '#9a7b5e';  // dusty tan sky [OUR ASSUMPTION]
+const WALK_SKY_HORIZON = '#c8a87a', WALK_SKY_ZENITH = '#8c6e4d';  // dusty tan sky, matches --mars-sky-horizon/zenith [OUR ASSUMPTION]
 const WALK_DETAIL_PHOTO = './data/pov/pov-3-nevado-sajama.jpg';   // Curiosity Mastcam, sol 4711
 const WALK_DEG = Math.PI / 180;
 /* EVA base camp (walkCamp). Only the habitat floor area and the mast height come from sources;
@@ -438,7 +438,7 @@ function walkMarkers() {
     w.stops.push({ x, z, props });
   };
   const hab = STATE.habitat || { lat: CONFIG.studyArea.defaultHabitatLat, lon: CONFIG.studyArea.defaultHabitatLon };
-  add(hab.lon, hab.lat, 'EVA BASE', '#D9622B', null);
+  add(hab.lon, hab.lat, 'EVA BASE', '#B07D4A', null);
   (STATE.targets || []).forEach((f, i) => {
     if (!f.geometry || f.geometry.type !== 'Point') return;
     const p = f.properties || {};
