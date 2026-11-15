@@ -17,6 +17,26 @@
 .t3d-labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .t3d-pin-label { position: absolute; transform: translate(-50%, -100%); padding: 4px 8px; max-width: 230px; border: 1px solid #48505b; border-bottom-color: currentColor; border-radius: 4px; background: #0f1115df; font: 11px/1.4 ui-monospace, Consolas, monospace; box-shadow: 0 3px 14px #0006; }
 .t3d-controls { position: absolute; z-index: 3; top: 124px; left: 32px; width: 310px; padding: 16px; border: 1px solid #2A2F3A; border-top: 2px solid #D9622B; border-radius: 8px; background: #181b22ed; box-shadow: 0 16px 50px #0005; }
+.t3d-controls { max-height: calc(100% - 190px); overflow-y: auto; }
+/* Route planning inside the 3D view (js/terrain3d-plan.js) */
+.t3d-step { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: #E8E6E3; font-size: 12px; font-weight: 600; letter-spacing: .02em; }
+.t3d-step b { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: #3FD0C9; color: #0F1115; font: 700 11px ui-monospace, Consolas, monospace; }
+.t3d-plan { border-radius: 6px; }
+.t3d-plan-targets { display: grid; gap: 5px; }
+.t3d-plan-targets button, .t3d-plan-pick { width: 100%; padding: 6px 9px; font-size: 12px; text-align: left; }
+.t3d-plan-pick { margin-top: 5px; border-style: dashed !important; }
+.t3d-picking .t3d-canvas { cursor: crosshair; }
+.t3d-plan-status { margin: 9px 0 14px; padding: 7px 9px; border-left: 3px solid #A3A8B3; background: #0f1115b3; color: #A3A8B3; font-size: 11.5px; line-height: 1.45; }
+.t3d-plan-status[data-kind="ok"] { border-left-color: #46C37B; color: #E8E6E3; }
+.t3d-plan-status[data-kind="warn"] { border-left-color: #F2B134; color: #F2B134; }
+.t3d-nudge { animation: t3d-nudge 1.4s ease-out 1; }
+@keyframes t3d-nudge { 0%, 40% { box-shadow: 0 0 0 3px #F2B134; } 100% { box-shadow: 0 0 0 3px transparent; } }
+.t3d-overlay button.t3d-locked { opacity: .55; border-style: dashed; }
+.t3d-overlay button.t3d-locked::before { content: "🔒 "; font-size: 10px; }
+.t3d-overlay button.t3d-ready { border-color: #3FD0C9; color: #0F1115; background: #3FD0C9; font-weight: 600; }
+.t3d-overlay button.t3d-ready:hover { color: #0F1115; background: #6fe0da; }
+.t3d-plan-banner { position: absolute; z-index: 3; top: 132px; left: 374px; right: 32px; width: fit-content; max-width: 560px; margin: 0 auto; padding: 10px 16px; border: 1px solid #3FD0C9; border-radius: 999px; background: #0f1115e6; color: #E8E6E3; font-size: 13px; text-align: center; white-space: pre-wrap; pointer-events: none; box-shadow: 0 8px 30px #0006; }
+.t3d-plan-banner[data-kind="warn"] { border-color: #F2B134; color: #F2B134; border-radius: 10px; }
 .t3d-modes { display: flex; gap: 6px; }
 .t3d-modes button { padding: 7px 9px; font-size: 12px; }
 .t3d-slider { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 20px; color: #A3A8B3; }
@@ -41,6 +61,7 @@
   .t3d-header h2 span { display: none; }
   .t3d-controls { top: 88px; left: 12px; width: 278px; padding: 10px; max-height: calc(100% - 245px); overflow-y: auto; }
   .t3d-help { display: none; }
+  .t3d-plan-banner { display: none; }   /* small screens: the status line in the panel says the same thing */
   .t3d-slider { margin-top: 12px; gap: 5px; }
   .t3d-legend { bottom: 132px; left: 12px; right: 12px; gap: 10px; padding: 6px 9px; }
   .t3d-notice { bottom: 59px; left: 12px; right: 12px; font-size: 10px; }
