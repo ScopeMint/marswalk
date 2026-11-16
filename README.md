@@ -6,9 +6,6 @@ MarsWalk is an installable, offline EVA planner for the first humans on Mars. It
 
 **Live app:** https://scopemint.github.io/marswalk/ (install it from the browser's address bar; it then works with no network)
 
-**Demo video (30 s, English captions):** [`media/marswalk-demo-30s.mp4`](media/marswalk-demo-30s.mp4) · subtitles [`media/marswalk-demo-30s.srt`](media/marswalk-demo-30s.srt)
-
-![Route, safety card, suit model and hazards on Curiosity's real route](media/shot-1-map-route.png)
 
 | EVA cue card | Visor HUD | 3D fly-through |
 |---|---|---|
@@ -76,13 +73,10 @@ Download from **[Releases](https://github.com/ScopeMint/marswalk/releases/latest
 It is the same app in its own window, fully offline. Maps, terrain, 3D and routing all run from files bundled in the app; only the global context basemap outside the study area needs a network. Build it yourself with `cd desktop && npm install && npm run dist`. It is built with Electron.
 
 ## Run it
-- **Online:** open the live link. Use **Install app** in the header to add it to your desktop, phone or tablet.
+- **Online:** open the live link, https://scopemint.github.io/marswalk/. Use **Install app** in the header to add it to your desktop, phone or tablet.
 - **Locally:** `python -m http.server 8080 --directory src`, then open http://localhost:8080. A local server is needed for the data files.
 - **Rebuild the data:** `python scripts/08_build_real_site.py`, then `09_get_themis.py`, `04_make_overlays.py`, `generate_los_overlay.py`, `05_prepare_rems.py` (real REMS temperatures from NASA PDS, ~1 h first run), `06_prepare_rad.py`, `10_make_app_assets.py`, `11_make_3d_texture.py`. These need `rasterio`, `numpy`, `scipy` and `Pillow`, and read only the needed window from NASA/USGS cloud-optimised files.
 - **Tests:** `node tests/marsclock.test.js`
-
-## Honest limits
-This is a planning concept, not flight software. Rocks smaller than ~2 m are not resolved; they show only as extra relief. Soil strength, live weather and solar-storm forecasts are not modelled. The radiation figure is the average galactic cosmic-ray dose Curiosity's RAD measured at the surface in 2012-2013 (210 ± 40 μGy/day, Hassler et al. 2014), not the dose inside a suit. Suit capacities are generic planning values.
 
 ## AI use
 MarsWalk was designed, directed and verified by our team, using AI coding assistants as development tools. We wrote the specifications: the science goal, the site, the targets, the route and safety model, and the specifications of the NASA datasets we used. Claude Code and OpenAI Codex, and GitHub Copilot then generated most of the code and data scripts sourced from them.We treated every AI output as a draft to check. We tested each feature in the browser, then checked numbers against the original papers and NASA archives. That review caught real problems: an unsupported radiation value, an invented solar-storm multiplier and a wrong temperature citation. We replaced each one with verified data. A full log of AI-assisted files is in docs/AI_USE.md. All images are real NASA data; no AI-generated images or video.
