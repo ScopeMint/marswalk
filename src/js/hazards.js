@@ -10,7 +10,7 @@
 
 const HAZ_MAST_HEIGHT_M = 10;      // habitat radio mast [OUR ASSUMPTION] — same as generate_los_overlay.py
 const HAZ_SUIT_ANTENNA_M = 2;      // suit antenna height [OUR ASSUMPTION]
-const HAZ_NEAR_LIMIT_DEG = 2;      // "near the slope limit" margin (docs/ROUTE_AND_SAFETY_MODEL.md section 8)
+const HAZ_NEAR_LIMIT_DEG = 2;      // "near the slope limit" margin [OUR ASSUMPTION]
 const HAZ_MIN_RANGE_M = 30;        // ignore hazard stretches shorter than this
 
 const HAZ_STYLE = {

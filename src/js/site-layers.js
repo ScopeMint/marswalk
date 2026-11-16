@@ -163,7 +163,7 @@ function setSiteLayerOpacity(layer, opacity) {
   return false;
 }
 
-/* Walk-back time bands in minutes (matches docs/ROUTE_AND_SAFETY_MODEL.md section 4a). */
+/* Walk-back time bands in minutes [OUR ASSUMPTION]. */
 const WALKBACK_BANDS = [
   { maxMin: 15,       rgba: [70, 195, 123, 150] },   // 0-15 min: green
   { maxMin: 30,       rgba: [63, 208, 201, 140] },   // 15-30: cyan

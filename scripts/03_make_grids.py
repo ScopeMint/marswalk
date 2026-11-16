@@ -194,7 +194,7 @@ def _load_with_pil_fallback(filepath):
     """
     Emergency fallback for GeoTIFF loading without rasterio.
     Returns: (west, east, south, north, elev_array)
-    Assumes the file covers the study area bounds from 01_pick_area.txt.
+    Assumes the file covers the fallback bounds written below.
     """
     try:
         from PIL import Image
@@ -206,7 +206,7 @@ def _load_with_pil_fallback(filepath):
         if arr.ndim == 3:
             arr = arr[:, :, 0]  # take first band
 
-        # Use default bounds from 01_pick_area.txt
+        # Fallback bounds (an early draft of the study area; the real box is in src/data/aoi.json)
         west, east, south, north = 137.699, 137.801, -5.151, -5.049
         print(f'[03] Fallback: assuming bounds W={west} E={east} S={south} N={north}')
         print('     If this is wrong, update bounds in this script.')
