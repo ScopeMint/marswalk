@@ -8,10 +8,9 @@ It uses data from five NASA missions: Mars Reconnaissance Orbiter, Mars Odyssey 
 
 **Live app:** https://scopemint.github.io/marswalk/ (it can be installed from the browser's address bar, and then works with no network)
 
-| Plan a safe route | Solar storm drill | Walk it first |
+| EVA cue card | Visor HUD | 3D fly-through |
 |---|---|---|
-| ![route plan with the route card](media/readme-1-route.png) | ![solar storm drill](media/readme-2-storm.png) | ![first-person walk](media/readme-3-walk.png) |
-| A slope-aware route on 1 m HiRISE terrain, with time, turn-back and GO / NO-GO checks. | If a storm alert comes mid-walk, how long until the crew is inside, against NASA's 2-hour figure. | The same route in first person on the real terrain. Press W A S D to leave the route and explore. |
+| ![cue card](media/shot-2-cue-card.png) | ![visor HUD](media/shot-4-visor-hud.png) | ![3D](media/shot-5-3d-flythrough.png) |
 
 ---
 
