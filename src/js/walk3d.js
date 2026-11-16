@@ -111,10 +111,17 @@ function initWalk3D() {
       <img data-w="photoImg" alt=""><figcaption data-w="photoCap"></figcaption>
     </figure>
     <div class="walk-message" data-w="message" role="status"></div>
+    <div class="walk-keys" data-w="keysHint" hidden>
+      <div class="walk-keycaps" aria-hidden="true"><kbd>W</kbd><span><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span></div>
+      <div><strong>You can leave the route and walk anywhere.</strong>
+        <span>Press W A S D or the arrow keys to walk freely. Drag to look around. Hold Shift to move faster.</span></div>
+      <button data-w="keysOk">Got it</button>
+    </div>
     <footer class="walk-bar">
       <button data-w="play">Pause</button>
       <label class="walk-speed">Time-lapse <select data-w="speed" aria-label="Time-lapse speed"></select></label>
       <input data-w="scrub" type="range" min="0" max="1" step="0.001" value="0" aria-label="Position along the route">
+      <button data-w="free" class="walk-free-btn">Walk freely · W A S D</button>
       <button data-w="route" hidden aria-label="Back to route"><svg class="icon" aria-hidden="true"><use href="#icon-turn-back"/></svg> Back to route</button>
       <button data-w="visorBtn" aria-pressed="true">Visor</button>
       <span class="walk-help">Drag: look around · W A S D / arrows: explore freely · Space: pause</span>
@@ -145,6 +152,8 @@ function initWalk3D() {
   el.speed.addEventListener('change', () => { _walk.lapse = Number(el.speed.value); walkHud(); });
   el.scrub.addEventListener('input', () => { walkBackToRoute(); _walk.distM = Number(el.scrub.value) * _walk.lengthM; _walk.lookYaw = _walk.lookPitch = 0; });
   el.route.addEventListener('click', walkBackToRoute);
+  el.free.addEventListener('click', () => { if (_walk.camera && _walk.mode === 'route') walkFreeRoam(); });
+  el.keysOk.addEventListener('click', () => { el.keysHint.hidden = true; });
   el.visorBtn.addEventListener('click', () => {
     const on = el.visor.hidden; el.visor.hidden = !on; el.visorBtn.setAttribute('aria-pressed', String(on));
   });
@@ -171,6 +180,7 @@ async function walkOpen() {
     if (!w.open || token !== w.token) return;
     walkBuild();
     w.el.message.textContent = '';
+    w.el.keysHint.hidden = false; w.el.free.hidden = false;   // tell the user they can leave the route (W A S D)
     w.el.close.focus();
     walkLoop();
   } catch (err) {
@@ -191,7 +201,7 @@ function walkClose() {
   [w.texHirise, w.texDetail, w.texCorridor].forEach(t => { if (t) t.dispose(); });
   if (w.renderer) { w.renderer.dispose(); w.renderer.forceContextLoss(); w.renderer.domElement.remove(); }
   w.renderer = w.scene = w.far = w.patch = w.texHirise = w.texDetail = w.texCorridor = null;
-  w.labels = []; w.el.labels.textContent = ''; w.el.photo.hidden = true; w.root.hidden = true;
+  w.labels = []; w.el.labels.textContent = ''; w.el.photo.hidden = true; w.el.keysHint.hidden = true; w.root.hidden = true;
   if (typeof t3dVisibility === 'function') t3dVisibility();   // wake the 3D map again if it is open
 }
 
@@ -537,12 +547,13 @@ function walkFreeRoam() {
   w.mode = 'free'; w.freeX = w.camera.position.x; w.freeZ = w.camera.position.z;
   w.freeYaw = (w.yaw || 0) + w.lookYaw; w.lookYaw = 0;
   w.el.route.hidden = false; w.el.play.textContent = 'Resume route';
+  w.el.free.hidden = true; w.el.keysHint.hidden = true;
 }
 
 function walkBackToRoute() {
   const w = _walk;
   if (w.mode !== 'free') return;
-  w.mode = 'route'; w.lookYaw = 0; w.lookPitch = 0; w.el.route.hidden = true;
+  w.mode = 'route'; w.lookYaw = 0; w.lookPitch = 0; w.el.route.hidden = true; w.el.free.hidden = false;
   w.el.play.textContent = w.paused ? 'Play' : 'Pause';
 }
 
