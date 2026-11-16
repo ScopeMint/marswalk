@@ -511,11 +511,6 @@ function _buildAssumptionsModal() {
   header.appendChild(closeBtn);
   box.appendChild(header);
 
-  const disclaimer = document.createElement('p');
-  disclaimer.className = 'modal-disclaimer';
-  disclaimer.textContent = 'This is a planning concept, not flight software. All [OUR ASSUMPTION] values are estimates chosen for this tool.';
-  box.appendChild(disclaimer);
-
   // Every number the app uses that is not measured data. Values are read live from the code where
   // possible so this table can never drift from what the model actually does.
   const A = 'OUR ASSUMPTION';
