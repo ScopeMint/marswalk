@@ -85,7 +85,8 @@ It is the same app in its own window, fully offline. Maps, terrain, 3D and routi
 This is a planning concept, not flight software. Rocks smaller than ~2 m are not resolved; they show only as extra relief. Soil strength, live weather and solar-storm forecasts are not modelled. The radiation figure is the average galactic cosmic-ray dose Curiosity's RAD measured at the surface in 2012-2013 (210 ± 40 μGy/day, Hassler et al. 2014), not the dose inside a suit. Suit capacities are generic planning values.
 
 ## AI use
-Claude Code (Anthropic) wrote most of the application code and data scripts. OpenAI Codex wrote the visor HUD, the Mars24 clock module and the 3D terrain view from written specifications. The team chose the concept, the site and the targets, checked the sources and tested the app. No AI-generated images or video were used; every picture is NASA data or a screenshot. Full log: [`docs/AI_USE.md`](docs/AI_USE.md).
+MarsWalk was designed, directed and verified by our team, using AI coding assistants as development tools. We wrote the specifications: the science goal, the site, the targets, the route and safety model, and which NASA datasets to use. Claude Code and OpenAI Codex then generated most of the code and data scripts from them.
+We treated every AI output as a draft to check. We tested each feature in the browser and checked numbers against the original papers and NASA archives. That review caught real problems: an unsupported radiation value, an invented solar-storm multiplier and a wrong temperature citation. We replaced each one with verified data. A full log of AI-assisted files is in docs/AI_USE.md. All images are real NASA data; no AI-generated images or video.
 
 ## License
 MIT. See [`LICENSE`](LICENSE). NASA data are public domain or CC0 as listed in `docs/SOURCES.md`.
