@@ -97,12 +97,6 @@ Every source, with a checked link, is in [`docs/SOURCES.md`](docs/SOURCES.md). O
 
 Every source, link and licence is listed in [`docs/SOURCES.md`](docs/SOURCES.md) and in the app's **About & Sources** panel. Every number that is our own planning guess is labelled **OUR ASSUMPTION** on screen and in `src/js/config.js`.
 
-## Desktop app (Windows)
-Download from **[Releases](https://github.com/ScopeMint/marswalk/releases/latest)**:
-- `MarsWalk-1.0.0-setup.exe`: installer with desktop and Start-menu shortcuts
-- `MarsWalk-1.0.0-portable.exe`: runs without installing
-
-It is the same app in its own window, fully offline. Maps, terrain, 3D and routing all run from files bundled in the app; only the global context basemap outside the study area needs a network. Build it yourself with `cd desktop && npm install && npm run dist`. It is built with Electron.
 
 ## Run it
 - **Online:** open the live link, https://scopemint.github.io/marswalk/. Use **Install app** in the header to add it to your desktop, phone or tablet.
