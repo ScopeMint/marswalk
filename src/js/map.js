@@ -96,7 +96,8 @@ const MAP_FAR_ZOOM = 11;      // below this zoom the 4 km study area is too smal
 function mapFillWorld(map) {
   const size = map.getSize();
   if (!size.x || !size.y) return;                       // map hidden (Weather / Science page): nothing to fit
-  const fill = Math.ceil(Math.log2(Math.max(size.x, size.y) / 256) * 100) / 100;
+  // Rounded up to a quarter step (the map's zoomSnap), so the opening view and the furthest zoom-out are the same.
+  const fill = Math.ceil(Math.log2(Math.max(size.x, size.y) / 256) * 4 - 1e-6) / 4;
   map.setMinZoom(fill);
   if (map.getZoom() < fill) map.setView(map.getCenter(), fill, { animate: false });
 }
@@ -187,7 +188,14 @@ function initMap() {
   opmLayer.addTo(map);
   STATE.tileLayers.opm = opmLayer;
   mapFillWorld(map);
-  map.on('resize', () => mapFillWorld(map));
+  // Open on the furthest zoom-out there is (the whole planet), and stay there if the map area changes
+  // size while the opening view is still showing.
+  const startFarOut = () => map.setView([0, 85], map.getMinZoom(), { animate: false });
+  startFarOut();
+  map.on('resize', () => {
+    mapFillWorld(map);
+    if (document.body.classList.contains('intro-flying') && !STATE.introFlying) startFarOut();
+  });
   map.on('zoomend', () => mapFarClass(map));
   mapFarClass(map);
 
