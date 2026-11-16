@@ -32,7 +32,7 @@ const CONFIG = {
   /* Tile layers for the map.
      Primary base: OpenPlanetaryMap (OPM) — NASA Viking MDIM + MOLA color data, CARTO hosted.
      Mars Trek WMTS tile endpoints were returning 404 as of Nov 14 2026 (server change/downtime).
-     OPM is openly licensed, cites NASA data, and is the documented fallback in docs/DATA_PLAN.md.
+     OPM is openly licensed, cites NASA data, and is listed in docs/SOURCES.md.
      Source: https://www.openplanetary.org/opm-basemaps/opm-mars-basemap-v0-1
      Data: NASA Viking MDIM 2.1 + MOLA colorized elevation (NASA/USGS/CARTO) */
   tileLayers: {
