@@ -1043,6 +1043,46 @@ body.intro-flying .leaflet-hazardPane-pane {
   accent-color: var(--accent);
   cursor: pointer;
 }
+/* Cross-browser range reset — Chrome default shows a thick filled track + capsule thumb;
+   these pseudo-element rules give Safari, Chrome, and Firefox the same thin-track + small-dot look. */
+.opacity-slider,
+.ctrl-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  outline: none;
+}
+.opacity-slider::-webkit-slider-runnable-track,
+.ctrl-slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+.opacity-slider::-webkit-slider-thumb,
+.ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  margin-top: -6px;
+}
+.opacity-slider::-moz-range-track,
+.ctrl-slider::-moz-range-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+.opacity-slider::-moz-range-thumb,
+.ctrl-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  cursor: pointer;
+}
 
 .layer-group-heading {
   font-size: 10px;
